@@ -111,4 +111,48 @@ class DashboardTest extends TestCase
 
         Livewire::test(Dashboard::class)->assertSee('AS');
     }
+
+    public function test_dashboard_renders_featured_lesson_embed_and_materials(): void
+    {
+        $user = User::factory()->create();
+        $course = Course::create(['label' => 'Módulo 4', 'title' => 'Modelos de Negócio', 'position' => 40]);
+        $lesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 5, 'title' => 'Aula 05',
+            'video_provider' => 'youtube', 'video_id' => 'dQw4w9WgXcQ', 'published_at' => '2026-07-17', 'position' => 1,
+        ]);
+        $lesson->materials()->create(['title' => 'Slides', 'file_url' => 'https://example.com/slides.pdf']);
+
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->assertSee('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ', false)
+            ->assertSee('Slides')
+            ->assertSee('Aula 05')
+            ->assertSee('Módulo 4');
+    }
+
+    public function test_watching_badge_appears_on_exactly_the_featured_lesson_card(): void
+    {
+        $user = User::factory()->create();
+        $course = Course::create(['label' => 'Curso 1', 'title' => 'Vendas', 'position' => 10]);
+        $watchedLesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula 1',
+            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 2,
+        ]);
+        Lesson::create([
+            'course_id' => $course->id, 'number' => 2, 'title' => 'Aula 2',
+            'video_provider' => 'youtube', 'video_id' => 'def', 'published_at' => '2026-01-02', 'position' => 1,
+        ]);
+
+        LessonProgress::create([
+            'user_id' => $user->id, 'lesson_id' => $watchedLesson->id,
+            'status' => 'watching', 'last_watched_at' => now(),
+        ]);
+
+        $this->actingAs($user);
+
+        $html = Livewire::test(Dashboard::class)->html();
+
+        $this->assertSame(1, substr_count($html, 'Assistindo'));
+    }
 }
