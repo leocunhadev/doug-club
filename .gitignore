@@ -20,6 +20,7 @@
 /public/storage
 /storage/*.key
 /storage/pail
+/.superpowers
 *.sqlite
 *.sqlite3
 /vendor
