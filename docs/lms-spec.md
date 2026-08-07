@@ -4,14 +4,14 @@
 
 Recriar a área de membros mostrada no design de referência: um LMS simples de conteúdo em vídeo, com um player em destaque (última aula assistida) e, abaixo, os cursos/módulos organizados em carrosséis horizontais de aulas.
 
-Projeto é um Laravel 13 novo (skeleton), Tailwind 4 + Vite, SQLite em dev. Ainda não há auth, models de domínio ou views além do `welcome.blade.php`.
+Projeto é um Laravel 13 novo (skeleton), Tailwind 4 + Vite, SQLite em dev. *(Estado inicial, quando esta spec foi escrita: ainda não havia auth, models de domínio ou views além do `welcome.blade.php` — ver seção 8 para o status atual.)*
 
 ## 2. Stack e decisões
 
 - **Backend/rotas:** Laravel 13, Blade.
 - **Interatividade:** Livewire 3 + Alpine.js para carrosséis, troca de vídeo em destaque e marcação de progresso (sem precisar de API JSON separada).
 - **Auth:** instalar **Laravel Breeze — stack "Blade with Alpine" com Livewire** (`php artisan breeze:install livewire`). Cobre login/logout/reset de senha. **Sem self-registration pública** — usuários são criados por seeding/admin (compra é liberada externamente, ex. webhook de checkout — fora de escopo desta spec).
-- **Vídeo:** embed externo (Panda Video / Vimeo / YouTube). O banco guarda só `video_provider` + `video_id`/`video_url`; nenhum upload/streaming próprio.
+- **Vídeo:** embed externo (Vimeo / YouTube). O banco guarda só `video_provider` + `video_id`; nenhum upload/streaming próprio. `Lesson::embedUrl` (accessor) monta a URL do iframe por provider — ver seção 3.
 - **Banco:** SQLite em dev (já configurado), sem mudanças necessárias para produção nesta fase.
 
 ## 3. Modelo de dados
@@ -34,7 +34,7 @@ lessons                     -- "aulas"
   number           integer  -- "AULA 05" (exibido, não necessariamente = id)
   title            string   -- "Estabilidade Não Existe - Modelo de Negócios - Aula 05"
   duration_seconds integer nullable
-  video_provider   enum('vimeo','youtube','panda')
+  video_provider   enum('vimeo','youtube')
   video_id         string   -- id/hash do embed
   thumbnail_path   string nullable  -- poster do card; fallback = frame do provider
   published_at     date     -- "17/07/2026" exibido no card
@@ -60,29 +60,40 @@ Relacionamentos: `Course hasMany Lesson`, `Lesson hasMany LessonMaterial`, `Less
 
 "Boas Vindas" é apenas um `Course` com `position` mais alto (aparece antes dos módulos) e um único `Lesson`, sem tratamento especial no código.
 
+### Embed de vídeo
+
+`Lesson` expõe um accessor `embedUrl` que monta a URL do iframe a partir de `video_provider` + `video_id` — a view usa só `$lesson->embed_url`, nunca monta a URL na Blade:
+
+```
+vimeo   -> https://player.vimeo.com/video/{video_id}
+youtube -> https://www.youtube-nocookie.com/embed/{video_id}
+```
+
 ## 4. Rotas
 
 | Rota | Método | Middleware | Descrição |
 |---|---|---|---|
 | `/login`, `/logout`, `/forgot-password`, `/reset-password/{token}` | Breeze default | `guest`/`auth` | Autenticação |
-| `/membros` | GET | `auth` | Página única do dashboard (imagem de referência) |
-| `/membros/aulas/{lesson}/assistir` | POST (Livewire action) | `auth` | Marca a aula clicada como `watching`, atualiza player em destaque |
-| `/membros/materiais/{lesson}` | GET | `auth` | Lista/baixa materiais da aula (pode ser modal Livewire em vez de rota própria) |
+| `/membros` | GET | `auth`, `verified` | Página única do dashboard (imagem de referência) |
 
 `/` redireciona para `/membros` se autenticado, senão para `/login`.
 
+Marcar aula como assistida e listar materiais **não são rotas HTTP** — são actions do componente Livewire `Dashboard` (`watchLesson()`), chamadas via `wire:click` direto no card/hero, sem navegação de página.
+
+**Sem self-registration:** a rota `register` (`routes/auth.php`) deve ser removida — hoje ainda está ativa por vir do scaffold padrão do Breeze, o que contradiz a decisão da seção 2. Usuários continuam sendo criados só por seed/tinker/admin futuro.
+
 ## 5. Composição da UI (`resources/views/livewire/membros/dashboard.blade.php`)
 
-Estrutura de cima para baixo, cada bloco como componente Livewire ou Blade component:
+Um único componente Livewire (`App\Livewire\Membros\Dashboard`) controla a página inteira — sem componentes Livewire filhos (evita overhead de comunicação entre componentes pra sincronizar "qual aula está assistindo"). Hero e carrossel são *includes*/Blade partials da mesma view; `<x-lesson-card>` pode ser um Blade component puro (não Livewire) para reuso visual. Estrutura de cima para baixo:
 
 1. **Header** (`<x-app-header>`) — logo à esquerda, avatar com iniciais do usuário à direita (dropdown: sair).
-2. **Hero** (`<livewire:membros.hero-player>`)
+2. **Hero** — partial dentro da própria `dashboard.blade.php` (não componente Livewire separado):
    - Título fixo "Sua central de conteúdos" + texto descritivo (conteúdo estático, não vem do banco).
-   - Player de vídeo grande = aula atual do usuário (última com `status = watching`, ou a primeira aula do curso mais recente se não houver progresso).
-   - Botão "Materiais de aula" abre lista de `lesson_materials` da aula em destaque.
+   - Player de vídeo grande = `$this->featuredLesson` (iframe usando `$lesson->embed_url`, ver seção 3).
+   - Lista de `lesson_materials` da aula em destaque exibida inline abaixo do player (sem modal).
 3. **Carrosséis de curso** — um por `Course`, na ordem de `position` desc:
    - Cabeçalho da seção: `label + ": " + title` (h2) e `description` (subtítulo), só renderiza subtítulo se existir.
-   - `<livewire:membros.lesson-carousel :course="$course">`: track horizontal (`overflow-x-auto`/`scroll-snap` + Alpine para os botões `‹ ›`), um `<x-lesson-card>` por `Lesson` do curso, ordenados por `position` desc.
+   - Track horizontal (`overflow-x-auto`/`scroll-snap` + Alpine para os botões `‹ ›`), um `<x-lesson-card>` por `Lesson` do curso, ordenados por `position` desc. Clique no card chama `wire:click="watchLesson({{ $lesson->id }})"` direto no componente `Dashboard`.
 4. **Footer** — links "Política de Privacidade" / "Sobre", texto de copyright, botão flutuante fixo do WhatsApp (`fixed bottom-4 right-4`).
 
 ### `<x-lesson-card>`
@@ -116,9 +127,21 @@ Estados/elementos do card (ver imagem):
 - **Cards:** `rounded-xl`, sombra sutil, hover com leve *scale*/brightness.
 - **Espaçamento entre seções:** generoso (`space-y-16`/`space-y-20`), títulos de seção com `mb-2` entre título e subtítulo.
 
-## 8. Fora de escopo (backlog)
+## 8. Status de implementação
+
+| Item | Status |
+|---|---|
+| Auth (Breeze Livewire: login/logout/reset) | ✅ Pronto |
+| Migrations + Models (`Course`, `Lesson`, `LessonMaterial`, `LessonProgress`) | ✅ Pronto |
+| `LmsSeeder` (dados de exemplo) | ⚠️ Pronto, mas usa `video_provider = 'panda'` — trocar para `vimeo`/`youtube` |
+| `Dashboard` (lógica: aula em destaque, `watchLesson`, cursos) | ✅ Pronto |
+| Rota `register` ativa em `routes/auth.php` | ❌ Pendente — remover (contradiz seção 2/4) |
+| `Lesson::embedUrl` (accessor) + iframe no Hero | ❌ Pendente |
+| UI visual (design tokens da seção 7, `x-lesson-card`, carrossel com setas, header/footer) | ❌ Pendente — `dashboard.blade.php` hoje é um placeholder genérico do Breeze, sem os tokens da seção 7 |
+
+## 9. Fora de escopo (backlog)
 
 - Painel admin para cadastrar cursos/aulas/materiais (candidato natural: Filament, já que é Laravel — avaliar depois).
 - Webhook de plataforma de pagamento para criar/liberar `User`.
 - Marcar aula como `completed` automaticamente via evento do player (% assistido).
-- Busca/filtro de aulas, página de materiais dedicada (hoje: modal/lista simples).
+- Busca/filtro de aulas, página de materiais dedicada (hoje: lista simples inline).
