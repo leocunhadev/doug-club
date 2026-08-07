@@ -11,6 +11,10 @@ export default {
 
     theme: {
         extend: {
+            colors: {
+                canvas: '#0a0a0b',
+                surface: '#12141a',
+            },
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },

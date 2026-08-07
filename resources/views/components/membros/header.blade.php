@@ -10,7 +10,7 @@
             </span>
         </a>
 
-        <x-dropdown align="right" width="48" contentClasses="py-1 bg-[#12141a] border border-slate-800/60">
+        <x-dropdown align="right" width="48" contentClasses="py-1 bg-surface border border-slate-800/60">
             <x-slot name="trigger">
                 <button type="button" class="h-9 w-9 rounded-full bg-gradient-to-br from-orange-500 to-red-600 text-sm font-semibold text-white flex items-center justify-center">
                     {{ $initials }}

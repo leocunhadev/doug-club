@@ -178,7 +178,7 @@ class DashboardTest extends TestCase
         $this->actingAs(User::factory()->create())
             ->get('/membros')
             ->assertOk()
-            ->assertSee('bg-[#0a0a0b]', false);
+            ->assertSee('bg-canvas', false);
     }
 
     public function test_watch_lesson_with_nonexistent_lesson_id_does_not_throw_unhandled_exception(): void

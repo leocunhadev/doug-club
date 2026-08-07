@@ -10,7 +10,7 @@
             </p>
 
             @if ($lesson = $this->featuredLesson)
-                <div class="mt-6 rounded-2xl border border-slate-800/60 bg-[#12141a] p-3 sm:p-4">
+                <div class="mt-6 rounded-2xl border border-slate-800/60 bg-surface p-3 sm:p-4">
                     <div class="relative aspect-video overflow-hidden rounded-xl">
                         <iframe
                             src="{{ $lesson->embed_url }}"
@@ -26,7 +26,7 @@
                     @if ($lesson->materials->isNotEmpty())
                         <div x-data="{ open: false }" class="relative inline-block">
                             <button type="button" @click="open = !open" @click.outside="open = false"
-                                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-[#12141a] border border-slate-800/60 text-gray-200 hover:bg-slate-800/60">
+                                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-surface border border-slate-800/60 text-gray-200 hover:bg-slate-800/60">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4 fill-current">
                                     <path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6Z"/>
                                 </svg>
@@ -34,7 +34,7 @@
                             </button>
 
                             <div x-show="open" x-cloak x-transition
-                                 class="absolute left-0 z-10 mt-2 min-w-[14rem] rounded-lg border border-slate-800/60 bg-[#12141a] py-1 shadow-lg">
+                                 class="absolute left-0 z-10 mt-2 min-w-[14rem] rounded-lg border border-slate-800/60 bg-surface py-1 shadow-lg">
                                 @foreach ($lesson->materials as $material)
                                     <a href="{{ $material->file_url }}" target="_blank" rel="noopener"
                                        class="block px-4 py-2 text-sm text-gray-200 hover:bg-slate-800/60">
@@ -44,7 +44,7 @@
                             </div>
                         </div>
                     @else
-                        <span class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-[#12141a] border border-slate-800/60 text-gray-500 cursor-not-allowed">
+                        <span class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-surface border border-slate-800/60 text-gray-500 cursor-not-allowed">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-4 w-4 fill-current">
                                 <path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6Z"/>
                             </svg>
