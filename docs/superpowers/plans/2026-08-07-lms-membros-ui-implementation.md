@@ -17,6 +17,213 @@
 - Design tokens from spec §7 (background `#0a0a0b`, cards `#12141a`/`border-slate-800/60`, orange→red gradient accent, `rounded-xl` cards) apply to every new UI element.
 - Run `php artisan test` after every task; all tests must pass before moving on.
 
+**Amendment (post-approval drift):** after this plan was approved, an out-of-band commit (`faf31bc`, closing GitHub issues #2-#8) landed on `main` and split the hero into a separate `HeroPlayer` Livewire component plus dedicated `LessonController` routes — the exact architecture the spec rejected in favor of a single `Dashboard` component. The human partner has confirmed the spec/plan govern: **Task 0** below consolidates that commit's code back into the single-component shape before Tasks 1-6 (written against the pre-`faf31bc` file shapes) proceed. Task 0 keeps `faf31bc`'s two `Actions` classes and its `seedSampleProgress()` seeder addition — both are compatible with the spec, just wired differently.
+
+---
+
+### Task 0: Consolidate back to a single Dashboard component
+
+**Files:**
+- Delete: `app/Livewire/Membros/HeroPlayer.php`
+- Delete: `resources/views/livewire/membros/hero-player.blade.php`
+- Delete: `app/Http/Controllers/Membros/LessonController.php`
+- Delete: `resources/views/membros/materiais.blade.php`
+- Modify: `app/Livewire/Membros/Dashboard.php`
+- Modify: `resources/views/livewire/membros/dashboard.blade.php`
+- Modify: `routes/web.php`
+
+**Interfaces:**
+- Consumes: `App\Actions\DetermineFeaturedLesson::handle(int $userId): ?int` and `App\Actions\MarkLessonAsWatching::handle(int $userId, int $lessonId): void` (both already exist from `faf31bc`, unchanged).
+- Produces: `Dashboard::$featuredLessonId`, `Dashboard::watchLesson(int $lessonId)`, `Dashboard::featuredLesson()` (Computed, eager-loads `['course', 'materials']`) — this is the exact shape Task 4 modifies, so Task 4's steps apply as written on top of this task's output. `/membros` is once again the only members route.
+
+- [ ] **Step 1: Delete the split-out component, controller, and their views**
+
+```bash
+rm app/Livewire/Membros/HeroPlayer.php
+rm resources/views/livewire/membros/hero-player.blade.php
+rm app/Http/Controllers/Membros/LessonController.php
+rm resources/views/membros/materiais.blade.php
+```
+
+- [ ] **Step 2: Restore `Dashboard` as the sole owner of featured-lesson state, wired to the existing Action classes**
+
+Replace `app/Livewire/Membros/Dashboard.php` with:
+
+```php
+<?php
+
+namespace App\Livewire\Membros;
+
+use App\Actions\DetermineFeaturedLesson;
+use App\Actions\MarkLessonAsWatching;
+use App\Models\Course;
+use App\Models\Lesson;
+use App\Models\LessonProgress;
+use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Computed;
+use Livewire\Attributes\Layout;
+use Livewire\Component;
+
+#[Layout('layouts.app')]
+class Dashboard extends Component
+{
+    public ?int $featuredLessonId = null;
+
+    public function mount(DetermineFeaturedLesson $determineFeaturedLesson): void
+    {
+        $this->featuredLessonId = $determineFeaturedLesson->handle(Auth::id());
+    }
+
+    public function watchLesson(int $lessonId, MarkLessonAsWatching $action): void
+    {
+        $action->handle(Auth::id(), $lessonId);
+
+        $this->featuredLessonId = $lessonId;
+    }
+
+    #[Computed]
+    public function featuredLesson(): ?Lesson
+    {
+        return Lesson::query()->with(['course', 'materials'])->find($this->featuredLessonId);
+    }
+
+    #[Computed]
+    public function courses()
+    {
+        return Course::query()
+            ->with('lessons')
+            ->orderByDesc('position')
+            ->get();
+    }
+
+    public function render()
+    {
+        return view('livewire.membros.dashboard', [
+            'watchingLessonId' => LessonProgress::query()
+                ->where('user_id', Auth::id())
+                ->where('status', 'watching')
+                ->latest('last_watched_at')
+                ->value('lesson_id'),
+        ]);
+    }
+}
+```
+
+- [ ] **Step 3: Inline the hero markup back into `dashboard.blade.php`**
+
+This is a transitional placeholder — Task 6 rewrites this file completely into the real spec UI. It only needs to compile, render, and keep the existing test suite green. Replace `resources/views/livewire/membros/dashboard.blade.php` with:
+
+```blade
+<div class="py-12">
+    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-12">
+
+        <h1 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Sua central de conteúdos') }}
+        </h1>
+
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+            @if ($lesson = $this->featuredLesson)
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                    {{ $lesson->course->label }}: {{ $lesson->course->title }}
+                </p>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    Aula {{ $lesson->number }} — {{ $lesson->title }}
+                </h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    {{ ucfirst($lesson->video_provider) }} · {{ $lesson->video_id }}
+                </p>
+
+                @if ($lesson->materials->isNotEmpty())
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        @foreach ($lesson->materials as $material)
+                            <a href="{{ $material->file_url }}" target="_blank"
+                               class="inline-flex items-center px-3 py-1.5 rounded-md text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600">
+                                📎 {{ $material->title }}
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
+            @else
+                <p class="text-gray-500 dark:text-gray-400">Nenhuma aula disponível ainda.</p>
+            @endif
+        </div>
+
+        @foreach ($this->courses as $course)
+            <div>
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    {{ $course->label }}: {{ $course->title }}
+                </h2>
+                @if ($course->description)
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ $course->description }}</p>
+                @endif
+
+                <div class="mt-4 flex gap-4 overflow-x-auto pb-2">
+                    @foreach ($course->lessons as $courseLesson)
+                        <button
+                            wire:click="watchLesson({{ $courseLesson->id }})"
+                            type="button"
+                            class="relative shrink-0 w-56 text-left bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 hover:ring-2 hover:ring-orange-500"
+                        >
+                            @if ($watchingLessonId === $courseLesson->id)
+                                <span class="absolute top-2 right-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-orange-500 text-white">
+                                    ASSISTINDO
+                                </span>
+                            @endif
+                            <p class="text-xs uppercase tracking-wide text-gray-400">Aula</p>
+                            <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $courseLesson->number }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                {{ $courseLesson->published_at->format('d/m/Y') }}
+                            </p>
+                            <p class="text-sm text-gray-700 dark:text-gray-200 mt-1 line-clamp-2">
+                                {{ $courseLesson->title }}
+                            </p>
+                        </button>
+                    @endforeach
+                </div>
+            </div>
+        @endforeach
+
+    </div>
+</div>
+```
+
+- [ ] **Step 4: Remove the dedicated members routes**
+
+Replace `routes/web.php` with:
+
+```php
+<?php
+
+use App\Livewire\Membros\Dashboard;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
+});
+
+Route::get('membros', Dashboard::class)
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
+Route::view('profile', 'profile')
+    ->middleware(['auth'])
+    ->name('profile');
+
+require __DIR__.'/auth.php';
+```
+
+- [ ] **Step 5: Run the full test suite**
+
+Run: `php artisan test`
+Expected: PASS — no test in the suite references `HeroPlayer`, `LessonController`, or the removed routes, so this should be a clean regression check.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add -A
+git commit -m "Consolidate hero player back into the single Dashboard component"
+```
+
 ---
 
 ### Task 1: Remove public self-registration
@@ -108,51 +315,65 @@ $table->enum('video_provider', ['vimeo', 'youtube']);
 
 - [ ] **Step 2: Replace Panda demo data in the seeder with real, embeddable IDs**
 
-In `database/seeders/LmsSeeder.php`, replace the lesson-creation loop at the bottom of `run()`:
+`database/seeders/LmsSeeder.php` currently has a `$providers = ['panda', 'vimeo', 'youtube']` cycle (added by the `faf31bc` commit — see the plan header amendment) feeding synthetic `demo-{course}-{number}` video IDs, followed by a `seedSampleProgress()` method. Keep `seedSampleProgress()` exactly as-is — only touch the provider/ID generation. Replace:
 
 ```php
-foreach ($courses as $courseData) {
-    $lessons = $courseData['lessons'];
-    unset($courseData['lessons']);
+        $providers = ['panda', 'vimeo', 'youtube'];
+        $providerIndex = 0;
 
-    $course = Course::create($courseData);
+        foreach ($courses as $courseData) {
+            $lessons = $courseData['lessons'];
+            unset($courseData['lessons']);
 
-    foreach ($lessons as $index => $lessonData) {
-        $course->lessons()->create($lessonData + [
-            'video_provider' => 'panda',
-            'video_id' => 'demo-'.$course->id.'-'.$lessonData['number'],
-            'position' => count($lessons) - $index,
-        ]);
-    }
-}
+            $course = Course::create($courseData);
+
+            foreach ($lessons as $index => $lessonData) {
+                $provider = $providers[$providerIndex % count($providers)];
+                $providerIndex++;
+
+                $course->lessons()->create($lessonData + [
+                    'video_provider' => $provider,
+                    'video_id' => 'demo-'.$course->id.'-'.$lessonData['number'],
+                    'position' => count($lessons) - $index,
+                ]);
+            }
+        }
+
+        $this->seedSampleProgress();
 ```
 
 with:
 
 ```php
-$demoVideos = [
-    ['provider' => 'youtube', 'id' => 'aqz-KE-bpKQ'],
-    ['provider' => 'vimeo', 'id' => '76979871'],
-    ['provider' => 'youtube', 'id' => 'dQw4w9WgXcQ'],
-];
+        $demoVideos = [
+            ['provider' => 'youtube', 'id' => 'aqz-KE-bpKQ'],
+            ['provider' => 'vimeo', 'id' => '76979871'],
+            ['provider' => 'youtube', 'id' => 'dQw4w9WgXcQ'],
+        ];
+        $videoIndex = 0;
 
-foreach ($courses as $courseData) {
-    $lessons = $courseData['lessons'];
-    unset($courseData['lessons']);
+        foreach ($courses as $courseData) {
+            $lessons = $courseData['lessons'];
+            unset($courseData['lessons']);
 
-    $course = Course::create($courseData);
+            $course = Course::create($courseData);
 
-    foreach ($lessons as $index => $lessonData) {
-        $video = $demoVideos[$index % count($demoVideos)];
+            foreach ($lessons as $index => $lessonData) {
+                $video = $demoVideos[$videoIndex % count($demoVideos)];
+                $videoIndex++;
 
-        $course->lessons()->create($lessonData + [
-            'video_provider' => $video['provider'],
-            'video_id' => $video['id'],
-            'position' => count($lessons) - $index,
-        ]);
-    }
-}
+                $course->lessons()->create($lessonData + [
+                    'video_provider' => $video['provider'],
+                    'video_id' => $video['id'],
+                    'position' => count($lessons) - $index,
+                ]);
+            }
+        }
+
+        $this->seedSampleProgress();
 ```
+
+(The `$videoIndex` now increments across all courses rather than resetting per course, purely so the demo mix looks varied end-to-end — this has no functional effect on `seedSampleProgress()`, which looks up lessons by title/course label, not by provider.)
 
 - [ ] **Step 3: Re-run migrations and seed, verify no Panda rows remain**
 
@@ -517,15 +738,7 @@ public function userInitials(): string
 }
 ```
 
-Also eager-load `course` alongside `materials` for the featured lesson (Task 6's hero needs `$lesson->course->label`/`title` without an extra query):
-
-```php
-#[Computed]
-public function featuredLesson(): ?Lesson
-{
-    return Lesson::query()->with(['materials', 'course'])->find($this->featuredLessonId);
-}
-```
+(`featuredLesson()` already eager-loads `['course', 'materials']` from Task 0 — no change needed there.)
 
 - [ ] **Step 4: Run the tests to verify they pass**
 
@@ -887,6 +1100,6 @@ git commit -m "Rewrite membros dashboard with hero embed, carousels, and design 
 
 ## Self-Review Notes
 
-- **Spec coverage:** §2/§4 self-registration → Task 1. §3 enum + embed → Tasks 2-3. §4 routes/actions → Tasks 1, 4. §5 UI composition (header, hero, materials inline, carousels, footer, card) → Tasks 5-6. §6 business rules (featured lesson, badge exclusivity, upsert) → already implemented, locked in by Task 4's regression tests and Task 6's badge-count test. §7 design tokens → Tasks 5-6 (arbitrary-value Tailwind classes matching the exact hex/gradient values). §8 status table itself needs no code. §9 out-of-scope items are intentionally untouched.
+- **Spec coverage:** §5 single-component architecture (undoing the `faf31bc` split) → Task 0. §2/§4 self-registration → Task 1. §3 enum + embed → Tasks 2-3. §4 routes/actions → Tasks 0, 1, 4. §5 UI composition (header, hero, materials inline, carousels, footer, card) → Tasks 5-6. §6 business rules (featured lesson, badge exclusivity, upsert) → already implemented, locked in by Task 4's regression tests and Task 6's badge-count test. §7 design tokens → Tasks 5-6 (arbitrary-value Tailwind classes matching the exact hex/gradient values). §8 status table itself needs no code. §9 out-of-scope items are intentionally untouched.
 - **Placeholder scan:** no TBD/TODO; the one open value (WhatsApp number) is handled as a real `env()`-backed config, not a code placeholder.
 - **Type consistency:** `Lesson::embedUrl/durationFormatted/thumbnailUrl` accessors are referenced consistently as `embed_url`/`duration_formatted`/`thumbnail_url` in every task from Task 3 onward. `Dashboard::userInitials` (Computed) is referenced as `$this->userInitials` consistently in Tasks 4 and 6.
