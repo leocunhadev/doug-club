@@ -54,6 +54,20 @@ class LessonPresentationTest extends TestCase
         $this->assertSame('1h 07min', $lesson->duration_formatted);
     }
 
+    public function test_duration_formatted_pads_single_digit_seconds(): void
+    {
+        $lesson = $this->makeLesson(['duration_seconds' => 65]);
+
+        $this->assertSame('1:05', $lesson->duration_formatted);
+    }
+
+    public function test_duration_formatted_drops_leftover_seconds_past_the_hour(): void
+    {
+        $lesson = $this->makeLesson(['duration_seconds' => 3661]);
+
+        $this->assertSame('1h 01min', $lesson->duration_formatted);
+    }
+
     public function test_duration_formatted_is_null_when_duration_is_null(): void
     {
         $lesson = $this->makeLesson(['duration_seconds' => null]);

@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\LessonProgress;
 use App\Models\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -154,5 +155,39 @@ class DashboardTest extends TestCase
         $html = Livewire::test(Dashboard::class)->html();
 
         $this->assertSame(1, substr_count($html, 'Assistindo'));
+
+        preg_match_all(
+            '/<button[^>]*wire:click="watchLesson\((\d+)\)"[^>]*>(.*?)<\/button>/s',
+            $html,
+            $cards,
+            PREG_SET_ORDER,
+        );
+
+        $cardsWithBadge = array_values(array_filter($cards, fn (array $card) => str_contains($card[2], 'Assistindo')));
+
+        $this->assertCount(1, $cardsWithBadge, 'Expected exactly one lesson card to contain the "Assistindo" badge.');
+        $this->assertSame(
+            (string) $watchedLesson->id,
+            $cardsWithBadge[0][1],
+            'The "Assistindo" badge is rendered on the wrong lesson card.',
+        );
+    }
+
+    public function test_membros_page_renders_through_the_dark_layout(): void
+    {
+        $this->actingAs(User::factory()->create())
+            ->get('/membros')
+            ->assertOk()
+            ->assertSee('bg-[#0a0a0b]', false);
+    }
+
+    public function test_watch_lesson_with_nonexistent_lesson_id_does_not_throw_unhandled_exception(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $this->expectException(ModelNotFoundException::class);
+
+        Livewire::test(Dashboard::class)->call('watchLesson', 999999);
     }
 }

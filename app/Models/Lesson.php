@@ -48,6 +48,7 @@ class Lesson extends Model
         return Attribute::get(fn () => match ($this->video_provider) {
             'vimeo' => "https://player.vimeo.com/video/{$this->video_id}",
             'youtube' => "https://www.youtube-nocookie.com/embed/{$this->video_id}",
+            default => throw new \InvalidArgumentException("Unsupported video provider: {$this->video_provider}"),
         });
     }
 

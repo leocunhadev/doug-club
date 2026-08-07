@@ -69,9 +69,9 @@ class Dashboard extends Component
         return view('livewire.membros.dashboard', [
             'watchingLessonId' => LessonProgress::query()
                 ->where('user_id', Auth::id())
+                ->where('lesson_id', $this->featuredLessonId)
                 ->where('status', 'watching')
-                ->latest('last_watched_at')
-                ->value('lesson_id'),
+                ->exists() ? $this->featuredLessonId : null,
         ]);
     }
 }
