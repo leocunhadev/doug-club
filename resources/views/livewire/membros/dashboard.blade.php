@@ -5,6 +5,9 @@
             {{ __('Sua central de conteúdos') }}
         </h1>
 
+        {{-- Temporary: confirms userInitials computed property works. Task 6 places this in the header. --}}
+        <span class="sr-only">{{ $this->userInitials }}</span>
+
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
             @if ($lesson = $this->featuredLesson)
                 <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">

@@ -1,0 +1,114 @@
+<?php
+
+namespace Tests\Feature\Livewire\Membros;
+
+use App\Livewire\Membros\Dashboard;
+use App\Models\Course;
+use App\Models\Lesson;
+use App\Models\LessonProgress;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+use Tests\TestCase;
+
+class DashboardTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_guests_are_redirected_to_login(): void
+    {
+        $this->get('/membros')->assertRedirect('/login');
+    }
+
+    public function test_featured_lesson_defaults_to_first_lesson_of_highest_position_course(): void
+    {
+        $user = User::factory()->create();
+        $olderCourse = Course::create(['label' => 'Curso 1', 'title' => 'Vendas', 'position' => 10]);
+        $newerCourse = Course::create(['label' => 'Boas Vindas', 'title' => '', 'position' => 50]);
+
+        Lesson::create([
+            'course_id' => $olderCourse->id, 'number' => 1, 'title' => 'Aula antiga',
+            'video_provider' => 'youtube', 'video_id' => 'abc123', 'published_at' => '2026-01-01', 'position' => 1,
+        ]);
+        $welcomeLesson = Lesson::create([
+            'course_id' => $newerCourse->id, 'number' => 1, 'title' => 'Boas Vindas',
+            'video_provider' => 'youtube', 'video_id' => 'def456', 'published_at' => '2026-01-01', 'position' => 1,
+        ]);
+
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->assertSet('featuredLessonId', $welcomeLesson->id);
+    }
+
+    public function test_featured_lesson_uses_most_recently_watched_lesson(): void
+    {
+        $user = User::factory()->create();
+        $course = Course::create(['label' => 'Curso 1', 'title' => 'Vendas', 'position' => 10]);
+
+        $olderLesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula 1',
+            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 1,
+        ]);
+        $recentLesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 2, 'title' => 'Aula 2',
+            'video_provider' => 'youtube', 'video_id' => 'def', 'published_at' => '2026-01-02', 'position' => 2,
+        ]);
+
+        LessonProgress::create([
+            'user_id' => $user->id, 'lesson_id' => $olderLesson->id,
+            'status' => 'watching', 'last_watched_at' => now()->subDay(),
+        ]);
+        LessonProgress::create([
+            'user_id' => $user->id, 'lesson_id' => $recentLesson->id,
+            'status' => 'watching', 'last_watched_at' => now(),
+        ]);
+
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->assertSet('featuredLessonId', $recentLesson->id);
+    }
+
+    public function test_watch_lesson_upserts_progress_and_updates_featured_lesson(): void
+    {
+        $user = User::factory()->create();
+        $course = Course::create(['label' => 'Curso 1', 'title' => 'Vendas', 'position' => 10]);
+        $lesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula 1',
+            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 1,
+        ]);
+
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->call('watchLesson', $lesson->id)
+            ->assertSet('featuredLessonId', $lesson->id);
+
+        $this->assertDatabaseHas('lesson_progress', [
+            'user_id' => $user->id,
+            'lesson_id' => $lesson->id,
+            'status' => 'watching',
+        ]);
+    }
+
+    public function test_user_can_log_out_from_dashboard(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->call('logout')
+            ->assertRedirect('/login');
+
+        $this->assertGuest();
+    }
+
+    public function test_user_initials_are_computed_from_name(): void
+    {
+        $user = User::factory()->create(['name' => 'Ana Souza']);
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)->assertSee('AS');
+    }
+}

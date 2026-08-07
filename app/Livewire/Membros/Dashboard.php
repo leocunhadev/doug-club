@@ -4,6 +4,7 @@ namespace App\Livewire\Membros;
 
 use App\Actions\DetermineFeaturedLesson;
 use App\Actions\MarkLessonAsWatching;
+use App\Livewire\Actions\Logout;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\LessonProgress;
@@ -12,7 +13,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('layouts.app')]
+#[Layout('layouts.membros')]
 class Dashboard extends Component
 {
     public ?int $featuredLessonId = null;
@@ -27,6 +28,25 @@ class Dashboard extends Component
         $action->handle(Auth::id(), $lessonId);
 
         $this->featuredLessonId = $lessonId;
+    }
+
+    public function logout(Logout $logout): void
+    {
+        $logout();
+
+        $this->redirect('/login', navigate: true);
+    }
+
+    #[Computed]
+    public function userInitials(): string
+    {
+        $initials = collect(explode(' ', Auth::user()->name))
+            ->filter()
+            ->map(fn (string $part) => mb_substr($part, 0, 1))
+            ->take(2)
+            ->implode('');
+
+        return mb_strtoupper($initials);
     }
 
     #[Computed]
