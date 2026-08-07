@@ -190,4 +190,34 @@ class DashboardTest extends TestCase
 
         Livewire::test(Dashboard::class)->call('watchLesson', 999999);
     }
+
+    public function test_footer_renders_privacy_about_links_and_copyright(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        Livewire::test(Dashboard::class)
+            ->assertSee('Política de Privacidade')
+            ->assertSee('Sobre')
+            ->assertSee('Todos os direitos reservados');
+    }
+
+    public function test_whatsapp_button_renders_when_number_is_configured(): void
+    {
+        config(['services.whatsapp.number' => '5511999999999']);
+
+        $this->actingAs(User::factory()->create());
+
+        Livewire::test(Dashboard::class)
+            ->assertSee('https://wa.me/5511999999999', false);
+    }
+
+    public function test_whatsapp_button_is_hidden_when_number_is_not_configured(): void
+    {
+        config(['services.whatsapp.number' => null]);
+
+        $this->actingAs(User::factory()->create());
+
+        Livewire::test(Dashboard::class)
+            ->assertDontSee('wa.me', false);
+    }
 }
