@@ -71,8 +71,12 @@ class LmsSeeder extends Seeder
             ],
         ];
 
-        $providers = ['panda', 'vimeo', 'youtube'];
-        $providerIndex = 0;
+        $demoVideos = [
+            ['provider' => 'youtube', 'id' => 'aqz-KE-bpKQ'],
+            ['provider' => 'vimeo', 'id' => '76979871'],
+            ['provider' => 'youtube', 'id' => 'dQw4w9WgXcQ'],
+        ];
+        $videoIndex = 0;
 
         foreach ($courses as $courseData) {
             $lessons = $courseData['lessons'];
@@ -81,12 +85,12 @@ class LmsSeeder extends Seeder
             $course = Course::create($courseData);
 
             foreach ($lessons as $index => $lessonData) {
-                $provider = $providers[$providerIndex % count($providers)];
-                $providerIndex++;
+                $video = $demoVideos[$videoIndex % count($demoVideos)];
+                $videoIndex++;
 
                 $course->lessons()->create($lessonData + [
-                    'video_provider' => $provider,
-                    'video_id' => 'demo-'.$course->id.'-'.$lessonData['number'],
+                    'video_provider' => $video['provider'],
+                    'video_id' => $video['id'],
                     'position' => count($lessons) - $index,
                 ]);
             }

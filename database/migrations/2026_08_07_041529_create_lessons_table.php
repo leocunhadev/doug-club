@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedInteger('number');
             $table->string('title');
             $table->unsignedInteger('duration_seconds')->nullable();
-            $table->enum('video_provider', ['vimeo', 'youtube', 'panda']);
+            $table->enum('video_provider', ['vimeo', 'youtube']);
             $table->string('video_id');
             $table->string('thumbnail_path')->nullable();
             $table->date('published_at');
