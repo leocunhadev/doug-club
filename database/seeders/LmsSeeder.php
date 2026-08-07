@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Course;
 use App\Models\Lesson;
+use App\Models\LessonProgress;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class LmsSeeder extends Seeder
@@ -69,6 +71,9 @@ class LmsSeeder extends Seeder
             ],
         ];
 
+        $providers = ['panda', 'vimeo', 'youtube'];
+        $providerIndex = 0;
+
         foreach ($courses as $courseData) {
             $lessons = $courseData['lessons'];
             unset($courseData['lessons']);
@@ -76,12 +81,54 @@ class LmsSeeder extends Seeder
             $course = Course::create($courseData);
 
             foreach ($lessons as $index => $lessonData) {
+                $provider = $providers[$providerIndex % count($providers)];
+                $providerIndex++;
+
                 $course->lessons()->create($lessonData + [
-                    'video_provider' => 'panda',
+                    'video_provider' => $provider,
                     'video_id' => 'demo-'.$course->id.'-'.$lessonData['number'],
                     'position' => count($lessons) - $index,
                 ]);
             }
+        }
+
+        $this->seedSampleProgress();
+    }
+
+    /**
+     * A little watch history so the hero player and the "ASSISTINDO" badge
+     * have something to show right after a fresh seed, without needing to
+     * click around first.
+     */
+    private function seedSampleProgress(): void
+    {
+        $user = User::first();
+
+        if (! $user) {
+            return;
+        }
+
+        $completedLesson = Lesson::whereHas('course', fn ($q) => $q->where('label', 'Boas Vindas'))->first();
+        $watchingLesson = Lesson::where('title', 'Estabilidade Não Existe - Modelo de Negócios - Aula 05')->first();
+
+        if ($completedLesson) {
+            LessonProgress::create([
+                'user_id' => $user->id,
+                'lesson_id' => $completedLesson->id,
+                'status' => 'completed',
+                'watched_seconds' => $completedLesson->duration_seconds,
+                'last_watched_at' => now()->subDays(3),
+            ]);
+        }
+
+        if ($watchingLesson) {
+            LessonProgress::create([
+                'user_id' => $user->id,
+                'lesson_id' => $watchingLesson->id,
+                'status' => 'watching',
+                'watched_seconds' => 900,
+                'last_watched_at' => now()->subHour(),
+            ]);
         }
     }
 }
