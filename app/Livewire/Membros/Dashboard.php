@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Membros;
 
+use App\Actions\DetermineFeaturedLesson;
 use App\Actions\MarkLessonAsWatching;
 use App\Models\Course;
+use App\Models\Lesson;
 use App\Models\LessonProgress;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
@@ -13,11 +15,24 @@ use Livewire\Component;
 #[Layout('layouts.app')]
 class Dashboard extends Component
 {
+    public ?int $featuredLessonId = null;
+
+    public function mount(DetermineFeaturedLesson $determineFeaturedLesson): void
+    {
+        $this->featuredLessonId = $determineFeaturedLesson->handle(Auth::id());
+    }
+
     public function watchLesson(int $lessonId, MarkLessonAsWatching $action): void
     {
         $action->handle(Auth::id(), $lessonId);
 
-        $this->dispatch('lesson-watched', lessonId: $lessonId);
+        $this->featuredLessonId = $lessonId;
+    }
+
+    #[Computed]
+    public function featuredLesson(): ?Lesson
+    {
+        return Lesson::query()->with(['course', 'materials'])->find($this->featuredLessonId);
     }
 
     #[Computed]
