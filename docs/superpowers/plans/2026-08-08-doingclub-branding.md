@@ -144,12 +144,11 @@ Add to `tests/Feature/Livewire/Membros/DashboardTest.php` (new test method, anyw
     {
         $this->actingAs(User::factory()->create());
 
-        Livewire::test(Dashboard::class)
-            ->assertSee('DO.ing Club', false)
-            ->assertDontSee('Estabilidade')
-            ->assertDontSee('Não existe');
+        Livewire::test(Dashboard::class)->assertSee('DO.ing Club', false);
     }
 ```
+
+(Not `assertDontSee('Estabilidade')` here — that string still legitimately exists in the footer copyright line until Task 6 removes it. Asserting its absence belongs to Task 6's footer test.)
 
 - [ ] **Step 2: Run it to confirm it fails**
 

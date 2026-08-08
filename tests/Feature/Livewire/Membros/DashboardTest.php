@@ -113,6 +113,13 @@ class DashboardTest extends TestCase
         Livewire::test(Dashboard::class)->assertSee('AS');
     }
 
+    public function test_header_shows_the_brand_wordmark(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        Livewire::test(Dashboard::class)->assertSee('DO.ing Club', false);
+    }
+
     public function test_dashboard_renders_featured_lesson_embed_and_materials(): void
     {
         $user = User::factory()->create();

@@ -3,11 +3,7 @@
 <header class="border-b border-slate-800/60">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-2.5">
-            <x-application-logo class="h-8 w-auto shrink-0 fill-current text-orange-500" />
-            <span class="leading-tight">
-                <span class="block text-sm font-bold uppercase tracking-wide text-white">Estabilidade</span>
-                <span class="block text-[11px] font-medium uppercase tracking-widest text-gray-400">Não existe</span>
-            </span>
+            <x-brand-logo class="h-8 w-auto text-white" />
         </a>
 
         <x-dropdown align="right" width="48" contentClasses="py-1 bg-surface border border-slate-800/60">
