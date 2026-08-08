@@ -3,7 +3,7 @@
 <button
     type="button"
     wire:click="watchLesson({{ $lesson->id }})"
-    {{ $attributes->class(['group relative shrink-0 w-64 text-left rounded-xl overflow-hidden bg-surface border border-slate-800/60 transition hover:scale-[1.02] hover:border-brand hover:brightness-110']) }}
+    {{ $attributes->class(['group relative shrink-0 w-64 text-left rounded-xl overflow-hidden bg-surface ring-1 ring-inset ring-slate-800/60 transition hover:scale-[1.02] hover:ring-brand hover:brightness-110']) }}
 >
     <div class="relative aspect-video bg-[#1a1c23]">
         @if ($lesson->thumbnail_url)
