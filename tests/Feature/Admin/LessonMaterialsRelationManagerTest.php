@@ -11,6 +11,8 @@ use App\Models\User;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -111,6 +113,58 @@ class LessonMaterialsRelationManagerTest extends TestCase
             ->callTableAction(DeleteAction::class, record: $material);
 
         $this->assertDatabaseMissing('lesson_materials', ['id' => $material->id]);
+    }
+
+    public function test_admin_can_create_a_material_with_only_an_uploaded_file(): void
+    {
+        Storage::fake('public');
+
+        $lesson = $this->lesson();
+
+        $this->actingAs($this->admin());
+
+        $this->testRelationManager($lesson)
+            ->callTableAction('create', data: [
+                'title' => 'Apostila em PDF',
+                'file_path' => UploadedFile::fake()->create('apostila.pdf', 10, 'application/pdf'),
+            ])
+            ->assertHasNoTableActionErrors();
+
+        $material = LessonMaterial::where('title', 'Apostila em PDF')->firstOrFail();
+        $this->assertTrue($material->hasUploadedFile());
+        Storage::disk('public')->assertExists($material->file_path);
+    }
+
+    public function test_creating_a_material_without_a_url_or_file_fails_validation(): void
+    {
+        $lesson = $this->lesson();
+
+        $this->actingAs($this->admin());
+
+        $this->testRelationManager($lesson)
+            ->callTableAction('create', data: [
+                'title' => 'Sem arquivo nem link',
+            ])
+            ->assertHasTableActionErrors(['file_url', 'file_path']);
+
+        $this->assertDatabaseMissing('lesson_materials', ['title' => 'Sem arquivo nem link']);
+    }
+
+    public function test_admin_can_create_a_material_with_only_a_url(): void
+    {
+        $lesson = $this->lesson();
+
+        $this->actingAs($this->admin());
+
+        $this->testRelationManager($lesson)
+            ->callTableAction('create', data: [
+                'title' => 'Link externo',
+                'file_url' => 'https://example.com/material.pdf',
+            ])
+            ->assertHasNoTableActionErrors();
+
+        $material = LessonMaterial::where('title', 'Link externo')->firstOrFail();
+        $this->assertFalse($material->hasUploadedFile());
     }
 
     public function test_relation_manager_has_no_associate_or_dissociate_actions(): void

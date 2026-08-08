@@ -14,10 +14,16 @@ class LessonMaterial extends Model
         'lesson_id',
         'title',
         'file_url',
+        'file_path',
     ];
 
     public function lesson(): BelongsTo
     {
         return $this->belongsTo(Lesson::class);
+    }
+
+    public function hasUploadedFile(): bool
+    {
+        return filled($this->file_path);
     }
 }
