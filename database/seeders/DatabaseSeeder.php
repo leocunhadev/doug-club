@@ -24,6 +24,13 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('123456789'),
         ]);
 
+        User::factory()->create([
+            'name' => 'Admin User',
+            'email' => 'admin@example.com',
+            'password' => Hash::make('123456789'),
+            'is_admin' => true,
+        ]);
+
         $this->call(LmsSeeder::class);
     }
 }
