@@ -36,10 +36,17 @@
                             <div x-show="open" x-cloak x-transition
                                  class="absolute left-0 z-10 mt-2 min-w-[14rem] rounded-lg border border-slate-800/60 bg-surface py-1 shadow-lg">
                                 @foreach ($lesson->materials as $material)
-                                    <a href="{{ $material->file_url }}" target="_blank" rel="noopener"
-                                       class="block px-4 py-2 text-sm text-gray-200 hover:bg-slate-800/60">
-                                        {{ $material->title }}
-                                    </a>
+                                    @if ($material->hasUploadedFile())
+                                        <a href="{{ route('membros.materials.download', $material) }}"
+                                           class="block px-4 py-2 text-sm text-gray-200 hover:bg-slate-800/60">
+                                            {{ $material->title }}
+                                        </a>
+                                    @else
+                                        <a href="{{ $material->file_url }}" target="_blank" rel="noopener"
+                                           class="block px-4 py-2 text-sm text-gray-200 hover:bg-slate-800/60">
+                                            {{ $material->title }}
+                                        </a>
+                                    @endif
                                 @endforeach
                             </div>
                         </div>

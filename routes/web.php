@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Membros\LessonMaterialDownloadController;
 use App\Livewire\Membros\Dashboard;
 use Illuminate\Support\Facades\Route;
 
@@ -10,6 +11,10 @@ Route::get('/', function () {
 Route::get('membros', Dashboard::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+Route::get('membros/materiais/{material}/download', LessonMaterialDownloadController::class)
+    ->middleware(['auth', 'verified'])
+    ->name('membros.materials.download');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])
