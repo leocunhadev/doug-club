@@ -120,7 +120,7 @@ class LessonMaterialsRelationManagerTest extends TestCase
         $this->actingAs($this->admin());
 
         $this->testRelationManager($lesson)
-            ->assertActionDoesNotExist('associate')
+            ->assertTableActionDoesNotExist('associate')
             ->assertTableActionDoesNotExist('dissociate');
     }
 }

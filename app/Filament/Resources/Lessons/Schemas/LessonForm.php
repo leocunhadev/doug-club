@@ -57,6 +57,10 @@ class LessonForm
 
         $parts = array_map('intval', explode(':', $value));
 
+        if (count($parts) < 2 || count($parts) > 3) {
+            return null;
+        }
+
         if (count($parts) === 2) {
             [$minutes, $seconds] = $parts;
 

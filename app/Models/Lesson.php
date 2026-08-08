@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Lesson extends Model
 {
@@ -71,9 +73,17 @@ class Lesson extends Model
 
     protected function thumbnailUrl(): Attribute
     {
-        return Attribute::get(fn () => $this->thumbnail_path ?? match ($this->video_provider) {
-            'youtube' => "https://img.youtube.com/vi/{$this->video_id}/hqdefault.jpg",
-            default => null,
+        return Attribute::get(function () {
+            if (filled($this->thumbnail_path)) {
+                return Str::startsWith($this->thumbnail_path, ['http://', 'https://'])
+                    ? $this->thumbnail_path
+                    : Storage::disk('public')->url($this->thumbnail_path);
+            }
+
+            return match ($this->video_provider) {
+                'youtube' => "https://img.youtube.com/vi/{$this->video_id}/hqdefault.jpg",
+                default => null,
+            };
         });
     }
 }

@@ -8,7 +8,10 @@ use App\Filament\Resources\Lessons\Pages\ListLessons;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\User;
+use Filament\Actions\DeleteAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -86,6 +89,37 @@ class LessonResourceTest extends TestCase
         ]);
     }
 
+    public function test_admin_can_upload_a_thumbnail_and_it_resolves_to_a_public_storage_url(): void
+    {
+        Storage::fake('public');
+
+        $course = $this->course();
+
+        $this->actingAs($this->admin());
+
+        Livewire::test(CreateLesson::class)
+            ->fillForm([
+                'course_id' => $course->id,
+                'number' => 1,
+                'title' => 'Aula com thumbnail',
+                'video_provider' => 'youtube',
+                'video_id' => 'abc123',
+                'thumbnail_path' => UploadedFile::fake()->image('thumb.jpg'),
+                'published_at' => '2026-01-01',
+                'position' => 10,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $lesson = Lesson::where('title', 'Aula com thumbnail')->firstOrFail();
+
+        Storage::disk('public')->assertExists($lesson->thumbnail_path);
+        $this->assertSame(
+            Storage::disk('public')->url($lesson->thumbnail_path),
+            $lesson->thumbnail_url,
+        );
+    }
+
     public function test_admin_can_edit_a_lesson_and_duration_round_trips_through_the_form(): void
     {
         $lesson = Lesson::create([
@@ -133,7 +167,7 @@ class LessonResourceTest extends TestCase
         $this->actingAs($this->admin());
 
         Livewire::test(ListLessons::class)
-            ->callTableAction(\Filament\Actions\DeleteAction::class, record: $lesson);
+            ->callTableAction(DeleteAction::class, record: $lesson);
 
         $this->assertDatabaseMissing('lessons', ['id' => $lesson->id]);
     }
