@@ -35,4 +35,11 @@ class SobreTest extends TestCase
 
         Livewire::test(Sobre::class)->assertSee('AS');
     }
+
+    public function test_footer_renders_below_the_bio(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        Livewire::test(Sobre::class)->assertSee('Todos os direitos reservados');
+    }
 }

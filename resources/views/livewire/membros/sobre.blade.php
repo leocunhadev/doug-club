@@ -17,4 +17,6 @@
             <footer class="mt-1 text-sm not-italic text-gray-400">— Douglas Oliveira</footer>
         </blockquote>
     </div>
+
+    <x-membros.footer />
 </div>

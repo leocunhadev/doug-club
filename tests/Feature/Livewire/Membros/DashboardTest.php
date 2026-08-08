@@ -223,7 +223,19 @@ class DashboardTest extends TestCase
         Livewire::test(Dashboard::class)
             ->assertSee('Política de Privacidade')
             ->assertSee('Sobre')
-            ->assertSee('Todos os direitos reservados');
+            ->assertSee('DO.ing Club')
+            ->assertSee('Todos os direitos reservados')
+            ->assertDontSee('Flávio Augusto')
+            ->assertDontSee('Geração de Valor');
+    }
+
+    public function test_hero_copy_references_douglas_oliveira(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        Livewire::test(Dashboard::class)
+            ->assertSee('Douglas Oliveira')
+            ->assertDontSee('Flávio Augusto');
     }
 
     public function test_whatsapp_button_renders_when_number_is_configured(): void
