@@ -98,6 +98,34 @@ class LessonMaterialsRelationManagerTest extends TestCase
         ]);
     }
 
+    public function test_editing_an_upload_only_material_preserves_the_file_path(): void
+    {
+        Storage::fake('public');
+        $path = UploadedFile::fake()->create('apostila.pdf', 10, 'application/pdf')
+            ->store('lesson-materials', 'public');
+
+        $lesson = $this->lesson();
+        $material = LessonMaterial::create([
+            'lesson_id' => $lesson->id,
+            'title' => 'Original',
+            'file_path' => $path,
+        ]);
+
+        $this->actingAs($this->admin());
+
+        $this->testRelationManager($lesson)
+            ->callTableAction(EditAction::class, record: $material, data: [
+                'title' => 'Atualizado',
+            ])
+            ->assertHasNoTableActionErrors();
+
+        $this->assertDatabaseHas('lesson_materials', [
+            'id' => $material->id,
+            'title' => 'Atualizado',
+            'file_path' => $path,
+        ]);
+    }
+
     public function test_admin_can_delete_a_material(): void
     {
         $lesson = $this->lesson();

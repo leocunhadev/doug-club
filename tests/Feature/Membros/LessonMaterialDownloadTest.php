@@ -66,4 +66,33 @@ class LessonMaterialDownloadTest extends TestCase
 
         $response->assertNotFound();
     }
+
+    public function test_downloading_a_material_whose_file_is_missing_from_disk_returns_404(): void
+    {
+        Storage::fake('public');
+
+        $material = $this->material(['file_path' => 'lesson-materials/does-not-exist.pdf']);
+
+        $this->actingAs(User::factory()->create());
+
+        $response = $this->get(route('membros.materials.download', $material));
+
+        $response->assertNotFound();
+    }
+
+    public function test_downloading_a_material_with_a_slash_in_the_title_does_not_error(): void
+    {
+        Storage::fake('public');
+        $path = UploadedFile::fake()->create('apostila.pdf', 10, 'application/pdf')
+            ->store('lesson-materials', 'public');
+
+        $material = $this->material(['title' => 'Apostila 1/2', 'file_path' => $path]);
+
+        $this->actingAs(User::factory()->create());
+
+        $response = $this->get(route('membros.materials.download', $material));
+
+        $response->assertOk();
+        $response->assertDownload('Apostila 1-2.pdf');
+    }
 }
