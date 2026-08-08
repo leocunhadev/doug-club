@@ -120,6 +120,21 @@ class DashboardTest extends TestCase
         Livewire::test(Dashboard::class)->assertSee('DO.ing Club', false);
     }
 
+    public function test_video_watermark_uses_the_brand_icon_not_the_default_jetstream_logo(): void
+    {
+        $user = User::factory()->create();
+        $course = Course::create(['label' => 'Curso 1', 'title' => 'Vendas', 'position' => 10]);
+        Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula 1',
+            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 1,
+        ]);
+
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->assertDontSee('305.8 81.125', false); // path data unique to the old Jetstream logo artwork
+    }
+
     public function test_dashboard_renders_featured_lesson_embed_and_materials(): void
     {
         $user = User::factory()->create();

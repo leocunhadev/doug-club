@@ -18,7 +18,7 @@
                             allow="autoplay; fullscreen; picture-in-picture"
                             allowfullscreen
                         ></iframe>
-                        <x-application-logo class="pointer-events-none absolute top-3 right-3 h-6 w-auto fill-current text-orange-500 drop-shadow" />
+                        <x-brand-logo icon-only class="pointer-events-none absolute top-3 right-3 h-6 w-auto drop-shadow" />
                     </div>
                 </div>
 

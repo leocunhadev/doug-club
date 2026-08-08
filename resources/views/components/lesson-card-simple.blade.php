@@ -10,13 +10,13 @@
             <img src="{{ $lesson->thumbnail_url }}" alt="" class="absolute inset-0 h-full w-full object-cover">
             <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
         @else
-            <div class="absolute inset-0 bg-gradient-to-br from-orange-500 to-red-600"></div>
+            <div class="absolute inset-0 bg-brand"></div>
         @endif
 
-        <x-application-logo class="absolute top-2 left-2 h-4 w-auto fill-current text-orange-500 drop-shadow" />
+        <x-brand-logo icon-only class="absolute top-2 left-2 h-4 w-auto drop-shadow" />
 
         @if ($watching)
-            <span class="absolute top-2 right-2 text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-500 to-red-600 text-white">
+            <span class="absolute top-2 right-2 text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-brand text-white">
                 Assistindo
             </span>
         @endif

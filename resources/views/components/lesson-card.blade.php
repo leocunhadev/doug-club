@@ -8,7 +8,7 @@
     <div class="relative aspect-video bg-[radial-gradient(circle_at_top_left,rgba(249,115,22,0.35),transparent_60%)]">
         <div class="absolute top-2 left-2 right-2 flex items-start justify-between gap-2">
             <span class="min-w-0">
-                <x-application-logo class="h-4 w-auto fill-current text-orange-500" />
+                <x-brand-logo icon-only class="h-4 w-auto" />
                 <span class="mt-1 block truncate text-[10px] font-semibold uppercase tracking-widest text-orange-400">
                     Curso
                 </span>
@@ -18,7 +18,7 @@
             </span>
 
             @if ($watching)
-                <span class="shrink-0 text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-500 to-red-600 text-white">
+                <span class="shrink-0 text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-brand text-white">
                     Assistindo
                 </span>
             @endif
@@ -26,7 +26,7 @@
 
         <span class="absolute inset-x-3 bottom-3 flex items-baseline gap-1.5">
             <span class="text-xs font-semibold uppercase tracking-widest text-white/70">Aula</span>
-            <span class="text-3xl font-extrabold text-orange-500">{{ sprintf('%02d', $lesson->number) }}</span>
+            <span class="text-3xl font-extrabold text-brand">{{ sprintf('%02d', $lesson->number) }}</span>
         </span>
 
         @if ($lesson->duration_formatted)
