@@ -31,6 +31,13 @@ class LmsSeeder extends Seeder
                 'description' => 'A estrutura para sua empresa crescer e não entrar na estatística dos 80% que quebram.',
                 'position' => 40,
                 'lessons' => [
+                    ['number' => 12, 'title' => 'Modelos de Negócio - Aula 12', 'duration_seconds' => 3120, 'published_at' => '2026-08-05'],
+                    ['number' => 11, 'title' => 'Modelos de Negócio - Aula 11', 'duration_seconds' => 2870, 'published_at' => '2026-08-04'],
+                    ['number' => 10, 'title' => 'Modelos de Negócio - Aula 10', 'duration_seconds' => 3510, 'published_at' => '2026-08-03'],
+                    ['number' => 9, 'title' => 'Modelos de Negócio - Aula 09', 'duration_seconds' => 2990, 'published_at' => '2026-07-22'],
+                    ['number' => 8, 'title' => 'Modelos de Negócio - Aula 08', 'duration_seconds' => 3340, 'published_at' => '2026-07-21'],
+                    ['number' => 7, 'title' => 'Modelos de Negócio - Aula 07', 'duration_seconds' => 3080, 'published_at' => '2026-07-20'],
+                    ['number' => 6, 'title' => 'Modelos de Negócio - Aula 06', 'duration_seconds' => 2755, 'published_at' => '2026-07-19'],
                     ['number' => 5, 'title' => 'Estabilidade Não Existe - Modelo de Negócios - Aula 05', 'duration_seconds' => 2923, 'published_at' => '2026-07-17'],
                     ['number' => 4, 'title' => 'Estabilidade Não Existe - Modelo de Negócios - Aula 04', 'duration_seconds' => 4020, 'published_at' => '2026-07-16'],
                     ['number' => 3, 'title' => 'Estabilidade Não Existe - Modelo de Negócios - Aula 03', 'duration_seconds' => 3300, 'published_at' => '2026-07-15'],
