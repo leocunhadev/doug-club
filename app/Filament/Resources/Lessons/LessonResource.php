@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Lessons;
 use App\Filament\Resources\Lessons\Pages\CreateLesson;
 use App\Filament\Resources\Lessons\Pages\EditLesson;
 use App\Filament\Resources\Lessons\Pages\ListLessons;
+use App\Filament\Resources\Lessons\RelationManagers\MaterialsRelationManager;
 use App\Filament\Resources\Lessons\Schemas\LessonForm;
 use App\Filament\Resources\Lessons\Tables\LessonsTable;
 use App\Models\Lesson;
@@ -35,7 +36,7 @@ class LessonResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            MaterialsRelationManager::class,
         ];
     }
 
