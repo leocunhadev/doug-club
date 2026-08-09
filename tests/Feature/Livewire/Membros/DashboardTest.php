@@ -93,6 +93,83 @@ class DashboardTest extends TestCase
         ]);
     }
 
+    public function test_update_progress_upserts_watched_seconds_for_authenticated_user(): void
+    {
+        $user = User::factory()->create();
+        $course = Course::create(['label' => 'Curso 1', 'title' => 'Vendas', 'position' => 10]);
+        $lesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula 1',
+            'video_provider' => 'vimeo', 'video_id' => '76979871', 'published_at' => '2026-01-01', 'position' => 1,
+        ]);
+
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->call('updateProgress', $lesson->id, 137);
+
+        $this->assertDatabaseHas('lesson_progress', [
+            'user_id' => $user->id,
+            'lesson_id' => $lesson->id,
+            'watched_seconds' => 137,
+            'status' => 'watching',
+        ]);
+    }
+
+    public function test_update_progress_does_not_downgrade_completed_status(): void
+    {
+        $user = User::factory()->create();
+        $course = Course::create(['label' => 'Curso 1', 'title' => 'Vendas', 'position' => 10]);
+        $lesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula 1',
+            'video_provider' => 'vimeo', 'video_id' => '76979871', 'published_at' => '2026-01-01', 'position' => 1,
+        ]);
+
+        LessonProgress::create([
+            'user_id' => $user->id, 'lesson_id' => $lesson->id,
+            'status' => 'completed', 'watched_seconds' => 590, 'last_watched_at' => now()->subMinute(),
+        ]);
+
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->call('updateProgress', $lesson->id, 600);
+
+        $this->assertDatabaseHas('lesson_progress', [
+            'user_id' => $user->id,
+            'lesson_id' => $lesson->id,
+            'watched_seconds' => 600,
+            'status' => 'completed',
+        ]);
+    }
+
+    public function test_update_progress_is_scoped_to_the_authenticated_user(): void
+    {
+        $owner = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $course = Course::create(['label' => 'Curso 1', 'title' => 'Vendas', 'position' => 10]);
+        $lesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula 1',
+            'video_provider' => 'vimeo', 'video_id' => '76979871', 'published_at' => '2026-01-01', 'position' => 1,
+        ]);
+
+        LessonProgress::create([
+            'user_id' => $owner->id, 'lesson_id' => $lesson->id,
+            'status' => 'watching', 'watched_seconds' => 50, 'last_watched_at' => now(),
+        ]);
+
+        $this->actingAs($otherUser);
+
+        Livewire::test(Dashboard::class)
+            ->call('updateProgress', $lesson->id, 999);
+
+        $this->assertDatabaseHas('lesson_progress', [
+            'user_id' => $owner->id, 'lesson_id' => $lesson->id, 'watched_seconds' => 50,
+        ]);
+        $this->assertDatabaseHas('lesson_progress', [
+            'user_id' => $otherUser->id, 'lesson_id' => $lesson->id, 'watched_seconds' => 999,
+        ]);
+    }
+
     public function test_user_can_log_out_from_dashboard(): void
     {
         $user = User::factory()->create();
