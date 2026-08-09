@@ -170,6 +170,27 @@ class DashboardTest extends TestCase
         ]);
     }
 
+    public function test_mark_completed_sets_status_to_completed(): void
+    {
+        $user = User::factory()->create();
+        $course = Course::create(['label' => 'Curso 1', 'title' => 'Vendas', 'position' => 10]);
+        $lesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula 1',
+            'video_provider' => 'vimeo', 'video_id' => '76979871', 'published_at' => '2026-01-01', 'position' => 1,
+        ]);
+
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->call('markCompleted', $lesson->id);
+
+        $this->assertDatabaseHas('lesson_progress', [
+            'user_id' => $user->id,
+            'lesson_id' => $lesson->id,
+            'status' => 'completed',
+        ]);
+    }
+
     public function test_user_can_log_out_from_dashboard(): void
     {
         $user = User::factory()->create();

@@ -3,6 +3,7 @@
 namespace App\Livewire\Membros;
 
 use App\Actions\DetermineFeaturedLesson;
+use App\Actions\MarkLessonAsCompleted;
 use App\Actions\MarkLessonAsWatching;
 use App\Actions\UpdateLessonWatchedSeconds;
 use App\Livewire\Actions\Logout;
@@ -37,6 +38,11 @@ class Dashboard extends Component
     public function updateProgress(int $lessonId, int $seconds, UpdateLessonWatchedSeconds $action): void
     {
         $action->handle(Auth::id(), $lessonId, $seconds);
+    }
+
+    public function markCompleted(int $lessonId, MarkLessonAsCompleted $action): void
+    {
+        $action->handle(Auth::id(), $lessonId);
     }
 
     public function logout(Logout $logout): void
