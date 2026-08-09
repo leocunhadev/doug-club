@@ -140,7 +140,7 @@ In `app/Models/User.php`, change the `Fillable` attribute (line 16) from:
 to:
 
 ```php
-#[Fillable(['name', 'email', 'password', 'is_admin', 'access_revoked_at'])]
+#[Fillable(['name', 'email', 'password', 'is_admin', 'access_revoked_at', 'email_verified_at'])]
 ```
 
 And add `access_revoked_at` to the `casts()` method:
