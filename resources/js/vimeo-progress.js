@@ -15,10 +15,19 @@ export default function vimeoProgress({ lessonId, provider, initialSeconds }) {
 
             this.player = new Player(this.$refs.iframe);
 
-            this.player.on('loaded', () => this.resumeIfNeeded());
+            this.player.on('loaded', () => this.startPlayback());
             this.player.on('timeupdate', (data) => this.checkCompleted(data));
             this.player.on('pause', () => this.saveProgress());
             this.player.on('ended', () => this.saveProgress());
+        },
+
+        async startPlayback() {
+            await this.resumeIfNeeded();
+
+            // Browsers block unmuted autoplay without a user gesture; muting first
+            // is the Vimeo SDK's own documented way to make play() succeed reliably.
+            await this.player.setMuted(true).catch(() => {});
+            this.player.play().catch(() => {});
         },
 
         async resumeIfNeeded() {
@@ -29,7 +38,7 @@ export default function vimeoProgress({ lessonId, provider, initialSeconds }) {
             const duration = await this.player.getDuration();
 
             if (initialSeconds < duration - RESUME_SAFETY_MARGIN_SECONDS) {
-                this.player.setCurrentTime(initialSeconds);
+                await this.player.setCurrentTime(initialSeconds);
             }
         },
 
