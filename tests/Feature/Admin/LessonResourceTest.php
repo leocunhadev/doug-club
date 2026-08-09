@@ -11,6 +11,7 @@ use App\Models\User;
 use Filament\Actions\DeleteAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -212,5 +213,123 @@ class LessonResourceTest extends TestCase
             ->call('reorderTable', [$a->getKey(), $b->getKey()]);
 
         $this->assertGreaterThan($b->fresh()->position, $a->fresh()->position);
+    }
+
+    public function test_creating_a_vimeo_lesson_autofills_and_locks_duration_on_a_valid_video_id(): void
+    {
+        Http::fake([
+            'vimeo.com/api/oembed.json*' => Http::response(['duration' => 125], 200),
+        ]);
+
+        $course = $this->course();
+
+        $this->actingAs($this->admin());
+
+        Livewire::test(CreateLesson::class)
+            ->fillForm([
+                'course_id' => $course->id,
+                'number' => 1,
+                'title' => 'Aula vimeo',
+                'video_provider' => 'vimeo',
+                'published_at' => '2026-01-01',
+                'position' => 10,
+            ])
+            ->set('data.video_id', 'xyz')
+            ->assertFormSet(['duration_seconds' => '2:05'])
+            ->assertFormFieldDisabled('duration_seconds')
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('lessons', [
+            'title' => 'Aula vimeo',
+            'duration_seconds' => 125,
+        ]);
+    }
+
+    public function test_creating_a_vimeo_lesson_leaves_duration_editable_when_the_vimeo_lookup_fails(): void
+    {
+        Http::fake([
+            'vimeo.com/api/oembed.json*' => Http::response(['error' => 'not found'], 404),
+        ]);
+
+        $course = $this->course();
+
+        $this->actingAs($this->admin());
+
+        Livewire::test(CreateLesson::class)
+            ->fillForm([
+                'course_id' => $course->id,
+                'number' => 1,
+                'title' => 'Aula vimeo invalida',
+                'video_provider' => 'vimeo',
+                'published_at' => '2026-01-01',
+                'position' => 10,
+            ])
+            ->set('data.video_id', 'does-not-exist')
+            ->assertFormFieldEnabled('duration_seconds')
+            ->assertNotified('Não foi possível obter a duração do Vimeo automaticamente')
+            ->fillForm(['duration_seconds' => '3:00'])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('lessons', [
+            'title' => 'Aula vimeo invalida',
+            'duration_seconds' => 180,
+        ]);
+    }
+
+    public function test_creating_a_youtube_lesson_never_calls_vimeo_and_keeps_duration_editable(): void
+    {
+        Http::fake();
+
+        $course = $this->course();
+
+        $this->actingAs($this->admin());
+
+        Livewire::test(CreateLesson::class)
+            ->fillForm([
+                'course_id' => $course->id,
+                'number' => 1,
+                'title' => 'Aula youtube',
+                'video_provider' => 'youtube',
+                'published_at' => '2026-01-01',
+                'position' => 10,
+            ])
+            ->set('data.video_id', 'abc123')
+            ->assertFormFieldEnabled('duration_seconds')
+            ->fillForm(['duration_seconds' => '4:15'])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        Http::assertNothingSent();
+
+        $this->assertDatabaseHas('lessons', [
+            'title' => 'Aula youtube',
+            'duration_seconds' => 255,
+        ]);
+    }
+
+    public function test_editing_an_existing_vimeo_lesson_opens_with_duration_already_locked(): void
+    {
+        Http::fake();
+
+        $lesson = Lesson::create([
+            'course_id' => $this->course()->id,
+            'number' => 1,
+            'title' => 'Aula vimeo existente',
+            'duration_seconds' => 125,
+            'video_provider' => 'vimeo',
+            'video_id' => 'xyz',
+            'published_at' => '2026-01-01',
+            'position' => 10,
+        ]);
+
+        $this->actingAs($this->admin());
+
+        Livewire::test(EditLesson::class, ['record' => $lesson->getKey()])
+            ->assertFormSet(['duration_seconds' => '2:05'])
+            ->assertFormFieldDisabled('duration_seconds');
+
+        Http::assertNothingSent();
     }
 }

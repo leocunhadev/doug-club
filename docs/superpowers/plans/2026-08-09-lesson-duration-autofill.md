@@ -320,8 +320,13 @@ class LessonForm
                 TextInput::make('title')
                     ->required(),
                 Hidden::make('duration_locked')
-                    ->default(fn (?Lesson $record): bool => $record?->video_provider === 'vimeo')
-                    ->dehydrated(false),
+                    ->dehydrated(false)
+                    // default() only feeds the create-form pass in this Filament
+                    // version, so an edit form's initial lock state has to be
+                    // computed here instead, from the record being edited.
+                    ->afterStateHydrated(function (Set $set, ?Lesson $record): void {
+                        $set('duration_locked', $record?->video_provider === 'vimeo');
+                    }),
                 TextInput::make('duration_seconds')
                     ->label('Duration (mm:ss or h:mm:ss)')
                     ->placeholder('e.g. 5:30 or 1:15:30')
@@ -432,6 +437,8 @@ class LessonForm
 
 Run: `php artisan test tests/Feature/Admin/LessonResourceTest.php`
 Expected: PASS (all tests in the file, including the pre-existing ones — `test_admin_can_create_a_lesson` and `test_admin_can_edit_a_lesson_and_duration_round_trips_through_the_form` must still pass unchanged).
+
+Note from actual execution: the first pass with `Hidden::make('duration_locked')->default(...)` left `test_editing_an_existing_vimeo_lesson_opens_with_duration_already_locked` failing — `default()` in this Filament version only feeds the create-form default-state hydration pass (see `hydrateDefaultState()` in `vendor/filament/schemas/src/Components/Concerns/HasState.php:558-575`, short-circuited whenever the record already has state, i.e. on edit). Swapping to `->afterStateHydrated()` (shown above) fixed it, since that hook fires for both create and edit.
 
 - [ ] **Step 5: Run the full test suite**
 
