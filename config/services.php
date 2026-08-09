@@ -41,6 +41,7 @@ return [
 
     'abacatepay' => [
         'webhook_secret' => env('ABACATEPAY_WEBHOOK_SECRET'),
+        'payment_link_url' => env('ABACATEPAY_PAYMENT_LINK_URL'),
     ],
 
 ];

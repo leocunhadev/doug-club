@@ -68,4 +68,16 @@ new #[Layout('layouts.guest')] class extends Component
             </x-primary-button>
         </div>
     </form>
+
+    @if ($paymentLinkUrl = config('services.abacatepay.payment_link_url'))
+        <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 text-center">
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+                Ainda não é membro?
+            </p>
+            <a href="{{ $paymentLinkUrl }}" target="_blank" rel="noopener"
+               class="mt-2 inline-flex items-center px-4 py-2 bg-brand border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                Quero fazer parte
+            </a>
+        </div>
+    @endif
 </div>

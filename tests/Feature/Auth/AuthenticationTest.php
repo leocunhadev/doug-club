@@ -71,6 +71,22 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_signup_button_renders_when_payment_link_is_configured(): void
+    {
+        config(['services.abacatepay.payment_link_url' => 'https://app.abacatepay.com/pay/bill_test123']);
+
+        $this->get('/login')
+            ->assertSee('https://app.abacatepay.com/pay/bill_test123', false);
+    }
+
+    public function test_signup_button_is_hidden_when_payment_link_is_not_configured(): void
+    {
+        config(['services.abacatepay.payment_link_url' => null]);
+
+        $this->get('/login')
+            ->assertDontSee('Quero fazer parte');
+    }
+
     public function test_users_can_logout(): void
     {
         $user = User::factory()->create();
