@@ -59,6 +59,19 @@ class Dashboard extends Component
     }
 
     #[Computed]
+    public function featuredProgress(): ?LessonProgress
+    {
+        if ($this->featuredLessonId === null) {
+            return null;
+        }
+
+        return LessonProgress::query()
+            ->where('user_id', Auth::id())
+            ->where('lesson_id', $this->featuredLessonId)
+            ->first();
+    }
+
+    #[Computed]
     public function courses()
     {
         return Course::query()

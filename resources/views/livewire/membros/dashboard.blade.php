@@ -10,9 +10,18 @@
             </p>
 
             @if ($lesson = $this->featuredLesson)
-                <div class="mt-6 rounded-2xl border border-slate-800/60 bg-surface p-3 sm:p-4">
+                <div
+                    wire:key="hero-player-{{ $lesson->id }}"
+                    x-data="vimeoProgress({
+                        lessonId: {{ $lesson->id }},
+                        provider: '{{ $lesson->video_provider }}',
+                        initialSeconds: {{ $this->featuredProgress?->watched_seconds ?? 0 }},
+                    })"
+                    class="mt-6 rounded-2xl border border-slate-800/60 bg-surface p-3 sm:p-4"
+                >
                     <div class="relative aspect-video overflow-hidden rounded-xl">
                         <iframe
+                            x-ref="iframe"
                             src="{{ $lesson->embed_url }}"
                             class="h-full w-full"
                             allow="autoplay; fullscreen; picture-in-picture"

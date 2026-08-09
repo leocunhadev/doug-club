@@ -191,6 +191,44 @@ class DashboardTest extends TestCase
         ]);
     }
 
+    public function test_hero_player_wires_up_the_vimeo_progress_component_for_vimeo_lessons(): void
+    {
+        $user = User::factory()->create();
+        $course = Course::create(['label' => 'Curso 1', 'title' => 'Vendas', 'position' => 10]);
+        $lesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula 1',
+            'video_provider' => 'vimeo', 'video_id' => '76979871', 'published_at' => '2026-01-01', 'position' => 1,
+        ]);
+
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->assertSee("wire:key=\"hero-player-{$lesson->id}\"", false)
+            ->assertSee('x-data="vimeoProgress(', false)
+            ->assertSee("provider: 'vimeo'", false)
+            ->assertSee('initialSeconds: 0', false);
+    }
+
+    public function test_hero_player_passes_the_saved_watched_seconds_into_the_alpine_component(): void
+    {
+        $user = User::factory()->create();
+        $course = Course::create(['label' => 'Curso 1', 'title' => 'Vendas', 'position' => 10]);
+        $lesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula 1',
+            'video_provider' => 'vimeo', 'video_id' => '76979871', 'published_at' => '2026-01-01', 'position' => 1,
+        ]);
+
+        LessonProgress::create([
+            'user_id' => $user->id, 'lesson_id' => $lesson->id,
+            'status' => 'watching', 'watched_seconds' => 245, 'last_watched_at' => now(),
+        ]);
+
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->assertSee('initialSeconds: 245', false);
+    }
+
     public function test_user_can_log_out_from_dashboard(): void
     {
         $user = User::factory()->create();
