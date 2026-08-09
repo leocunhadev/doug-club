@@ -18,7 +18,7 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100 dark:bg-gray-900">
             <div>
                 <a href="/" wire:navigate>
-                    <x-brand-logo class="h-14 w-auto text-gray-900" />
+                    <x-brand-logo class="h-14 w-auto text-gray-900 dark:text-white" />
                 </a>
             </div>
 
