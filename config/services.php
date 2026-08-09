@@ -39,4 +39,8 @@ return [
         'number' => env('WHATSAPP_NUMBER'),
     ],
 
+    'abacatepay' => [
+        'webhook_secret' => env('ABACATEPAY_WEBHOOK_SECRET'),
+    ],
+
 ];

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Membros\LessonMaterialDownloadController;
+use App\Http\Controllers\Webhooks\AbacatePayWebhookController;
 use App\Livewire\Membros\Dashboard;
 use App\Livewire\Membros\Sobre;
 use Illuminate\Support\Facades\Route;
@@ -24,5 +25,8 @@ Route::get('membros/sobre', Sobre::class)
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
+
+Route::post('webhooks/abacatepay', AbacatePayWebhookController::class)
+    ->name('webhooks.abacatepay');
 
 require __DIR__.'/auth.php';

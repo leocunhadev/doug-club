@@ -492,7 +492,7 @@ namespace App\Http\Controllers\Webhooks;
 use App\Http\Controllers\Controller;
 use App\Models\PaymentWebhookEvent;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 class AbacatePayWebhookController extends Controller
 {
@@ -687,7 +687,7 @@ use App\Actions\ActivateUserFromPayment;
 use App\Http\Controllers\Controller;
 use App\Models\PaymentWebhookEvent;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 class AbacatePayWebhookController extends Controller
 {
@@ -852,7 +852,7 @@ use App\Actions\RevokeUserAccess;
 use App\Http\Controllers\Controller;
 use App\Models\PaymentWebhookEvent;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 class AbacatePayWebhookController extends Controller
 {
