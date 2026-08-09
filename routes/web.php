@@ -10,15 +10,15 @@ Route::get('/', function () {
 });
 
 Route::get('membros', Dashboard::class)
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'active'])
     ->name('dashboard');
 
 Route::get('membros/materiais/{material}/download', LessonMaterialDownloadController::class)
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'active'])
     ->name('membros.materials.download');
 
 Route::get('membros/sobre', Sobre::class)
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'active'])
     ->name('membros.sobre');
 
 Route::view('profile', 'profile')

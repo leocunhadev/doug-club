@@ -38,6 +38,15 @@ class LoginForm extends Form
             ]);
         }
 
+        if (Auth::user()->access_revoked_at !== null) {
+            Auth::logout();
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'form.email' => 'Sua assinatura está inativa. Entre em contato com o suporte.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

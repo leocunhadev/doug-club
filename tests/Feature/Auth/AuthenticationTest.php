@@ -54,6 +54,23 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_users_with_revoked_access_cannot_authenticate(): void
+    {
+        $user = User::factory()->create(['access_revoked_at' => now()]);
+
+        $component = Volt::test('pages.auth.login')
+            ->set('form.email', $user->email)
+            ->set('form.password', 'password');
+
+        $component->call('login');
+
+        $component
+            ->assertHasErrors('form.email')
+            ->assertNoRedirect();
+
+        $this->assertGuest();
+    }
+
     public function test_users_can_logout(): void
     {
         $user = User::factory()->create();
