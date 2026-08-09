@@ -3,7 +3,7 @@
 <button
     type="button"
     wire:click="watchLesson({{ $lesson->id }})"
-    {{ $attributes->class(['group relative shrink-0 w-64 text-left rounded-xl bg-surface ring-1 ring-inset ring-slate-800/60 transition hover:scale-[1.02] hover:ring-brand hover:brightness-110']) }}
+    {{ $attributes->class(['group relative shrink-0 w-64 text-left rounded-xl bg-surface ring-1 ring-inset ring-slate-800/60 transition hover:ring-brand hover:brightness-110']) }}
 >
     <div class="relative aspect-video overflow-hidden rounded-t-xl bg-[radial-gradient(circle_at_top_left,rgba(249,115,22,0.35),transparent_60%)]">
         <div class="absolute top-2 left-2 right-2 flex items-start justify-between gap-2">

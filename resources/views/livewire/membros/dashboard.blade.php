@@ -88,7 +88,7 @@
                     </div>
 
                     <div class="relative">
-                        <div x-ref="track" @scroll.debounce.100ms="update()" class="mt-4 flex gap-4 overflow-x-auto pb-2 scroll-smooth snap-x">
+                        <div x-ref="track" @scroll.debounce.100ms="update()" class="mt-4 flex gap-4 overflow-x-auto scrollbar-none pb-2 scroll-smooth snap-x">
                             @foreach ($course->lessons as $courseLesson)
                                 <div class="snap-start">
                                     @if ($course->lessons->count() === 1)
