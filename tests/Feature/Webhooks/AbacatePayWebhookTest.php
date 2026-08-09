@@ -103,4 +103,41 @@ class AbacatePayWebhookTest extends TestCase
 
         $this->assertDatabaseCount('users', 0);
     }
+
+    public function test_checkout_refunded_revokes_an_active_users_access(): void
+    {
+        $user = User::factory()->create(['email' => 'reembolsado@example.com']);
+
+        $this->postWebhook([
+            'id' => 'log_refund',
+            'event' => 'checkout.refunded',
+            'data' => ['customer' => ['email' => 'reembolsado@example.com']],
+        ])->assertOk();
+
+        $this->assertNotNull($user->fresh()->access_revoked_at);
+    }
+
+    public function test_refund_for_unknown_email_is_a_no_op(): void
+    {
+        $this->postWebhook([
+            'id' => 'log_refund_unknown',
+            'event' => 'checkout.refunded',
+            'data' => ['customer' => ['email' => 'ninguem@example.com']],
+        ])->assertOk();
+
+        $this->assertDatabaseCount('users', 0);
+    }
+
+    public function test_unknown_event_type_has_no_side_effect(): void
+    {
+        $user = User::factory()->create(['email' => 'saque@example.com']);
+
+        $this->postWebhook([
+            'id' => 'log_payout',
+            'event' => 'payout.completed',
+            'data' => ['customer' => ['email' => 'saque@example.com']],
+        ])->assertOk();
+
+        $this->assertNull($user->fresh()->access_revoked_at);
+    }
 }

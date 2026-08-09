@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Webhooks;
 
 use App\Actions\ActivateUserFromPayment;
+use App\Actions\RevokeUserAccess;
 use App\Http\Controllers\Controller;
 use App\Models\PaymentWebhookEvent;
 use Illuminate\Http\Request;
@@ -18,8 +19,21 @@ class AbacatePayWebhookController extends Controller
         'subscription.trial_started',
     ];
 
-    public function __invoke(Request $request, ActivateUserFromPayment $activateUserFromPayment): Response
-    {
+    private const REVOKE_EVENTS = [
+        'checkout.refunded',
+        'checkout.disputed',
+        'checkout.lost',
+        'transparent.refunded',
+        'transparent.disputed',
+        'transparent.lost',
+        'subscription.cancelled',
+    ];
+
+    public function __invoke(
+        Request $request,
+        ActivateUserFromPayment $activateUserFromPayment,
+        RevokeUserAccess $revokeUserAccess,
+    ): Response {
         $expectedSecret = config('services.abacatepay.webhook_secret');
 
         if (! $expectedSecret || ! hash_equals($expectedSecret, (string) $request->query('webhookSecret'))) {
@@ -51,8 +65,12 @@ class AbacatePayWebhookController extends Controller
 
         $email = $request->input('data.customer.email');
 
-        if ($email && in_array($event, self::ACTIVATE_EVENTS, true)) {
-            $activateUserFromPayment->handle($email, $request->input('data.customer.name'));
+        if ($email) {
+            if (in_array($event, self::ACTIVATE_EVENTS, true)) {
+                $activateUserFromPayment->handle($email, $request->input('data.customer.name'));
+            } elseif (in_array($event, self::REVOKE_EVENTS, true)) {
+                $revokeUserAccess->handle($email);
+            }
         }
 
         $webhookEvent->update(['processed_at' => now()]);
