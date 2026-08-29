@@ -221,15 +221,17 @@ iniciais pra um accessor `User::initials()` (mesmo padrão de `Lesson::durationF
 `profile.blade.php` chama `<x-membros.header :initials="auth()->user()->initials" />` diretamente.
 
 O botão "Sair" do dropdown do header usa hoje `wire:click="logout"`, que depende de um componente
-Livewire pai com método `logout()` (existe em `Dashboard`/`Sobre`). Fora de um componente Livewire —
-caso de `profile.blade.php` — isso não tem efeito nenhum (sem erro, o clique simplesmente não faz
-nada). Como o objetivo é o mesmo header funcionar em qualquer página, o botão passa a ser um form
-comum: `<form method="POST" action="{{ route('logout') }}">@csrf<button>Sair</button></form>`, com uma
-rota nova `POST /logout` (`App\Http\Controllers\Auth\LogoutController`, invokable, reaproveitando a
-mesma `App\Livewire\Actions\Logout` que os componentes já usam) registrada em `routes/auth.php`. Os
-métodos `logout()` de `Dashboard` e `Sobre` — e os testes que os chamam diretamente
-(`DashboardTest::test_user_can_log_out_from_dashboard`) — saem, substituídos por um teste único do
-fluxo de logout via rota (seção 7).
+Livewire pai com método `logout()` (só `Dashboard` tem esse método hoje). Fora de um componente
+Livewire — caso de `profile.blade.php` — isso não tem efeito nenhum (sem erro, o clique simplesmente
+não faz nada); é inclusive o que já acontece hoje na página Sobre, cujo componente `Sobre` nunca
+implementou `logout()` (bug latente, o botão "Sair" ali não faz nada). Como o objetivo é o mesmo
+header funcionar em qualquer página, o botão passa a ser um form comum:
+`<form method="POST" action="{{ route('logout') }}">@csrf<button>Sair</button></form>`, com uma rota
+nova `POST /logout` (`App\Http\Controllers\Auth\LogoutController`, invokable, reaproveitando a mesma
+`App\Livewire\Actions\Logout` que `Dashboard` já usa) registrada em `routes/auth.php`. Isso conserta o
+bug da página Sobre de graça. O método `logout()` de `Dashboard` — e o teste que o chama diretamente
+(`DashboardTest::test_user_can_log_out_from_dashboard`) — sai, substituído por um teste único do fluxo
+de logout via rota (seção 7).
 
 Filament (`/admin`) **não muda** — é uma superfície separada, sem tokens de marca compartilhados
 hoje.
@@ -241,11 +243,15 @@ hoje.
 - `Tests\Feature\Membros\TierGatingTest` (novo): `tier:mentor` bloqueia `start`/`club` em
   `/membros/mentor` com redirect; `tier:mentor` libera `mentor`.
 - `Tests\Feature\Auth\LogoutTest` (novo): `POST /logout` desloga o usuário autenticado e redireciona
-  pra `/login`; substitui a asserção de logout que hoje vive em `DashboardTest`.
+  pra `/login`; substitui a asserção de logout que hoje vive em `DashboardTest` e em
+  `AuthenticationTest`.
 - Ajustar `Tests\Feature\Livewire\Membros\DashboardTest`: remover
   `test_user_can_log_out_from_dashboard` (método `logout()` sai do componente) e trocar
   `test_membros_page_renders_through_the_dark_layout` (`assertSee('bg-canvas', ...)`) por uma
   asserção do token novo (`bg-paper`).
+- Ajustar `Tests\Feature\Auth\AuthenticationTest`: remover `test_users_can_logout` (testa
+  `Volt::test('layout.navigation')->call('logout')` — o componente Volt `layout.navigation` é
+  removido junto com `livewire/layout/navigation.blade.php`).
 - `Tests\Feature\ProfileTest` continua passando sem alteração (`assertSeeVolt` checa os 3
   sub-componentes Volt, que não mudam de nome nem de comportamento — só a página em volta muda de
   layout).
