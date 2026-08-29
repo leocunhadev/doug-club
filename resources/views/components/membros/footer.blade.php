@@ -1,8 +1,8 @@
-<footer class="border-t border-slate-800/60 mt-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col items-center justify-center gap-2 text-center text-sm text-gray-400">
+<footer class="border-t border-sand mt-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col items-center justify-center gap-2 text-center text-sm text-stone">
         <div class="flex gap-4">
-            <a href="#" class="hover:text-white">Política de Privacidade</a>
-            <a href="{{ route('membros.sobre') }}" wire:navigate class="hover:text-white">Sobre</a>
+            <a href="#" class="hover:text-ink">Política de Privacidade</a>
+            <a href="{{ route('membros.sobre') }}" wire:navigate class="hover:text-ink">Sobre</a>
         </div>
         <p>&copy; DO.ing Club &middot; {{ now()->year }} Todos os direitos reservados.</p>
     </div>

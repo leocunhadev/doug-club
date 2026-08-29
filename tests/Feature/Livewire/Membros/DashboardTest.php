@@ -322,12 +322,12 @@ class DashboardTest extends TestCase
         );
     }
 
-    public function test_membros_page_renders_through_the_dark_layout(): void
+    public function test_membros_page_renders_through_the_paper_layout(): void
     {
         $this->actingAs(User::factory()->create())
             ->get('/membros')
             ->assertOk()
-            ->assertSee('bg-canvas', false);
+            ->assertSee('bg-paper', false);
     }
 
     public function test_watch_lesson_with_nonexistent_lesson_id_does_not_throw_unhandled_exception(): void
