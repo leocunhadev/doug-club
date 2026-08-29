@@ -381,4 +381,24 @@ class DashboardTest extends TestCase
         Livewire::test(Dashboard::class)
             ->assertDontSee('wa.me', false);
     }
+
+    public function test_start_tier_sees_a_generic_hero_title(): void
+    {
+        $user = User::factory()->create(['tier' => 'start']);
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->assertSee('Sua central de conteúdos')
+            ->assertDontSee('Acompanhe as transmissões ao vivo e os conteúdos gravados de Douglas Oliveira');
+    }
+
+    public function test_club_tier_sees_the_full_hero_copy(): void
+    {
+        $user = User::factory()->create(['tier' => 'club']);
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->assertSee('Sua central de conteúdos')
+            ->assertSee('Acompanhe as transmissões ao vivo e os conteúdos gravados de Douglas Oliveira', false);
+    }
 }

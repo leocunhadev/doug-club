@@ -4,10 +4,16 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16 sm:space-y-20">
         <section>
             <h1 class="text-2xl font-bold">Sua central de conteúdos</h1>
-            <p class="mt-1 max-w-2xl text-gray-400">
-                Acompanhe as transmissões ao vivo e os conteúdos gravados de Douglas Oliveira. Tudo em um lugar só,
-                exclusivo para quem decidiu agir.
-            </p>
+            @if (auth()->user()->hasClubAccess())
+                <p class="mt-1 max-w-2xl text-gray-400">
+                    Acompanhe as transmissões ao vivo e os conteúdos gravados de Douglas Oliveira. Tudo em um lugar só,
+                    exclusivo para quem decidiu agir.
+                </p>
+            @else
+                <p class="mt-1 max-w-2xl text-gray-400">
+                    Os conteúdos gravados de Douglas Oliveira, organizados pra você assistir no seu ritmo.
+                </p>
+            @endif
 
             @if ($lesson = $this->featuredLesson)
                 <div
