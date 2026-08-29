@@ -5,6 +5,7 @@ namespace Tests\Feature\Livewire\Membros;
 use App\Livewire\Membros\Encontros;
 use App\Models\Course;
 use App\Models\Encontro;
+use App\Models\EncontroFeedback;
 use App\Models\Lesson;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -136,5 +137,57 @@ class EncontrosTest extends TestCase
         $this->actingAs(User::factory()->create(['tier' => 'club']));
 
         Livewire::test(Encontros::class)->assertSee('Nenhum encontro agendado ainda.');
+    }
+
+    public function test_avaliar_button_appears_only_on_past_encontros(): void
+    {
+        $this->encontro(['tema' => 'Futuro', 'scheduled_at' => now()->addDay()]);
+        $this->encontro(['tema' => 'Passado', 'scheduled_at' => now()->subDay()]);
+
+        $this->actingAs(User::factory()->create(['tier' => 'club']));
+
+        $html = Livewire::test(Encontros::class)->html();
+
+        $this->assertSame(1, substr_count($html, 'Avaliar'));
+    }
+
+    public function test_avaliar_button_disappears_after_the_user_already_rated_that_encontro(): void
+    {
+        $ratedEncontro = $this->encontro(['tema' => 'Já avaliado', 'scheduled_at' => now()->subDay()]);
+        $this->encontro(['tema' => 'Ainda não avaliado', 'scheduled_at' => now()->subDays(2)]);
+
+        $user = User::factory()->create(['tier' => 'club']);
+        EncontroFeedback::create(['user_id' => $user->id, 'encontro_id' => $ratedEncontro->id, 'score' => 8]);
+
+        $this->actingAs($user);
+
+        $html = Livewire::test(Encontros::class)->html();
+
+        $this->assertSame(1, substr_count($html, 'Avaliar'));
+    }
+
+    public function test_submit_encontro_nps_score_persists_the_score(): void
+    {
+        $encontro = $this->encontro(['scheduled_at' => now()->subDay()]);
+
+        $this->actingAs(User::factory()->create(['tier' => 'club']));
+
+        Livewire::test(Encontros::class)
+            ->call('submitEncontroNpsScore', $encontro->id, 9);
+
+        $this->assertDatabaseHas('encontro_feedback', [
+            'encontro_id' => $encontro->id,
+            'score' => 9,
+        ]);
+    }
+
+    public function test_submit_encontro_nps_score_is_a_no_op_for_a_nonexistent_encontro(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'club']));
+
+        Livewire::test(Encontros::class)
+            ->call('submitEncontroNpsScore', 999999, 9);
+
+        $this->assertDatabaseMissing('encontro_feedback', ['encontro_id' => 999999]);
     }
 }

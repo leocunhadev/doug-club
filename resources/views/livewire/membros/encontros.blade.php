@@ -20,10 +20,12 @@
         @else
             <div class="enc-timeline max-w-3xl">
                 @foreach ($this->encontros as $encontro)
-                    <x-encontro-card :encontro="$encontro" :is-next="$next !== null && $encontro->is($next)" />
+                    <x-encontro-card :encontro="$encontro" :is-next="$next !== null && $encontro->is($next)" :rated-encontro-ids="$this->ratedEncontroIds" />
                 @endforeach
             </div>
         @endif
+
+        <x-nps-modal />
     </div>
 
     <x-membros.footer />

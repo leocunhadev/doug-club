@@ -1,4 +1,4 @@
-@props(['encontro', 'isNext' => false])
+@props(['encontro', 'isNext' => false, 'ratedEncontroIds' => []])
 
 <div class="enc-item {{ $isNext ? 'next' : '' }} pb-5">
     <div class="flex items-center gap-4 flex-wrap px-[22px] py-[18px] rounded-[18px] border {{ $isNext ? 'border-brand' : 'border-sand' }} bg-card shadow-[0_1px_2px_rgba(11,11,12,.05),0_10px_28px_rgba(11,11,12,.07)]">
@@ -25,6 +25,18 @@
                     <span class="inline-flex items-center px-[11px] py-[5px] rounded-full text-[11px] font-bold uppercase tracking-[.1em] bg-paper text-stone border border-sand cursor-not-allowed">
                         Gravação em breve
                     </span>
+                @endif
+
+                @if (! in_array($encontro->id, $ratedEncontroIds))
+                    <button
+                        type="button"
+                        @click="window.dispatchEvent(new CustomEvent('open-nps-modal', { detail: {
+                            action: 'submitEncontroNpsScore',
+                            subjectId: {{ $encontro->id }},
+                            subtitle: 'De 0 a 10, o quanto esse encontro te ajudou a decidir melhor?',
+                        } }))"
+                        class="inline-flex items-center px-[11px] py-[5px] rounded-full text-[11px] font-bold uppercase tracking-[.1em] bg-paper text-stone border border-sand hover:border-black hover:text-ink"
+                    >Avaliar</button>
                 @endif
             @else
                 @if ($isNext)

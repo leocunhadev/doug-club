@@ -2,8 +2,11 @@
 
 namespace App\Livewire\Membros;
 
+use App\Actions\SubmitEncontroNpsScore;
 use App\Livewire\Concerns\ComputesUserInitials;
 use App\Models\Encontro;
+use App\Models\EncontroFeedback;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -27,6 +30,24 @@ class Encontros extends Component
             ->get();
 
         return $upcoming->concat($past);
+    }
+
+    #[Computed]
+    public function ratedEncontroIds(): array
+    {
+        return EncontroFeedback::query()
+            ->where('user_id', Auth::id())
+            ->pluck('encontro_id')
+            ->all();
+    }
+
+    public function submitEncontroNpsScore(int $encontroId, int $score, SubmitEncontroNpsScore $action): void
+    {
+        if (! Encontro::query()->whereKey($encontroId)->exists()) {
+            return;
+        }
+
+        $action->handle(Auth::id(), $encontroId, $score);
     }
 
     public function render()
