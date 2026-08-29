@@ -15,13 +15,15 @@
             $next = $this->encontros->first(fn ($encontro) => ! $encontro->isPast());
         @endphp
 
-        <div class="flex flex-col gap-3 max-w-3xl">
-            @forelse ($this->encontros as $encontro)
-                <x-encontro-card :encontro="$encontro" :is-next="$next !== null && $encontro->is($next)" />
-            @empty
-                <p class="text-stone">Nenhum encontro agendado ainda.</p>
-            @endforelse
-        </div>
+        @if ($this->encontros->isEmpty())
+            <p class="text-stone">Nenhum encontro agendado ainda.</p>
+        @else
+            <div class="enc-timeline max-w-3xl">
+                @foreach ($this->encontros as $encontro)
+                    <x-encontro-card :encontro="$encontro" :is-next="$next !== null && $encontro->is($next)" />
+                @endforeach
+            </div>
+        @endif
     </div>
 
     <x-membros.footer />

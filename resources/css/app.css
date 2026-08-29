@@ -142,3 +142,36 @@
     color: transparent;
     -webkit-text-stroke: 1.5px theme('colors.brand');
 }
+.enc-timeline {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding-left: 26px;
+}
+.enc-timeline::before {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: theme('colors.sand');
+}
+.enc-item {
+    position: relative;
+}
+.enc-item::before {
+    content: "";
+    position: absolute;
+    left: -25px;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: theme('colors.card');
+    border: 3px solid theme('colors.sand');
+}
+.enc-item.next::before {
+    background: theme('colors.brand');
+    border-color: theme('colors.brand');
+}
