@@ -14,10 +14,36 @@
             </x-slot>
 
             <x-slot name="content">
-                <button wire:click="logout" type="button" class="w-full text-start px-4 py-2 text-sm text-gray-300 hover:bg-slate-800/60">
-                    Sair
-                </button>
+                <a href="{{ route('profile') }}" wire:navigate class="block px-4 py-2 text-sm text-gray-300 hover:bg-slate-800/60">
+                    Meu perfil
+                </a>
+
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="w-full text-start px-4 py-2 text-sm text-gray-300 hover:bg-slate-800/60">
+                        Sair
+                    </button>
+                </form>
             </x-slot>
         </x-dropdown>
     </div>
+
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-3 flex gap-1 overflow-x-auto" aria-label="Navegação principal">
+        @foreach ((new \App\Support\PersonaNavigation)->tabs(auth()->user()->tier) as $tab)
+            @if ($tab['available'])
+                <a
+                    href="{{ route($tab['route']) }}"
+                    wire:navigate
+                    @if (request()->routeIs($tab['route'])) aria-current="page" @endif
+                    class="shrink-0 px-3 py-1.5 rounded-full text-sm font-medium {{ request()->routeIs($tab['route']) ? 'bg-white text-black' : 'text-gray-400 hover:text-white' }}"
+                >
+                    {{ $tab['label'] }}
+                </a>
+            @else
+                <span class="shrink-0 px-3 py-1.5 rounded-full text-sm font-medium text-gray-600 cursor-not-allowed" title="Em breve">
+                    {{ $tab['label'] }} 🔒
+                </span>
+            @endif
+        @endforeach
+    </nav>
 </header>

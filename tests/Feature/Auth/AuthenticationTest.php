@@ -86,21 +86,4 @@ class AuthenticationTest extends TestCase
         $this->get('/login')
             ->assertDontSee('Quero fazer parte');
     }
-
-    public function test_users_can_logout(): void
-    {
-        $user = User::factory()->create();
-
-        $this->actingAs($user);
-
-        $component = Volt::test('layout.navigation');
-
-        $component->call('logout');
-
-        $component
-            ->assertHasNoErrors()
-            ->assertRedirect('/');
-
-        $this->assertGuest();
-    }
 }

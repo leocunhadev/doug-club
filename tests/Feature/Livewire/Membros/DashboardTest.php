@@ -229,18 +229,6 @@ class DashboardTest extends TestCase
             ->assertSee('initialSeconds: 245', false);
     }
 
-    public function test_user_can_log_out_from_dashboard(): void
-    {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
-        Livewire::test(Dashboard::class)
-            ->call('logout')
-            ->assertRedirect('/login');
-
-        $this->assertGuest();
-    }
-
     public function test_user_initials_are_computed_from_name(): void
     {
         $user = User::factory()->create(['name' => 'Ana Souza']);

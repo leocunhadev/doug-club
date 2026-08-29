@@ -6,7 +6,6 @@ use App\Actions\DetermineFeaturedLesson;
 use App\Actions\MarkLessonAsCompleted;
 use App\Actions\MarkLessonAsWatching;
 use App\Actions\UpdateLessonWatchedSeconds;
-use App\Livewire\Actions\Logout;
 use App\Livewire\Concerns\ComputesUserInitials;
 use App\Models\Course;
 use App\Models\Lesson;
@@ -43,13 +42,6 @@ class Dashboard extends Component
     public function markCompleted(int $lessonId, MarkLessonAsCompleted $action): void
     {
         $action->handle(Auth::id(), $lessonId);
-    }
-
-    public function logout(Logout $logout): void
-    {
-        $logout();
-
-        $this->redirect('/login', navigate: true);
     }
 
     #[Computed]
