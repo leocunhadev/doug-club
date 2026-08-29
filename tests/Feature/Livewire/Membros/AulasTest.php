@@ -282,4 +282,115 @@ class AulasTest extends TestCase
         $this->get('/membros/aulas?lesson=999999')
             ->assertOk();
     }
+
+    public function test_search_filters_lessons_by_title(): void
+    {
+        $course = $this->course();
+        Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Consumidor 4S na prática',
+            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-02', 'position' => 2,
+        ]);
+        Lesson::create([
+            'course_id' => $course->id, 'number' => 2, 'title' => 'Precificação sem medo',
+            'video_provider' => 'youtube', 'video_id' => 'def', 'published_at' => '2026-01-01', 'position' => 1,
+        ]);
+
+        $this->actingAs(User::factory()->create());
+
+        Livewire::test(Aulas::class)
+            ->set('search', 'consumidor')
+            ->assertSee('Consumidor 4S na prática')
+            ->assertDontSee('Precificação sem medo');
+    }
+
+    public function test_search_is_case_insensitive(): void
+    {
+        $course = $this->course();
+        Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Consumidor 4S na prática',
+            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 1,
+        ]);
+
+        $this->actingAs(User::factory()->create());
+
+        Livewire::test(Aulas::class)
+            ->set('search', 'CONSUMIDOR')
+            ->assertSee('Consumidor 4S na prática');
+    }
+
+    public function test_search_matches_the_course_label(): void
+    {
+        $matchingCourse = Course::create(['label' => 'Vendas B2B', 'title' => '', 'position' => 20]);
+        $otherCourse = $this->course();
+
+        Lesson::create([
+            'course_id' => $matchingCourse->id, 'number' => 1, 'title' => 'Aula qualquer',
+            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 1,
+        ]);
+        Lesson::create([
+            'course_id' => $otherCourse->id, 'number' => 1, 'title' => 'Outra aula',
+            'video_provider' => 'youtube', 'video_id' => 'def', 'published_at' => '2026-01-02', 'position' => 2,
+        ]);
+
+        $this->actingAs(User::factory()->create());
+
+        Livewire::test(Aulas::class)
+            ->set('search', 'b2b')
+            ->assertSee('Aula qualquer')
+            ->assertDontSee('Outra aula');
+    }
+
+    public function test_search_combines_with_the_category_filter(): void
+    {
+        $course = $this->course();
+        Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Consumidor 4S na prática',
+            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-02', 'position' => 2,
+            'category' => 'Frameworks',
+        ]);
+        Lesson::create([
+            'course_id' => $course->id, 'number' => 2, 'title' => 'Consumidor 4S: encontro ao vivo',
+            'video_provider' => 'youtube', 'video_id' => 'def', 'published_at' => '2026-01-01', 'position' => 1,
+            'category' => 'Encontros',
+        ]);
+
+        $this->actingAs(User::factory()->create());
+
+        Livewire::test(Aulas::class)
+            ->set('search', 'consumidor')
+            ->call('selectCategory', 'Frameworks')
+            ->assertSee('Consumidor 4S na prática')
+            ->assertDontSee('Consumidor 4S: encontro ao vivo');
+    }
+
+    public function test_search_never_leaks_lessons_outside_the_users_tier(): void
+    {
+        $course = $this->course();
+        Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Consumidor 4S CLUB',
+            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 1,
+            'tier' => 'club',
+        ]);
+
+        $this->actingAs(User::factory()->create(['tier' => 'start']));
+
+        Livewire::test(Aulas::class)
+            ->set('search', 'consumidor')
+            ->assertDontSee('Consumidor 4S CLUB');
+    }
+
+    public function test_empty_state_shows_the_search_term_when_nothing_matches(): void
+    {
+        $course = $this->course();
+        Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula qualquer',
+            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 1,
+        ]);
+
+        $this->actingAs(User::factory()->create());
+
+        Livewire::test(Aulas::class)
+            ->set('search', 'termo-que-nao-existe')
+            ->assertSee('Nenhuma aula encontrada para "termo-que-nao-existe".', false);
+    }
 }

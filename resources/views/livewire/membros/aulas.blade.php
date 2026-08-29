@@ -19,20 +19,27 @@
             · {{ $this->totalCount }} {{ Str::plural('aula', $this->totalCount) }} na sua biblioteca
         </p>
 
-        <div class="mt-6 flex flex-wrap gap-2">
+        <div class="mt-6 flex flex-wrap items-center gap-2">
             @foreach (['Tudo', 'Encontros', 'Convidados', 'Frameworks'] as $cat)
                 <button type="button" wire:click="selectCategory('{{ $cat }}')"
                         class="px-3.5 py-1.5 rounded-full text-sm font-medium border {{ $category === $cat ? 'bg-black text-white border-black' : 'bg-card text-stone border-sand hover:text-ink' }}">
                     {{ $cat }}
                 </button>
             @endforeach
+
+            <input type="search" wire:model.live.debounce.300ms="search" placeholder="Buscar aula..."
+                   class="ms-auto px-3.5 py-1.5 rounded-full text-sm border border-sand bg-card text-ink placeholder:text-stone focus:outline-none focus:border-black">
         </div>
 
         <div class="mt-6 grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
             @forelse ($this->lessons as $lesson)
                 <x-aula-card :lesson="$lesson" :watching="$this->featuredLessonId === $lesson->id" />
             @empty
-                <p class="col-span-full text-stone">Nenhuma aula nesta categoria ainda.</p>
+                @if ($search !== '')
+                    <p class="col-span-full text-stone">Nenhuma aula encontrada para "{{ $search }}".</p>
+                @else
+                    <p class="col-span-full text-stone">Nenhuma aula nesta categoria ainda.</p>
+                @endif
             @endforelse
         </div>
     </div>

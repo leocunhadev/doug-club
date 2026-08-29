@@ -21,6 +21,8 @@ class Aulas extends Component
 
     public string $category = 'Tudo';
 
+    public string $search = '';
+
     public function mount(DetermineFeaturedLesson $determineFeaturedLesson): void
     {
         $this->traitMount($determineFeaturedLesson);
@@ -47,6 +49,12 @@ class Aulas extends Component
         return Lesson::query()->with('course')
             ->when(! Auth::user()->hasClubAccess(), fn ($q) => $q->where('tier', 'start'))
             ->when($this->category !== 'Tudo', fn ($q) => $q->where('category', $this->category))
+            ->when(filled($this->search), fn ($q) => $q->where(
+                fn ($q) => $q->where('title', 'like', '%'.$this->search.'%')
+                    ->orWhereHas('course', fn ($q) => $q
+                        ->where('label', 'like', '%'.$this->search.'%')
+                        ->orWhere('title', 'like', '%'.$this->search.'%'))
+            ))
             ->orderByDesc('published_at')
             ->orderByDesc('position')
             ->get();
