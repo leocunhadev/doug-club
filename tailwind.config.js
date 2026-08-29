@@ -12,13 +12,18 @@ export default {
     theme: {
         extend: {
             colors: {
-                canvas: '#100B09',
-                surface: '#1A120E',
-                'surface-2': '#241813',
+                paper: '#F6F3EE',
+                ink: '#1A1A1C',
+                black: '#0B0B0C',
+                card: '#FFFFFF',
+                sand: '#E6E0D6',
+                stone: '#8B857A',
                 brand: '#FF5100',
+                'brand-soft': '#FFEDE4',
             },
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                display: ['Syne', ...defaultTheme.fontFamily.sans],
+                sans: ['DM Sans', ...defaultTheme.fontFamily.sans],
             },
         },
     },
