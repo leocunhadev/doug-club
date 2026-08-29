@@ -235,25 +235,35 @@ class AulasTest extends TestCase
     public function test_lesson_query_param_sets_the_featured_lesson_when_valid_and_available(): void
     {
         $course = $this->course();
-        $lesson = Lesson::create([
-            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula via deep link',
-            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 1,
+        $defaultLesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Higher position (default pick)',
+            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 2,
+            'category' => 'Encontros', 'tier' => 'start',
+        ]);
+        $deepLinkLesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 2, 'title' => 'Aula via deep link',
+            'video_provider' => 'youtube', 'video_id' => 'def', 'published_at' => '2026-01-02', 'position' => 1,
             'category' => 'Encontros', 'tier' => 'start',
         ]);
 
         $this->actingAs(User::factory()->create(['tier' => 'start']));
 
-        $this->get('/membros/aulas?lesson='.$lesson->id)
+        $this->get('/membros/aulas?lesson='.$deepLinkLesson->id)
             ->assertOk()
-            ->assertSee("wire:key=\"hero-player-{$lesson->id}\"", false);
+            ->assertSee("wire:key=\"hero-player-{$deepLinkLesson->id}\"", false);
     }
 
     public function test_lesson_query_param_is_ignored_when_it_points_to_an_unavailable_lesson(): void
     {
         $course = $this->course();
-        $clubLesson = Lesson::create([
-            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula club',
+        $startLesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Start tier lesson',
             'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 1,
+            'category' => 'Encontros', 'tier' => 'start',
+        ]);
+        $clubLesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 2, 'title' => 'Aula club',
+            'video_provider' => 'youtube', 'video_id' => 'def', 'published_at' => '2026-01-02', 'position' => 2,
             'category' => 'Encontros', 'tier' => 'club',
         ]);
 
@@ -261,6 +271,7 @@ class AulasTest extends TestCase
 
         $this->get('/membros/aulas?lesson='.$clubLesson->id)
             ->assertOk()
+            ->assertSee("wire:key=\"hero-player-{$startLesson->id}\"", false)
             ->assertDontSee("wire:key=\"hero-player-{$clubLesson->id}\"", false);
     }
 
