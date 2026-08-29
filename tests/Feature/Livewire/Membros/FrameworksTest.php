@@ -102,4 +102,25 @@ class FrameworksTest extends TestCase
         $this->assertSame(1, substr_count($html, 'Ver aula'));
         $this->assertStringContainsString(route('membros.aulas', ['lesson' => $lesson->id]), $html);
     }
+
+    public function test_ver_aula_shows_locked_state_when_the_linked_lesson_is_unavailable_to_the_viewer(): void
+    {
+        $course = Course::create(['label' => 'Curso', 'title' => 'Teste', 'position' => 10]);
+        $lesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula CLUB',
+            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 1,
+            'tier' => 'club',
+        ]);
+        Framework::create([
+            'code' => '4S', 'title' => 'Com aula CLUB', 'description' => 'Teste',
+            'lesson_id' => $lesson->id, 'position' => 10,
+        ]);
+
+        $this->actingAs(User::factory()->create(['tier' => 'start']));
+
+        $html = Livewire::test(Frameworks::class)->html();
+
+        $this->assertStringNotContainsString(route('membros.aulas', ['lesson' => $lesson->id]), $html);
+        $this->assertStringContainsString('Exclusivo CLUB', $html);
+    }
 }
