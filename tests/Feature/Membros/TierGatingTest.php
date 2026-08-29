@@ -23,6 +23,9 @@ class TierGatingTest extends TestCase
         $this->get('/membros/mentor')
             ->assertRedirect(route('dashboard'))
             ->assertSessionHas('status');
+
+        $this->get(route('dashboard'))
+            ->assertSee('Esse conteúdo está disponível no mentor.', false);
     }
 
     public function test_club_tier_cannot_access_the_mentor_placeholder(): void

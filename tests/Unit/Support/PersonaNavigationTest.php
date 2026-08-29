@@ -28,13 +28,13 @@ class PersonaNavigationTest extends TestCase
         $this->assertSame([true, false, false, false, false, false, false], array_column($tabs, 'available'));
     }
 
-    public function test_mentor_tier_has_four_locked_tabs_and_no_available_ones(): void
+    public function test_mentor_tier_has_one_available_tab_and_four_locked_tabs(): void
     {
         $tabs = (new PersonaNavigation)->tabs('mentor');
 
-        $this->assertCount(4, $tabs);
-        $this->assertSame(['Radar', 'Dossiês', 'Publicar', 'Disponibilidade'], array_column($tabs, 'label'));
-        $this->assertSame([false, false, false, false], array_column($tabs, 'available'));
+        $this->assertCount(5, $tabs);
+        $this->assertSame(['Painel', 'Radar', 'Dossiês', 'Publicar', 'Disponibilidade'], array_column($tabs, 'label'));
+        $this->assertSame([true, false, false, false, false], array_column($tabs, 'available'));
     }
 
     public function test_unknown_tier_returns_no_tabs(): void

@@ -28,6 +28,8 @@
         </x-dropdown>
     </div>
 
+        <x-auth-session-status class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3" :status="session('status')" />
+
     <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-3 flex gap-1 overflow-x-auto" aria-label="Navegação principal">
         @foreach ((new \App\Support\PersonaNavigation)->tabs(auth()->user()->tier) as $tab)
             @if ($tab['available'])
