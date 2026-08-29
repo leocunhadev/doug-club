@@ -6,7 +6,7 @@
             <p class="text-xs font-bold uppercase tracking-widest text-brand mb-2.5">
                 {{ auth()->user()->hasClubAccess() ? 'DO.ing Club · Mentoria' : 'DO.ing Club start · Sua base' }}
             </p>
-            <h1 class="text-3xl sm:text-4xl font-bold font-display text-ink leading-[1.05]">
+            <h1 class="text-[clamp(34px,6vw,58px)] leading-[1.02] font-display font-extrabold tracking-[-0.015em] text-black">
                 Olá, {{ auth()->user()->name }}.<br>
                 @if (auth()->user()->hasClubAccess())
                     Vamos <span class="text-brand">continuar de onde paramos?</span>
