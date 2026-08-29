@@ -21,6 +21,7 @@ class LmsSeeder extends Seeder
                 'title' => '',
                 'description' => null,
                 'position' => 50,
+                'category' => 'Encontros',
                 'lessons' => [
                     ['number' => 1, 'title' => 'Boas Vindas ao Estabilidade não Existe', 'duration_seconds' => 127, 'published_at' => '2026-04-01'],
                 ],
@@ -30,6 +31,7 @@ class LmsSeeder extends Seeder
                 'title' => 'Modelos de Negócio',
                 'description' => 'A estrutura para sua empresa crescer e não entrar na estatística dos 80% que quebram.',
                 'position' => 40,
+                'category' => 'Frameworks',
                 'lessons' => [
                     ['number' => 12, 'title' => 'Modelos de Negócio - Aula 12', 'duration_seconds' => 3120, 'published_at' => '2026-08-05'],
                     ['number' => 11, 'title' => 'Modelos de Negócio - Aula 11', 'duration_seconds' => 2870, 'published_at' => '2026-08-04'],
@@ -48,6 +50,7 @@ class LmsSeeder extends Seeder
                 'title' => 'Liderança e Recrutamento',
                 'description' => null,
                 'position' => 30,
+                'category' => 'Convidados',
                 'lessons' => [
                     ['number' => 4, 'title' => 'Estabilidade Não Existe - Formação de Times de Vendas - Aula 04', 'duration_seconds' => 3660, 'published_at' => '2026-06-11'],
                     ['number' => 3, 'title' => 'Estabilidade Não Existe - Formação de Times de Vendas - Aula 03', 'duration_seconds' => 3400, 'published_at' => '2026-06-10'],
@@ -59,6 +62,7 @@ class LmsSeeder extends Seeder
                 'title' => 'Influência',
                 'description' => null,
                 'position' => 20,
+                'category' => 'Encontros',
                 'lessons' => [
                     ['number' => 5, 'title' => 'Estabilidade Não Existe - Influência - Aula 05', 'duration_seconds' => 3960, 'published_at' => '2026-05-15'],
                     ['number' => 4, 'title' => 'Estabilidade Não Existe - Influência - Aula 04', 'duration_seconds' => 3455, 'published_at' => '2026-05-14'],
@@ -70,6 +74,7 @@ class LmsSeeder extends Seeder
                 'title' => 'Vendas',
                 'description' => null,
                 'position' => 10,
+                'category' => 'Convidados',
                 'lessons' => [
                     ['number' => 3, 'title' => 'Estabilidade Não Existe - Vendas - Aula 03', 'duration_seconds' => 3900, 'published_at' => '2026-04-15'],
                     ['number' => 2, 'title' => 'Estabilidade Não Existe - Vendas - Aula 02', 'duration_seconds' => 4200, 'published_at' => '2026-04-14'],
@@ -87,7 +92,8 @@ class LmsSeeder extends Seeder
 
         foreach ($courses as $courseData) {
             $lessons = $courseData['lessons'];
-            unset($courseData['lessons']);
+            $category = $courseData['category'];
+            unset($courseData['lessons'], $courseData['category']);
 
             $course = Course::create($courseData);
 
@@ -99,6 +105,8 @@ class LmsSeeder extends Seeder
                     'video_provider' => $video['provider'],
                     'video_id' => $video['id'],
                     'position' => count($lessons) - $index,
+                    'category' => $category,
+                    'tier' => ($index === 0 && count($lessons) > 1) ? 'club' : 'start',
                 ]);
             }
         }
