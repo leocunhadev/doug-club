@@ -67,6 +67,21 @@ class LessonForm
                     ->required()
                     ->numeric()
                     ->default(0),
+                Select::make('category')
+                    ->options([
+                        'Encontros' => 'Encontros',
+                        'Convidados' => 'Convidados',
+                        'Frameworks' => 'Frameworks',
+                    ])
+                    ->default('Encontros')
+                    ->required(),
+                Select::make('tier')
+                    ->options([
+                        'start' => 'Start',
+                        'club' => 'CLUB',
+                    ])
+                    ->default('start')
+                    ->required(),
             ]);
     }
 

@@ -90,6 +90,34 @@ class LessonResourceTest extends TestCase
         ]);
     }
 
+    public function test_admin_can_set_category_and_tier_when_creating_a_lesson(): void
+    {
+        $course = $this->course();
+
+        $this->actingAs($this->admin());
+
+        Livewire::test(CreateLesson::class)
+            ->fillForm([
+                'course_id' => $course->id,
+                'number' => 1,
+                'title' => 'Aula CLUB de frameworks',
+                'video_provider' => 'youtube',
+                'video_id' => 'abc123',
+                'published_at' => '2026-01-01',
+                'position' => 10,
+                'category' => 'Frameworks',
+                'tier' => 'club',
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('lessons', [
+            'title' => 'Aula CLUB de frameworks',
+            'category' => 'Frameworks',
+            'tier' => 'club',
+        ]);
+    }
+
     public function test_admin_can_upload_a_thumbnail_and_it_resolves_to_a_public_storage_url(): void
     {
         Storage::fake('public');
