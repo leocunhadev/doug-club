@@ -3,7 +3,7 @@
 <button
     type="button"
     wire:click="watchLesson({{ $lesson->id }})"
-    {{ $attributes->class(['group relative shrink-0 w-64 text-left rounded-xl bg-surface ring-1 ring-inset ring-slate-800/60 transition hover:ring-brand hover:brightness-110']) }}
+    {{ $attributes->class(['group relative shrink-0 w-64 text-left rounded-xl bg-surface transition hover:brightness-110']) }}
 >
     <div class="relative aspect-video overflow-hidden rounded-t-xl bg-[#1a1c23]">
         @if ($lesson->thumbnail_url)
@@ -32,4 +32,6 @@
         <p class="text-xs text-gray-400">{{ $lesson->published_at->format('d/m/Y') }}</p>
         <p class="mt-1 text-sm font-medium text-white line-clamp-2">{{ $lesson->title }}</p>
     </div>
+
+    <div class="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-slate-800/60 transition group-hover:ring-brand"></div>
 </button>
