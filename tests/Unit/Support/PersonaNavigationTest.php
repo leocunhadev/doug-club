@@ -1,0 +1,44 @@
+<?php
+
+namespace Tests\Unit\Support;
+
+use App\Support\PersonaNavigation;
+use PHPUnit\Framework\TestCase;
+
+class PersonaNavigationTest extends TestCase
+{
+    public function test_start_tier_has_one_available_tab_and_three_locked_tabs(): void
+    {
+        $tabs = (new PersonaNavigation)->tabs('start');
+
+        $this->assertCount(4, $tabs);
+        $this->assertSame(['Início', 'Aulas', 'Frameworks', 'Sessão 1:1'], array_column($tabs, 'label'));
+        $this->assertSame([true, false, false, false], array_column($tabs, 'available'));
+    }
+
+    public function test_club_tier_has_one_available_tab_and_six_locked_tabs(): void
+    {
+        $tabs = (new PersonaNavigation)->tabs('club');
+
+        $this->assertCount(7, $tabs);
+        $this->assertSame(
+            ['Início', 'Aulas', 'Meu cofre', 'Minha sessão', 'Pessoas', 'Encontros', 'Frameworks'],
+            array_column($tabs, 'label'),
+        );
+        $this->assertSame([true, false, false, false, false, false, false], array_column($tabs, 'available'));
+    }
+
+    public function test_mentor_tier_has_four_locked_tabs_and_no_available_ones(): void
+    {
+        $tabs = (new PersonaNavigation)->tabs('mentor');
+
+        $this->assertCount(4, $tabs);
+        $this->assertSame(['Radar', 'Dossiês', 'Publicar', 'Disponibilidade'], array_column($tabs, 'label'));
+        $this->assertSame([false, false, false, false], array_column($tabs, 'available'));
+    }
+
+    public function test_unknown_tier_returns_no_tabs(): void
+    {
+        $this->assertSame([], (new PersonaNavigation)->tabs('unknown'));
+    }
+}
