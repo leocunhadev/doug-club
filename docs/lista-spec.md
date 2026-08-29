@@ -1,0 +1,16 @@
+- [x] Personas/planos (Start/CLUB/Mentor) — tier/role no User, navegação e gating de conteúdo. Base de tudo.
+  - `tier` no User (start/club/mentor), `hasClubAccess()`/`isMentor()`, `EnsureTier` middleware, `PersonaNavigation` (nav com abas trancadas 🔒), header/topbar/marquee reskin, rota placeholder do mentor, preview de persona pra admin.
+- [ ] Biblioteca de aulas com tiers + Frameworks DO — estende Course/Lesson existentes com gating por tier; novo tipo de conteúdo "Framework" (PDF + aula vinculada).
+  - [x] Biblioteca de aulas com tiers — `category`+`tier` no Lesson, `/membros/aulas` (grid, filtro por categoria, player, gate de material por tier), aba destrancada no nav, Início voltou a ser só "continuar assistindo".
+  - [ ] Frameworks DO como tipo de conteúdo próprio (PDF + aula vinculada) — **próximo passo**, ver abaixo.
+- [ ] Perfil (upload de foto, nome) — pequeno, usado no topbar de todas as personas; checar o que já existe em profile.blade.php.
+  - [x] Nome editável, layout no header de marca (já existia/foi migrado nesta spec).
+  - [ ] Upload de foto.
+- [ ] Marca d'água dinâmica no player — item técnico/segurança, mexe no player que já existe (Vimeo).
+- [ ] NPS pós-aula/encontro — feedback curto após assistir.
+- [ ] Encontros ao vivo — calendário de eventos; gravação cai na biblioteca de aulas (depende do #2).
+- [ ] Agenda de sessões 1:1 + disponibilidade do mentor — agendamento CLUB↔Mentor (depende do #1, já pronto).
+- [ ] Painel do mentor (radar do dia, dossiês/"fio da mentoria", publicar conteúdo) — maior bloco novo, depende de #1 (pronto), #2, #6, #7.
+- [ ] Cofre (documentos privados por mentorado) — depende da relação mentor↔mentorado criada no #8.
+- [ ] Pessoas do CLUB (matching/pontes) — rede entre membros, depende do #1 (pronto).
+- [ ] Fluxo de upgrade Start→CLUB — CTA de aplicação, depende do #1 (pronto).
