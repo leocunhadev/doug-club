@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Membros;
 
+use App\Actions\DetermineFeaturedLesson;
 use App\Livewire\Concerns\ComputesUserInitials;
 use App\Livewire\Concerns\TracksLessonProgress;
 use App\Models\Lesson;
@@ -13,9 +14,27 @@ use Livewire\Component;
 #[Layout('layouts.membros')]
 class Aulas extends Component
 {
-    use ComputesUserInitials, TracksLessonProgress;
+    use ComputesUserInitials;
+    use TracksLessonProgress {
+        mount as protected traitMount;
+    }
 
     public string $category = 'Tudo';
+
+    public function mount(DetermineFeaturedLesson $determineFeaturedLesson): void
+    {
+        $this->traitMount($determineFeaturedLesson);
+
+        $requestedLessonId = request()->integer('lesson');
+
+        if ($requestedLessonId) {
+            $lesson = Lesson::find($requestedLessonId);
+
+            if ($lesson && $lesson->isAvailableFor(Auth::user())) {
+                $this->featuredLessonId = $lesson->id;
+            }
+        }
+    }
 
     public function selectCategory(string $category): void
     {

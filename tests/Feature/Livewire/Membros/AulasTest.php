@@ -231,4 +231,44 @@ class AulasTest extends TestCase
         $this->assertCount(1, $cardsWithBadge, 'Expected exactly one card to contain the "Assistindo" badge.');
         $this->assertSame((string) $watchedLesson->id, $cardsWithBadge[0][1]);
     }
+
+    public function test_lesson_query_param_sets_the_featured_lesson_when_valid_and_available(): void
+    {
+        $course = $this->course();
+        $lesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula via deep link',
+            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 1,
+            'category' => 'Encontros', 'tier' => 'start',
+        ]);
+
+        $this->actingAs(User::factory()->create(['tier' => 'start']));
+
+        $this->get('/membros/aulas?lesson='.$lesson->id)
+            ->assertOk()
+            ->assertSee("wire:key=\"hero-player-{$lesson->id}\"", false);
+    }
+
+    public function test_lesson_query_param_is_ignored_when_it_points_to_an_unavailable_lesson(): void
+    {
+        $course = $this->course();
+        $clubLesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula club',
+            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 1,
+            'category' => 'Encontros', 'tier' => 'club',
+        ]);
+
+        $this->actingAs(User::factory()->create(['tier' => 'start']));
+
+        $this->get('/membros/aulas?lesson='.$clubLesson->id)
+            ->assertOk()
+            ->assertDontSee("wire:key=\"hero-player-{$clubLesson->id}\"", false);
+    }
+
+    public function test_lesson_query_param_is_ignored_when_the_lesson_does_not_exist(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        $this->get('/membros/aulas?lesson=999999')
+            ->assertOk();
+    }
 }
