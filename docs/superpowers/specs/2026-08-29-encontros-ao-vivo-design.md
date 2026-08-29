@@ -119,8 +119,9 @@ Estrutura/CSS: mesmo padrão de card já estabelecido (`bg-card border-sand roun
 Tailwind, sem CSS custom novo) — não precisa portar `.enc`/`.datebox` do protótipo linha a linha, só o
 essencial visual (caixa de data com dia/mês, título, quem/hora).
 
-- Caixa de data: dia + mês abreviado em pt-BR, extraídos de `scheduled_at` (`->format('d')` /
-  `->translatedFormat('M')`).
+- Caixa de data: dia + mês abreviado em pt-BR, extraídos de `scheduled_at` (`->format('d')` + um
+  accessor determinístico no model com o array de meses pt-BR — o locale da app é `en`, então
+  `translatedFormat('M')` devolveria "Jul", não "jul").
 - `tema` (título) + `quem` · hora (`scheduled_at->format('H\hi')`).
 - Se **passado**:
   - `recording_lesson_id` setado e a `Lesson` ainda existe → "Ver na biblioteca", deep-link real pra
