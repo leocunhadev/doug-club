@@ -276,50 +276,7 @@ class DashboardTest extends TestCase
             ->assertSee('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ', false)
             ->assertSee('Slides')
             ->assertSee('Apostila')
-            ->assertSee(route('membros.materials.download', $uploaded), false)
-            ->assertSee('Aula 05')
-            ->assertSee('Módulo 4');
-    }
-
-    public function test_watching_badge_appears_on_exactly_the_featured_lesson_card(): void
-    {
-        $user = User::factory()->create();
-        $course = Course::create(['label' => 'Curso 1', 'title' => 'Vendas', 'position' => 10]);
-        $watchedLesson = Lesson::create([
-            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula 1',
-            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 2,
-        ]);
-        Lesson::create([
-            'course_id' => $course->id, 'number' => 2, 'title' => 'Aula 2',
-            'video_provider' => 'youtube', 'video_id' => 'def', 'published_at' => '2026-01-02', 'position' => 1,
-        ]);
-
-        LessonProgress::create([
-            'user_id' => $user->id, 'lesson_id' => $watchedLesson->id,
-            'status' => 'watching', 'last_watched_at' => now(),
-        ]);
-
-        $this->actingAs($user);
-
-        $html = Livewire::test(Dashboard::class)->html();
-
-        $this->assertSame(1, substr_count($html, 'Assistindo'));
-
-        preg_match_all(
-            '/<button[^>]*wire:click="watchLesson\((\d+)\)"[^>]*>(.*?)<\/button>/s',
-            $html,
-            $cards,
-            PREG_SET_ORDER,
-        );
-
-        $cardsWithBadge = array_values(array_filter($cards, fn (array $card) => str_contains($card[2], 'Assistindo')));
-
-        $this->assertCount(1, $cardsWithBadge, 'Expected exactly one lesson card to contain the "Assistindo" badge.');
-        $this->assertSame(
-            (string) $watchedLesson->id,
-            $cardsWithBadge[0][1],
-            'The "Assistindo" badge is rendered on the wrong lesson card.',
-        );
+            ->assertSee(route('membros.materials.download', $uploaded), false);
     }
 
     public function test_membros_page_renders_through_the_paper_layout(): void
@@ -492,5 +449,27 @@ class DashboardTest extends TestCase
         Livewire::test(Dashboard::class)
             ->assertDontSee("wire:key=\"hero-player-{$clubLesson->id}\"", false)
             ->assertSee('Nenhuma aula disponível ainda.');
+    }
+
+    public function test_newest_lesson_card_never_recommends_a_club_only_lesson_to_a_start_tier_user(): void
+    {
+        $user = User::factory()->create(['tier' => 'start']);
+        $course = Course::create(['label' => 'Curso 1', 'title' => 'Vendas', 'position' => 10]);
+        Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula start mais antiga',
+            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 1,
+            'category' => 'Encontros', 'tier' => 'start',
+        ]);
+        Lesson::create([
+            'course_id' => $course->id, 'number' => 2, 'title' => 'Aula club mais nova',
+            'video_provider' => 'youtube', 'video_id' => 'def', 'published_at' => '2026-06-01', 'position' => 2,
+            'category' => 'Encontros', 'tier' => 'club',
+        ]);
+
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->assertSee('Aula start mais antiga')
+            ->assertDontSee('Aula club mais nova');
     }
 }

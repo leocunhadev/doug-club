@@ -4,9 +4,7 @@ namespace App\Livewire\Membros;
 
 use App\Livewire\Concerns\ComputesUserInitials;
 use App\Livewire\Concerns\TracksLessonProgress;
-use App\Models\Course;
 use App\Models\Lesson;
-use App\Models\LessonProgress;
 use App\Support\PersonaNavigation;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
@@ -19,19 +17,11 @@ class Dashboard extends Component
     use ComputesUserInitials, TracksLessonProgress;
 
     #[Computed]
-    public function courses()
-    {
-        return Course::query()
-            ->with('lessons')
-            ->orderByDesc('position')
-            ->get();
-    }
-
-    #[Computed]
     public function newestLesson(): ?Lesson
     {
         return Lesson::query()
             ->with('course')
+            ->where('tier', 'start')
             ->orderByDesc('published_at')
             ->orderByDesc('position')
             ->first();
@@ -61,12 +51,6 @@ class Dashboard extends Component
 
     public function render()
     {
-        return view('livewire.membros.dashboard', [
-            'watchingLessonId' => LessonProgress::query()
-                ->where('user_id', Auth::id())
-                ->where('lesson_id', $this->featuredLessonId)
-                ->where('status', 'watching')
-                ->exists() ? $this->featuredLessonId : null,
-        ]);
+        return view('livewire.membros.dashboard');
     }
 }

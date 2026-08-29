@@ -73,62 +73,6 @@
             </div>
             </div>
         </section>
-
-        @foreach ($this->courses as $course)
-            @if ($course->lessons->isNotEmpty())
-                <section
-                    x-data="{
-                        canScrollLeft: false,
-                        canScrollRight: false,
-                        update() {
-                            this.canScrollLeft = this.$refs.track.scrollLeft > 0;
-                            this.canScrollRight = this.$refs.track.scrollLeft + this.$refs.track.clientWidth < this.$refs.track.scrollWidth - 1;
-                        },
-                    }"
-                    x-init="update()"
-                    @resize.window.debounce.100ms="update()"
-                >
-                    <div>
-                        <h2 class="text-lg font-semibold font-display text-ink">
-                            {{ $course->label }}@if($course->title): {{ $course->title }}@endif
-                        </h2>
-                        @if ($course->description)
-                            <p class="mt-2 text-sm text-stone">{{ $course->description }}</p>
-                        @endif
-                    </div>
-
-                    <div class="relative">
-                        <div x-ref="track" @scroll.debounce.100ms="update()" class="mt-4 flex gap-4 overflow-x-auto scrollbar-none pb-2 scroll-smooth snap-x">
-                            @foreach ($course->lessons as $courseLesson)
-                                <div class="snap-start">
-                                    @if ($course->lessons->count() === 1)
-                                        <x-lesson-card-simple :lesson="$courseLesson" :course="$course" :watching="$watchingLessonId === $courseLesson->id" />
-                                    @else
-                                        <x-lesson-card :lesson="$courseLesson" :course="$course" :watching="$watchingLessonId === $courseLesson->id" />
-                                    @endif
-                                </div>
-                            @endforeach
-                        </div>
-
-                        <button type="button" x-show="canScrollLeft" x-cloak
-                                @click="$refs.track.scrollBy({ left: -300, behavior: 'smooth' })"
-                                class="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full bg-brand text-white shadow-lg hover:brightness-110">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 fill-current">
-                                <path d="M14.71 6.71a1 1 0 0 1 0 1.42L10.41 12l4.3 4.29a1 1 0 0 1-1.42 1.42l-5-5a1 1 0 0 1 0-1.42l5-5a1 1 0 0 1 1.42 0Z"/>
-                            </svg>
-                        </button>
-
-                        <button type="button" x-show="canScrollRight" x-cloak
-                                @click="$refs.track.scrollBy({ left: 300, behavior: 'smooth' })"
-                                class="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 items-center justify-center rounded-full bg-brand text-white shadow-lg hover:brightness-110">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 fill-current">
-                                <path d="M9.29 6.71a1 1 0 0 1 1.42 0l5 5a1 1 0 0 1 0 1.42l-5 5a1 1 0 0 1-1.42-1.42L13.59 12 9.29 7.71a1 1 0 0 1 0-1.42Z"/>
-                            </svg>
-                        </button>
-                    </div>
-                </section>
-            @endif
-        @endforeach
     </div>
 
     <x-membros.footer />
