@@ -8,6 +8,8 @@
   - [x] Upload de foto — `photo_path` no User, upload/troca/remoção no card de Profile Information, avatar do header mostra a foto quando existe (fallback pras iniciais).
 - [x] Marca d'água dinâmica no player — e-mail do membro sobre o vídeo, reposicionando aleatoriamente a cada 10s (Alpine, `lesson-watermark.js`), sem gate de provedor (Vimeo/YouTube).
 - [ ] NPS pós-aula/encontro — feedback curto após assistir.
+  - [x] Pós-aula — nota 0–10 no player ao bater ~90% assistido (só Vimeo, mesmo gatilho de "concluída"), uma vez por aula.
+  - [ ] Pós-encontro — depende do model de Encontro existir (item #5).
 - [ ] Encontros ao vivo — calendário de eventos; gravação cai na biblioteca de aulas (depende do #2).
 - [ ] Agenda de sessões 1:1 + disponibilidade do mentor — agendamento CLUB↔Mentor (depende do #1, já pronto).
 - [ ] Painel do mentor (radar do dia, dossiês/"fio da mentoria", publicar conteúdo) — maior bloco novo, depende de #1 (pronto), #2, #6, #7.
