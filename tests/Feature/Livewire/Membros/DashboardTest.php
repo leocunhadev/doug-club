@@ -388,7 +388,9 @@ class DashboardTest extends TestCase
         $this->actingAs($user);
 
         Livewire::test(Dashboard::class)
-            ->assertSee('Sua central de conteúdos')
+            ->assertSee('Sua próxima')
+            ->assertSee('decisão')
+            ->assertSee('começa aqui')
             ->assertDontSee('Acompanhe as transmissões ao vivo e os conteúdos gravados de Douglas Oliveira');
     }
 
@@ -398,7 +400,72 @@ class DashboardTest extends TestCase
         $this->actingAs($user);
 
         Livewire::test(Dashboard::class)
-            ->assertSee('Sua central de conteúdos')
+            ->assertSee('continuar de onde paramos')
             ->assertSee('Acompanhe as transmissões ao vivo e os conteúdos gravados de Douglas Oliveira', false);
+    }
+
+    public function test_hero_greets_the_user_by_name(): void
+    {
+        $user = User::factory()->create(['name' => 'Ricardo Mendes']);
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->assertSee('Olá, Ricardo Mendes.', false);
+    }
+
+    public function test_quick_links_render_locked_with_no_href_when_route_does_not_exist_yet(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'club']));
+
+        $html = Livewire::test(Dashboard::class)->html();
+
+        foreach (['Biblioteca de aulas', 'Frameworks DO', 'Marcar minha sessão'] as $label) {
+            $this->assertMatchesRegularExpression(
+                '#<span[^>]*>\s*'.preg_quote($label, '#').'.*?🔒#s',
+                $html,
+            );
+        }
+
+        $this->assertStringNotContainsString('href="http://localhost/membros/aulas"', $html);
+    }
+
+    public function test_start_tier_quick_links_show_conhecer_o_club_as_the_third_link(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'start']));
+
+        Livewire::test(Dashboard::class)->assertSee('Conhecer o CLUB');
+    }
+
+    public function test_start_tier_sees_the_newest_lesson_in_the_novidade_card_with_a_working_watch_button(): void
+    {
+        $user = User::factory()->create(['tier' => 'start']);
+        $course = Course::create(['label' => 'Curso 1', 'title' => 'Vendas', 'position' => 10]);
+        Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula antiga',
+            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 1,
+        ]);
+        $newest = Lesson::create([
+            'course_id' => $course->id, 'number' => 2, 'title' => 'Aula nova de verdade',
+            'video_provider' => 'youtube', 'video_id' => 'def', 'published_at' => '2026-06-01', 'position' => 2,
+        ]);
+
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->assertSee('Novidade na biblioteca')
+            ->assertSee('Aula nova de verdade')
+            ->call('watchLesson', $newest->id)
+            ->assertSet('featuredLessonId', $newest->id);
+    }
+
+    public function test_club_tier_sees_a_locked_next_session_card_with_no_fake_date(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'club']));
+
+        Livewire::test(Dashboard::class)
+            ->assertSee('Sua próxima sessão 1:1')
+            ->assertSee('Agenda chega em breve')
+            ->assertDontSee('09 de julho')
+            ->assertDontSee('Adicionar ao calendário');
     }
 }
