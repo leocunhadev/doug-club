@@ -138,14 +138,21 @@ comportamento atual).
 
 ## 5. Home por persona
 
-Dentro de `/membros` (dashboard), pequenas variações de copy condicionadas a `auth()->user()->tier`
-(sem novo componente Livewire, é lógica de view igual ao resto de `dashboard.blade.php`):
+Dentro de `/membros` (dashboard), a única variação é o texto de abertura, condicionado a
+`auth()->user()->tier` (sem novo componente Livewire, é lógica de view igual ao resto de
+`dashboard.blade.php`):
 
-- **Start**: título/eyebrow sem menção a "sessão 1:1"; sem o bloco de citação "onde paramos" (esse
-  bloco, no protótipo, é o resumo da última sessão de mentoria — não existe pra quem não tem CLUB).
-- **CLUB**: comportamento atual mantido (o dashboard de hoje já é, na prática, a experiência CLUB).
+- **Start**: `"Sua central de conteúdos"` / texto sem menção a acompanhamento com o Douglas.
+- **CLUB**: mantém o texto atual ("Acompanhe as transmissões ao vivo e os conteúdos gravados de
+  Douglas Oliveira...").
 
-Sem mudança de dados/consulta — é condicional de exibição sobre o `$user` já carregado.
+O protótipo (`doingclub.html`) também mostra, na home do CLUB, um bloco com a última anotação da
+sessão de mentoria ("onde paramos"). Esse bloco depende de dado que não existe no banco ainda
+(resumo de sessão 1:1 — nasce só nos itens `#7`/`#8`, agenda e painel do mentor), então **não entra
+nesta spec** — não há dado real pra exibir, e mockar um texto fixo seria inventar conteúdo falso na
+tela. Fica registrado no backlog (seção 8).
+
+Sem mudança de dados/consulta — é condicional de exibição de texto estático sobre `$user->tier`.
 
 ## 6. Migração visual (design tokens)
 
@@ -209,6 +216,8 @@ hoje.
 - Conteúdo real de qualquer aba trancada (aulas por tier, frameworks, cofre, agenda, pessoas,
   encontros, radar/dossiês/publicar/disponibilidade do mentor, tela de upgrade Start→CLUB) — itens
   #2 e #6-#11 do `lista-spec.md`, cada um com sua própria spec.
+- Bloco "onde paramos" (resumo da última sessão de mentoria) na home do CLUB — depende de dado que
+  só existe depois dos itens `#7`/`#8`.
 - Troca de persona livre por um seletor (como o protótipo faz pra demonstração) — no app real o tier
   é fixo por usuário, não um toggle.
 - Marca d'água dinâmica no player, NPS, upload de foto de perfil — itens #3-#5 do `lista-spec.md`.
