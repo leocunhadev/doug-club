@@ -3,13 +3,13 @@
 <button
     type="button"
     wire:click="watchLesson({{ $lesson->id }})"
-    {{ $attributes->class(['group relative shrink-0 w-64 text-left rounded-xl bg-surface ring-1 ring-inset ring-slate-800/60 transition hover:ring-brand hover:brightness-110']) }}
+    {{ $attributes->class(['group relative shrink-0 w-64 text-left rounded-xl bg-card ring-1 ring-inset ring-sand transition hover:ring-brand hover:brightness-110']) }}
 >
     <div class="relative aspect-video overflow-hidden rounded-t-xl bg-[radial-gradient(circle_at_top_left,rgba(249,115,22,0.35),transparent_60%)]">
         <div class="absolute top-2 left-2 right-2 flex items-start justify-between gap-2">
             <span class="min-w-0">
                 <x-brand-logo icon-only class="h-4 w-auto" />
-                <span class="mt-1 block truncate text-[10px] font-semibold uppercase tracking-widest text-orange-400">
+                <span class="mt-1 block truncate text-[10px] font-semibold uppercase tracking-widest text-brand">
                     Curso
                 </span>
                 <span class="block truncate text-xs font-semibold uppercase tracking-wide text-white">
@@ -37,7 +37,7 @@
     </div>
 
     <div class="p-3">
-        <p class="text-xs text-gray-400">{{ $lesson->published_at->format('d/m/Y') }}</p>
-        <p class="mt-1 text-sm font-medium text-white line-clamp-2">{{ $lesson->title }}</p>
+        <p class="text-xs text-stone">{{ $lesson->published_at->format('d/m/Y') }}</p>
+        <p class="mt-1 text-sm font-medium text-ink line-clamp-2">{{ $lesson->title }}</p>
     </div>
 </button>
