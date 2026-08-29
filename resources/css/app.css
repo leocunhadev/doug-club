@@ -9,3 +9,39 @@
 .scrollbar-none::-webkit-scrollbar {
     display: none; /* Chrome/Safari/Edge Chromium */
 }
+
+.marquee {
+    overflow: hidden;
+    background: theme('colors.black');
+    border-radius: 14px;
+    margin: 6px 0 18px;
+    padding: 11px 0;
+}
+.marquee .track {
+    display: flex;
+    gap: 0;
+    width: max-content;
+    animation: marquee-scroll 26s linear infinite;
+}
+.marquee span {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: #fff;
+    padding: 0 22px;
+    white-space: nowrap;
+}
+.marquee span:nth-child(even) {
+    color: theme('colors.brand');
+}
+@keyframes marquee-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .marquee .track {
+        animation: none;
+    }
+}

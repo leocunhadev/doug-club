@@ -28,6 +28,10 @@
         </x-dropdown>
     </div>
 
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="marquee" aria-hidden="true"><div class="track" id="mqTrack"><span>Tudo é gente ·</span><span>Decisão Orientada ·</span><span>Dado · Padrão · Decisão ·</span><span>DOR: Direção, Orientação, Resultado ·</span><span>Consumidor 4S ·</span><span>Tudo é gente ·</span><span>Decisão Orientada ·</span><span>Dado · Padrão · Decisão ·</span><span>DOR: Direção, Orientação, Resultado ·</span><span>Consumidor 4S ·</span></div></div>
+    </div>
+
         <x-auth-session-status class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3" :status="session('status')" />
 
     <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-3 flex gap-1 overflow-x-auto" aria-label="Navegação principal">
