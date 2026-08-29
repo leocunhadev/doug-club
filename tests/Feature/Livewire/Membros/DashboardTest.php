@@ -5,6 +5,7 @@ namespace Tests\Feature\Livewire\Membros;
 use App\Livewire\Membros\Dashboard;
 use App\Models\Course;
 use App\Models\Lesson;
+use App\Models\LessonFeedback;
 use App\Models\LessonProgress;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -191,6 +192,45 @@ class DashboardTest extends TestCase
         ]);
     }
 
+    public function test_submit_nps_score_records_the_feedback(): void
+    {
+        $user = User::factory()->create();
+        $course = Course::create(['label' => 'Curso 1', 'title' => 'Vendas', 'position' => 10]);
+        $lesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula 1',
+            'video_provider' => 'vimeo', 'video_id' => '76979871', 'published_at' => '2026-01-01', 'position' => 1,
+        ]);
+
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->call('submitNpsScore', $lesson->id, 9);
+
+        $this->assertDatabaseHas('lesson_feedback', [
+            'user_id' => $user->id,
+            'lesson_id' => $lesson->id,
+            'score' => 9,
+        ]);
+    }
+
+    public function test_submit_nps_score_is_ignored_for_a_lesson_unavailable_to_the_users_tier(): void
+    {
+        $user = User::factory()->create(['tier' => 'start']);
+        $course = Course::create(['label' => 'Curso 1', 'title' => 'Vendas', 'position' => 10]);
+        $lesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula CLUB',
+            'video_provider' => 'vimeo', 'video_id' => '76979871', 'published_at' => '2026-01-01', 'position' => 1,
+            'tier' => 'club',
+        ]);
+
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->call('submitNpsScore', $lesson->id, 9);
+
+        $this->assertDatabaseMissing('lesson_feedback', ['lesson_id' => $lesson->id]);
+    }
+
     public function test_hero_player_wires_up_the_vimeo_progress_component_for_vimeo_lessons(): void
     {
         $user = User::factory()->create();
@@ -207,6 +247,37 @@ class DashboardTest extends TestCase
             ->assertSee('x-data="vimeoProgress(', false)
             ->assertSee("provider: 'vimeo'", false)
             ->assertSee('initialSeconds: 0', false);
+    }
+
+    public function test_hero_player_passes_has_feedback_false_when_the_user_has_not_rated_the_lesson(): void
+    {
+        $user = User::factory()->create();
+        $course = Course::create(['label' => 'Curso 1', 'title' => 'Vendas', 'position' => 10]);
+        $lesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula 1',
+            'video_provider' => 'vimeo', 'video_id' => '76979871', 'published_at' => '2026-01-01', 'position' => 1,
+        ]);
+
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->assertSee('hasFeedback: false', false);
+    }
+
+    public function test_hero_player_passes_has_feedback_true_when_the_user_already_rated_the_lesson(): void
+    {
+        $user = User::factory()->create();
+        $course = Course::create(['label' => 'Curso 1', 'title' => 'Vendas', 'position' => 10]);
+        $lesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula 1',
+            'video_provider' => 'vimeo', 'video_id' => '76979871', 'published_at' => '2026-01-01', 'position' => 1,
+        ]);
+        LessonFeedback::create(['user_id' => $user->id, 'lesson_id' => $lesson->id, 'score' => 10]);
+
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->assertSee('hasFeedback: true', false);
     }
 
     public function test_hero_player_passes_the_saved_watched_seconds_into_the_alpine_component(): void

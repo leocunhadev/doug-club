@@ -28,7 +28,7 @@
             <div class="mt-8 grid grid-cols-1 min-[860px]:grid-cols-[1.5fr_0.8fr] gap-[18px]">
             <div>
             <p class="text-xs font-bold uppercase tracking-widest text-stone mb-2.5">Continuar assistindo</p>
-            <x-lesson-player :lesson="$this->featuredLesson" :progress="$this->featuredProgress" />
+            <x-lesson-player :lesson="$this->featuredLesson" :progress="$this->featuredProgress" :has-feedback="$this->featuredHasFeedback" />
             </div>
 
             <div class="flex flex-col gap-4">

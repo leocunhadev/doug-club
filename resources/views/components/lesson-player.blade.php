@@ -1,4 +1,4 @@
-@props(['lesson', 'progress'])
+@props(['lesson', 'progress', 'hasFeedback' => false])
 
 @if ($lesson && $lesson->isAvailableFor(auth()->user()))
     <div
@@ -7,6 +7,7 @@
             lessonId: {{ $lesson->id }},
             provider: '{{ $lesson->video_provider }}',
             initialSeconds: {{ $progress?->watched_seconds ?? 0 }},
+            hasFeedback: {{ $hasFeedback ? 'true' : 'false' }},
         })"
         class="mt-6 rounded-2xl border border-sand bg-card p-3 sm:p-4"
     >
@@ -24,6 +25,21 @@
                 :style="`top:${top}%;left:${left}%`"
                 class="pointer-events-none absolute select-none whitespace-nowrap text-xs font-medium text-white/40 [text-shadow:0_1px_2px_rgba(0,0,0,.6)]"
             >{{ auth()->user()->email }}</span>
+        </div>
+
+        <div x-show="showNps" x-cloak x-transition class="mt-3 rounded-xl border border-sand bg-paper p-4">
+            <p class="text-sm font-medium text-ink">De 0 a 10, o quanto você recomendaria esta aula?</p>
+            <div class="mt-2 flex flex-wrap items-center gap-1.5">
+                @for ($i = 0; $i <= 10; $i++)
+                    <button type="button" @click="submitNps({{ $i }})"
+                            class="h-8 w-8 rounded-full border border-sand text-sm font-medium text-ink hover:border-black hover:bg-card">
+                        {{ $i }}
+                    </button>
+                @endfor
+                <button type="button" @click="showNps = false" class="ms-2 text-xs text-stone hover:text-ink">
+                    Agora não
+                </button>
+            </div>
         </div>
     </div>
 

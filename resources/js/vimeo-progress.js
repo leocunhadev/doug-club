@@ -3,10 +3,11 @@ import Player from '@vimeo/player';
 const COMPLETED_THRESHOLD = 0.9;
 const RESUME_SAFETY_MARGIN_SECONDS = 5;
 
-export default function vimeoProgress({ lessonId, provider, initialSeconds }) {
+export default function vimeoProgress({ lessonId, provider, initialSeconds, hasFeedback }) {
     return {
         player: null,
         completedSent: false,
+        showNps: false,
 
         init() {
             if (provider !== 'vimeo') {
@@ -49,11 +50,20 @@ export default function vimeoProgress({ lessonId, provider, initialSeconds }) {
 
             this.completedSent = true;
             this.$wire.markCompleted(lessonId);
+
+            if (!hasFeedback) {
+                this.showNps = true;
+            }
         },
 
         async saveProgress() {
             const seconds = await this.player.getCurrentTime();
             this.$wire.updateProgress(lessonId, Math.floor(seconds));
+        },
+
+        submitNps(score) {
+            this.$wire.submitNpsScore(lessonId, score);
+            this.showNps = false;
         },
     };
 }
