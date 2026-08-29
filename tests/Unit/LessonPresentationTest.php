@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Models\Course;
 use App\Models\Lesson;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -94,5 +95,31 @@ class LessonPresentationTest extends TestCase
         $lesson = $this->makeLesson(['thumbnail_path' => 'https://cdn.example.com/thumb.jpg']);
 
         $this->assertSame('https://cdn.example.com/thumb.jpg', $lesson->thumbnail_url);
+    }
+
+    public function test_is_available_for_start_tier_lesson_regardless_of_user_tier(): void
+    {
+        $lesson = $this->makeLesson(['tier' => 'start']);
+
+        $this->assertTrue($lesson->isAvailableFor(User::factory()->create(['tier' => 'start'])));
+        $this->assertTrue($lesson->isAvailableFor(User::factory()->create(['tier' => 'club'])));
+    }
+
+    public function test_is_available_for_club_tier_lesson_requires_club_access(): void
+    {
+        $lesson = $this->makeLesson(['tier' => 'club']);
+
+        $this->assertFalse($lesson->isAvailableFor(User::factory()->create(['tier' => 'start'])));
+        $this->assertTrue($lesson->isAvailableFor(User::factory()->create(['tier' => 'club'])));
+        $this->assertTrue($lesson->isAvailableFor(User::factory()->create(['tier' => 'mentor'])));
+    }
+
+    public function test_lesson_defaults_to_encontros_category_and_start_tier(): void
+    {
+        $lesson = $this->makeLesson();
+        $lesson->refresh();
+
+        $this->assertSame('Encontros', $lesson->category);
+        $this->assertSame('start', $lesson->tier);
     }
 }

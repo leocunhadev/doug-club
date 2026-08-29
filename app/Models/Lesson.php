@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,6 +25,8 @@ class Lesson extends Model
         'thumbnail_path',
         'published_at',
         'position',
+        'category',
+        'tier',
     ];
 
     protected $casts = [
@@ -43,6 +46,11 @@ class Lesson extends Model
     public function progress(): HasMany
     {
         return $this->hasMany(LessonProgress::class);
+    }
+
+    public function isAvailableFor(User $user): bool
+    {
+        return $this->tier === 'start' || $user->hasClubAccess();
     }
 
     protected function embedUrl(): Attribute
