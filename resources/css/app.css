@@ -97,3 +97,40 @@
         font-size: 13px;
     }
 }
+.aula-card-thumb {
+    aspect-ratio: 16 / 9;
+    background: theme('colors.black');
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding: 14px;
+    border-radius: 18px 18px 0 0;
+    overflow: hidden;
+}
+.aula-card-number {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 44px;
+    color: transparent;
+    -webkit-text-stroke: 1.5px theme('colors.brand');
+    position: absolute;
+    top: 8px;
+    right: 14px;
+    opacity: .9;
+}
+.aula-card-play {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: theme('colors.brand');
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.aula-card-play::after {
+    content: "";
+    border-style: solid;
+    border-width: 6px 0 6px 10px;
+    border-color: transparent transparent transparent #fff;
+    margin-left: 2px;
+}

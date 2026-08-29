@@ -3,6 +3,7 @@
 use App\Http\Controllers\Membros\LessonMaterialDownloadController;
 use App\Http\Controllers\Membros\PreviewPersonaController;
 use App\Http\Controllers\Webhooks\AbacatePayWebhookController;
+use App\Livewire\Membros\Aulas;
 use App\Livewire\Membros\Dashboard;
 use App\Livewire\Membros\MentorPlaceholder;
 use App\Livewire\Membros\Sobre;
@@ -29,6 +30,10 @@ Route::get('membros/materiais/{material}/download', LessonMaterialDownloadContro
 Route::get('membros/sobre', Sobre::class)
     ->middleware(['auth', 'verified', 'active'])
     ->name('membros.sobre');
+
+Route::get('membros/aulas', Aulas::class)
+    ->middleware(['auth', 'verified', 'active'])
+    ->name('membros.aulas');
 
 Route::get('membros/mentor', MentorPlaceholder::class)
     ->middleware(['auth', 'verified', 'active', 'tier:mentor'])
