@@ -468,4 +468,26 @@ class DashboardTest extends TestCase
             ->assertDontSee('09 de julho')
             ->assertDontSee('Adicionar ao calendário');
     }
+
+    public function test_hero_player_refuses_to_render_a_club_only_lesson_for_a_start_tier_viewer(): void
+    {
+        $user = User::factory()->create(['tier' => 'start']);
+        $course = Course::create(['label' => 'Curso 1', 'title' => 'Vendas', 'position' => 10]);
+        $clubLesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula só de club',
+            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 1,
+            'category' => 'Encontros', 'tier' => 'club',
+        ]);
+
+        LessonProgress::create([
+            'user_id' => $user->id, 'lesson_id' => $clubLesson->id,
+            'status' => 'watching', 'last_watched_at' => now(),
+        ]);
+
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->assertDontSee("wire:key=\"hero-player-{$clubLesson->id}\"", false)
+            ->assertSee('Nenhuma aula disponível ainda.');
+    }
 }
