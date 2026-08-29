@@ -1,15 +1,21 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Livewire\WithFileUploads;
 use Livewire\Volt\Component;
 
 new class extends Component
 {
+    use WithFileUploads;
+
     public string $name = '';
     public string $email = '';
+    public ?UploadedFile $photo = null;
 
     /**
      * Mount the component.
@@ -18,6 +24,60 @@ new class extends Component
     {
         $this->name = Auth::user()->name;
         $this->email = Auth::user()->email;
+    }
+
+    /**
+     * Save the new photo as soon as it finishes uploading, no separate button needed.
+     */
+    public function updatedPhoto(): void
+    {
+        $this->updatePhoto();
+    }
+
+    /**
+     * Upload and set a new profile photo, replacing any existing one.
+     */
+    public function updatePhoto(): void
+    {
+        try {
+            $this->validate([
+                'photo' => ['required', 'image', 'max:2048'],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->photo = null;
+
+            throw $e;
+        }
+
+        $user = Auth::user();
+        $previousPath = $user->photo_path;
+
+        $user->photo_path = $this->photo->store('avatars', 'public');
+        $user->save();
+
+        if ($previousPath) {
+            Storage::disk('public')->delete($previousPath);
+        }
+
+        $this->photo = null;
+
+        $this->dispatch('profile-updated', name: $user->name);
+    }
+
+    /**
+     * Remove the current profile photo.
+     */
+    public function removePhoto(): void
+    {
+        $user = Auth::user();
+
+        if ($user->photo_path) {
+            Storage::disk('public')->delete($user->photo_path);
+            $user->photo_path = null;
+            $user->save();
+        }
+
+        $this->dispatch('profile-updated', name: $user->name);
     }
 
     /**
@@ -72,6 +132,33 @@ new class extends Component
             {{ __("Update your account's profile information and email address.") }}
         </p>
     </header>
+
+    <div class="mt-6 flex items-center gap-4">
+        @if ($photo)
+            <img src="{{ $photo->temporaryUrl() }}" alt="" class="h-16 w-16 rounded-full object-cover">
+        @elseif (auth()->user()->photo_url)
+            <img src="{{ auth()->user()->photo_url }}" alt="" class="h-16 w-16 rounded-full object-cover">
+        @else
+            <div class="h-16 w-16 rounded-full bg-brand text-white flex items-center justify-center font-semibold">
+                {{ auth()->user()->initials }}
+            </div>
+        @endif
+
+        <div>
+            <label class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-semibold border border-sand text-ink hover:border-black cursor-pointer">
+                Trocar foto
+                <input type="file" wire:model="photo" accept="image/*" class="hidden">
+            </label>
+
+            @if (auth()->user()->photo_url)
+                <button type="button" wire:click="removePhoto" class="ms-2 text-xs font-semibold text-stone hover:text-ink">
+                    Remover foto
+                </button>
+            @endif
+
+            <x-input-error class="mt-2" :messages="$errors->get('photo')" />
+        </div>
+    </div>
 
     <form wire:submit="updateProfileInformation" class="mt-6 space-y-6">
         <div>

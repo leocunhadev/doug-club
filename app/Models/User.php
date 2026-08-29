@@ -13,8 +13,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
-#[Fillable(['name', 'email', 'password', 'is_admin', 'access_revoked_at', 'email_verified_at', 'tier'])]
+#[Fillable(['name', 'email', 'password', 'is_admin', 'access_revoked_at', 'email_verified_at', 'tier', 'photo_path'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements FilamentUser
 {
@@ -81,5 +82,12 @@ class User extends Authenticatable implements FilamentUser
 
             return mb_strtoupper($initials);
         });
+    }
+
+    protected function photoUrl(): Attribute
+    {
+        return Attribute::get(fn () => filled($this->photo_path)
+            ? Storage::disk('public')->url($this->photo_path)
+            : null);
     }
 }

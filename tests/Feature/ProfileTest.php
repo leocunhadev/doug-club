@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Volt\Volt;
 use Tests\TestCase;
 
@@ -97,5 +99,114 @@ class ProfileTest extends TestCase
             ->assertNoRedirect();
 
         $this->assertNotNull($user->fresh());
+    }
+
+    public function test_user_can_upload_a_profile_photo(): void
+    {
+        Storage::fake('public');
+
+        $user = User::factory()->create(['photo_path' => null]);
+
+        $this->actingAs($user);
+
+        $component = Volt::test('profile.update-profile-information-form')
+            ->set('name', $user->name)
+            ->set('email', $user->email)
+            ->set('photo', UploadedFile::fake()->image('avatar.jpg'));
+
+        $component->assertHasNoErrors();
+
+        $user->refresh();
+
+        $this->assertNotNull($user->photo_path);
+        Storage::disk('public')->assertExists($user->photo_path);
+    }
+
+    public function test_uploading_a_new_photo_deletes_the_previous_one(): void
+    {
+        Storage::fake('public');
+
+        $oldPath = UploadedFile::fake()->image('old.jpg')->store('avatars', 'public');
+        $user = User::factory()->create(['photo_path' => $oldPath]);
+
+        $this->actingAs($user);
+
+        Volt::test('profile.update-profile-information-form')
+            ->set('name', $user->name)
+            ->set('email', $user->email)
+            ->set('photo', UploadedFile::fake()->image('new.jpg'))
+            ->assertHasNoErrors();
+
+        Storage::disk('public')->assertMissing($oldPath);
+    }
+
+    public function test_photo_upload_rejects_non_image_files(): void
+    {
+        Storage::fake('public');
+
+        $user = User::factory()->create(['photo_path' => null]);
+
+        $this->actingAs($user);
+
+        Volt::test('profile.update-profile-information-form')
+            ->set('photo', UploadedFile::fake()->create('document.pdf', 10, 'application/pdf'))
+            ->assertHasErrors('photo');
+
+        $this->assertNull($user->fresh()->photo_path);
+    }
+
+    public function test_photo_upload_rejects_files_over_2mb(): void
+    {
+        Storage::fake('public');
+
+        $user = User::factory()->create(['photo_path' => null]);
+
+        $this->actingAs($user);
+
+        Volt::test('profile.update-profile-information-form')
+            ->set('photo', UploadedFile::fake()->image('big.jpg')->size(3000))
+            ->assertHasErrors('photo');
+
+        $this->assertNull($user->fresh()->photo_path);
+    }
+
+    public function test_header_shows_the_photo_when_the_user_has_one(): void
+    {
+        Storage::fake('public');
+
+        $path = UploadedFile::fake()->image('avatar.jpg')->store('avatars', 'public');
+        $user = User::factory()->create(['photo_path' => $path]);
+
+        $response = $this->actingAs($user)->get('/profile');
+
+        $response->assertOk();
+        $response->assertSee(Storage::disk('public')->url($path), false);
+    }
+
+    public function test_header_shows_initials_when_the_user_has_no_photo(): void
+    {
+        $user = User::factory()->create(['name' => 'Ana Beatriz', 'photo_path' => null]);
+
+        $response = $this->actingAs($user)->get('/profile');
+
+        $response->assertOk();
+        $response->assertSee('AB');
+    }
+
+    public function test_user_can_remove_their_profile_photo(): void
+    {
+        Storage::fake('public');
+
+        $path = UploadedFile::fake()->image('avatar.jpg')->store('avatars', 'public');
+        $user = User::factory()->create(['photo_path' => $path]);
+
+        $this->actingAs($user);
+
+        Volt::test('profile.update-profile-information-form')
+            ->call('removePhoto')
+            ->assertHasNoErrors();
+
+        $this->assertNull($user->fresh()->photo_path);
+        Storage::disk('public')->assertMissing($path);
     }
 }

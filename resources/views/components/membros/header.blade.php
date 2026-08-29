@@ -20,9 +20,15 @@
 
             <x-dropdown align="right" width="48" contentClasses="py-1 bg-card border border-sand">
                 <x-slot name="trigger">
-                    <button type="button" class="h-9 w-9 rounded-full bg-brand text-sm font-semibold text-white flex items-center justify-center">
-                        {{ $initials }}
-                    </button>
+                    @if (auth()->user()->photo_url)
+                        <button type="button" class="h-9 w-9 rounded-full overflow-hidden">
+                            <img src="{{ auth()->user()->photo_url }}" alt="" class="h-9 w-9 rounded-full object-cover">
+                        </button>
+                    @else
+                        <button type="button" class="h-9 w-9 rounded-full bg-brand text-sm font-semibold text-white flex items-center justify-center">
+                            {{ $initials }}
+                        </button>
+                    @endif
                 </x-slot>
 
                 <x-slot name="content">
