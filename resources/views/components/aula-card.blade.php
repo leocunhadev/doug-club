@@ -13,6 +13,11 @@
         @endif
         <span class="aula-card-number">{{ sprintf('%02d', $lesson->number) }}</span>
         <span class="aula-card-play"></span>
+        @if ($lesson->duration_formatted)
+            <span class="aula-card-duration absolute bottom-2 right-2 text-xs font-medium text-white bg-black/60 rounded px-1.5 py-0.5">
+                {{ $lesson->duration_formatted }}
+            </span>
+        @endif
     </div>
     <div class="p-3.5">
         <b class="font-display text-sm block leading-tight">{{ $lesson->title }}</b>

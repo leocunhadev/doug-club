@@ -148,6 +148,34 @@ class AulasTest extends TestCase
             ->assertSee('Nenhuma aula nesta categoria ainda.');
     }
 
+    public function test_aula_card_shows_the_formatted_duration_when_present(): void
+    {
+        $course = $this->course();
+        Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula com duração',
+            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 1,
+            'category' => 'Encontros', 'tier' => 'start', 'duration_seconds' => 3900,
+        ]);
+
+        $this->actingAs(User::factory()->create());
+
+        Livewire::test(Aulas::class)->assertSee('1h 05min');
+    }
+
+    public function test_aula_card_omits_the_duration_chip_when_duration_is_unknown(): void
+    {
+        $course = $this->course();
+        Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula sem duração',
+            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 1,
+            'category' => 'Encontros', 'tier' => 'start', 'duration_seconds' => null,
+        ]);
+
+        $this->actingAs(User::factory()->create());
+
+        Livewire::test(Aulas::class)->assertDontSee('aula-card-duration', false);
+    }
+
     public function test_watching_a_lesson_from_the_grid_updates_the_hero_player(): void
     {
         $course = $this->course();
