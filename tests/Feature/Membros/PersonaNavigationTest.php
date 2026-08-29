@@ -34,7 +34,7 @@ class PersonaNavigationTest extends TestCase
         );
     }
 
-    public function test_club_tier_shows_inicio_aulas_and_frameworks_as_links_and_four_tabs_locked(): void
+    public function test_club_tier_shows_inicio_aulas_encontros_and_frameworks_as_links_and_three_tabs_locked(): void
     {
         $user = User::factory()->create(['tier' => 'club']);
         $this->actingAs($user);
@@ -44,6 +44,7 @@ class PersonaNavigationTest extends TestCase
         foreach ([
             ['href' => 'http://localhost/membros', 'label' => 'Início'],
             ['href' => 'http://localhost/membros/aulas', 'label' => 'Aulas'],
+            ['href' => 'http://localhost/membros/encontros', 'label' => 'Encontros'],
             ['href' => 'http://localhost/membros/frameworks', 'label' => 'Frameworks'],
         ] as $link) {
             $this->assertMatchesRegularExpression(
@@ -52,7 +53,7 @@ class PersonaNavigationTest extends TestCase
             );
         }
 
-        foreach (['Meu cofre', 'Minha sessão', 'Pessoas', 'Encontros'] as $label) {
+        foreach (['Meu cofre', 'Minha sessão', 'Pessoas'] as $label) {
             $this->assertMatchesRegularExpression(
                 '#<span[^>]*title="Em breve"[^>]*>\s*'.preg_quote($label, '#').'#s',
                 $html,

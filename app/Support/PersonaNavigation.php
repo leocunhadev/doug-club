@@ -22,7 +22,7 @@ class PersonaNavigation
                 ['label' => 'Meu cofre', 'route' => 'membros.cofre', 'available' => false],
                 ['label' => 'Minha sessão', 'route' => 'membros.agenda', 'available' => false],
                 ['label' => 'Pessoas', 'route' => 'membros.pessoas', 'available' => false],
-                ['label' => 'Encontros', 'route' => 'membros.encontros', 'available' => false],
+                ['label' => 'Encontros', 'route' => 'membros.encontros', 'available' => true],
                 ['label' => 'Frameworks', 'route' => 'membros.frameworks', 'available' => true],
             ],
             'mentor' => [
