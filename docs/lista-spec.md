@@ -3,9 +3,9 @@
 - [x] Biblioteca de aulas com tiers + Frameworks DO — estende Course/Lesson existentes com gating por tier; novo tipo de conteúdo "Framework" (PDF + aula vinculada).
   - [x] Biblioteca de aulas com tiers — `category`+`tier` no Lesson, `/membros/aulas` (grid, filtro por categoria, player, gate de material por tier), aba destrancada no nav, Início voltou a ser só "continuar assistindo".
   - [x] Frameworks DO como tipo de conteúdo próprio (PDF + aula vinculada) — model `Framework` (PDF upload/link externo + aula vinculada opcional), `/membros/frameworks` sem gate de tier, deep-link `?lesson=` na Biblioteca de aulas, admin Filament, aba destrancada no nav.
-- [ ] Perfil (upload de foto, nome) — pequeno, usado no topbar de todas as personas; checar o que já existe em profile.blade.php.
+- [x] Perfil (upload de foto, nome) — pequeno, usado no topbar de todas as personas; checar o que já existe em profile.blade.php.
   - [x] Nome editável, layout no header de marca (já existia/foi migrado nesta spec).
-  - [ ] Upload de foto.
+  - [x] Upload de foto — `photo_path` no User, upload/troca/remoção no card de Profile Information, avatar do header mostra a foto quando existe (fallback pras iniciais).
 - [ ] Marca d'água dinâmica no player — item técnico/segurança, mexe no player que já existe (Vimeo).
 - [ ] NPS pós-aula/encontro — feedback curto após assistir.
 - [ ] Encontros ao vivo — calendário de eventos; gravação cai na biblioteca de aulas (depende do #2).
