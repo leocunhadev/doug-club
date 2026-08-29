@@ -8,7 +8,13 @@ use App\Livewire\Membros\Sobre;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
+    if (! auth()->check()) {
+        return redirect()->route('login');
+    }
+
+    return auth()->user()->isMentor()
+        ? redirect()->route('mentor.placeholder')
+        : redirect()->route('dashboard');
 });
 
 Route::get('membros', Dashboard::class)
