@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Membros\FrameworkPdfDownloadController;
 use App\Http\Controllers\Membros\LessonMaterialDownloadController;
 use App\Http\Controllers\Membros\PreviewPersonaController;
 use App\Http\Controllers\Webhooks\AbacatePayWebhookController;
@@ -26,6 +27,10 @@ Route::get('membros', Dashboard::class)
 Route::get('membros/materiais/{material}/download', LessonMaterialDownloadController::class)
     ->middleware(['auth', 'verified', 'active'])
     ->name('membros.materials.download');
+
+Route::get('membros/frameworks/{framework}/download', FrameworkPdfDownloadController::class)
+    ->middleware(['auth', 'verified', 'active'])
+    ->name('membros.frameworks.download');
 
 Route::get('membros/sobre', Sobre::class)
     ->middleware(['auth', 'verified', 'active'])
