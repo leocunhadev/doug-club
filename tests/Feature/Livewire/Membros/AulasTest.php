@@ -129,7 +129,23 @@ class AulasTest extends TestCase
         Livewire::test(Aulas::class)
             ->call('selectCategory', 'Encontros')
             ->assertSet('category', 'Encontros')
-            ->assertSee('1 aulas na sua biblioteca');
+            ->assertSee('1 aula na sua biblioteca');
+    }
+
+    public function test_category_filter_with_no_matching_lessons_shows_an_empty_state_message(): void
+    {
+        $course = $this->course();
+        Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula encontro',
+            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 1,
+            'category' => 'Encontros', 'tier' => 'start',
+        ]);
+
+        $this->actingAs(User::factory()->create(['tier' => 'club']));
+
+        Livewire::test(Aulas::class)
+            ->call('selectCategory', 'Frameworks')
+            ->assertSee('Nenhuma aula nesta categoria ainda.');
     }
 
     public function test_watching_a_lesson_from_the_grid_updates_the_hero_player(): void

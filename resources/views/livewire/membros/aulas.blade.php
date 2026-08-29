@@ -15,7 +15,7 @@
 
         <p class="mt-4 text-sm text-stone">
             Você está assistindo agora: <b class="font-semibold text-ink">{{ $this->featuredLesson && $this->featuredLesson->isAvailableFor(auth()->user()) ? $this->featuredLesson->title : '—' }}</b>
-            · {{ $this->totalCount }} aulas na sua biblioteca
+            · {{ $this->totalCount }} {{ Str::plural('aula', $this->totalCount) }} na sua biblioteca
         </p>
 
         <div class="mt-6 flex flex-wrap gap-2">
@@ -28,9 +28,11 @@
         </div>
 
         <div class="mt-6 grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
-            @foreach ($this->lessons as $lesson)
+            @forelse ($this->lessons as $lesson)
                 <x-aula-card :lesson="$lesson" :watching="$this->featuredLessonId === $lesson->id" />
-            @endforeach
+            @empty
+                <p class="col-span-full text-stone">Nenhuma aula nesta categoria ainda.</p>
+            @endforelse
         </div>
     </div>
 
