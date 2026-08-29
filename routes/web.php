@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Membros\LessonMaterialDownloadController;
+use App\Http\Controllers\Membros\PreviewPersonaController;
 use App\Http\Controllers\Webhooks\AbacatePayWebhookController;
 use App\Livewire\Membros\Dashboard;
 use App\Livewire\Membros\MentorPlaceholder;
@@ -32,6 +33,10 @@ Route::get('membros/sobre', Sobre::class)
 Route::get('membros/mentor', MentorPlaceholder::class)
     ->middleware(['auth', 'verified', 'active', 'tier:mentor'])
     ->name('mentor.placeholder');
+
+Route::get('membros/preview-persona/{tier}', PreviewPersonaController::class)
+    ->middleware(['auth', 'verified', 'active'])
+    ->name('membros.preview-persona');
 
 Route::view('profile', 'profile')
     ->middleware(['auth', 'verified', 'active'])

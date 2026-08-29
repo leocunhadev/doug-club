@@ -241,7 +241,7 @@ class DashboardTest extends TestCase
     {
         $this->actingAs(User::factory()->create());
 
-        Livewire::test(Dashboard::class)->assertSee('DO.ing Club', false);
+        Livewire::test(Dashboard::class)->assertSee('id="wmark"', false)->assertSee('DO.ing', false);
     }
 
     public function test_video_watermark_uses_the_brand_icon_not_the_default_jetstream_logo(): void

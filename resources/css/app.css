@@ -45,3 +45,55 @@
         animation: none;
     }
 }
+
+.wordmark {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 17px;
+    color: theme('colors.black');
+    white-space: nowrap;
+}
+.wordmark span {
+    color: theme('colors.brand');
+}
+.start-tag {
+    font-family: 'Syne', sans-serif;
+    font-style: normal;
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: #fff;
+    background: theme('colors.brand');
+    border-radius: 99px;
+    padding: 3px 9px;
+    vertical-align: middle;
+    margin-left: 6px;
+}
+
+.planswitch {
+    display: flex;
+    background: theme('colors.black');
+    border-radius: 99px;
+    padding: 3px;
+}
+.planswitch a {
+    color: #B9B4AB;
+    padding: 7px 14px;
+    border-radius: 99px;
+    font-weight: 500;
+    transition: .2s;
+    white-space: nowrap;
+    display: inline-block;
+}
+.planswitch a.on {
+    background: theme('colors.brand');
+    color: #fff;
+    font-weight: 700;
+}
+@media (max-width: 560px) {
+    .planswitch a {
+        padding: 7px 10px;
+        font-size: 13px;
+    }
+}
