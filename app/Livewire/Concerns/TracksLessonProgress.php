@@ -17,7 +17,7 @@ trait TracksLessonProgress
 
     public function mount(DetermineFeaturedLesson $determineFeaturedLesson): void
     {
-        $this->featuredLessonId = $determineFeaturedLesson->handle(Auth::id());
+        $this->featuredLessonId = $determineFeaturedLesson->handle(Auth::user());
     }
 
     public function watchLesson(int $lessonId, MarkLessonAsWatching $action): void
