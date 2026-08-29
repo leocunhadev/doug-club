@@ -6,7 +6,7 @@
 - [x] Perfil (upload de foto, nome) — pequeno, usado no topbar de todas as personas; checar o que já existe em profile.blade.php.
   - [x] Nome editável, layout no header de marca (já existia/foi migrado nesta spec).
   - [x] Upload de foto — `photo_path` no User, upload/troca/remoção no card de Profile Information, avatar do header mostra a foto quando existe (fallback pras iniciais).
-- [ ] Marca d'água dinâmica no player — item técnico/segurança, mexe no player que já existe (Vimeo).
+- [x] Marca d'água dinâmica no player — e-mail do membro sobre o vídeo, reposicionando aleatoriamente a cada 10s (Alpine, `lesson-watermark.js`), sem gate de provedor (Vimeo/YouTube).
 - [ ] NPS pós-aula/encontro — feedback curto após assistir.
 - [ ] Encontros ao vivo — calendário de eventos; gravação cai na biblioteca de aulas (depende do #2).
 - [ ] Agenda de sessões 1:1 + disponibilidade do mentor — agendamento CLUB↔Mentor (depende do #1, já pronto).
