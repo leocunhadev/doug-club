@@ -187,12 +187,49 @@ usado no protótipo).
 `layouts/membros.blade.php`, `layouts/guest.blade.php`, `components/membros/header.blade.php` (+ nav
 nova), `components/membros/footer.blade.php`, `livewire/membros/dashboard.blade.php`,
 `components/lesson-card.blade.php`, `components/lesson-card-simple.blade.php`,
-`livewire/membros/sobre.blade.php`, `livewire/pages/auth/login.blade.php`, `resources/views/profile.blade.php`
-(+ os 3 componentes de formulário de profile). Ajuste ponto a ponto de classe (`bg-canvas` →
-`bg-paper`, `text-white` → `text-ink`, `bg-surface` → `bg-card` + `border-sand`, etc.), sem redesenhar
-layout/estrutura de cada tela — é troca de paleta/tipografia sobre a estrutura que já existe, não uma
-reconstrução visual peça a peça do protótipo (cards com marca d'água, player fake, avatares
-coloridos etc. pertencem às specs de conteúdo, não a esta).
+`livewire/membros/sobre.blade.php`, `livewire/pages/auth/login.blade.php`. Ajuste ponto a ponto de
+classe (`bg-canvas` → `bg-paper`, `text-white` → `text-ink`, `bg-surface` → `bg-card` + `border-sand`,
+etc.), sem redesenhar layout/estrutura de cada tela — é troca de paleta/tipografia sobre a estrutura
+que já existe, não uma reconstrução visual peça a peça do protótipo (cards com marca d'água, player
+fake, avatares coloridos etc. pertencem às specs de conteúdo, não a esta).
+
+Componentes de UI genéricos usados por login/profile (`components/text-input.blade.php`,
+`primary-button.blade.php`, `secondary-button.blade.php`, `danger-button.blade.php`,
+`input-label.blade.php`, `input-error.blade.php`, `dropdown.blade.php`, `modal.blade.php`,
+`action-message.blade.php`, `auth-session-status.blade.php`) trocam as classes `gray-*`/`dark:*` do
+scaffold padrão do Breeze pelos tokens novos (`ink`/`sand`/`stone`/`card`) e **perdem os variantes
+`dark:`** — o app passa a ter um único tema (claro), não dark-mode togglável.
+
+**`resources/views/profile.blade.php` muda de layout, não só de cor.** Hoje ele usa `x-app-layout`
+(`layouts/app.blade.php`), que carrega `livewire:layout.navigation` — um segundo header/nav genérico
+do scaffold do Breeze, usado *só* nesta página (confirmado: nenhuma outra view referencia
+`x-app-layout` ou `layout.navigation`). Isso duplica exatamente o que esta spec está construindo
+(header + nav por persona). Em vez de re-pintar essa navbar duplicada, `profile.blade.php` passa a
+usar `layouts.membros` + `x-membros.header` como as outras páginas da área de membros — consistente
+com "navegação... base de tudo" e é menos trabalho do que reskinar dois headers. `layouts/app.blade.php`,
+`livewire/layout/navigation.blade.php`, `components/nav-link.blade.php`,
+`components/responsive-nav-link.blade.php` e `components/dropdown-link.blade.php` ficam sem uso e são
+removidos. As 3 views de formulário de profile (`livewire/profile/update-profile-information-form.blade.php`,
+`update-password-form.blade.php`, `delete-user-form.blade.php`) só trocam classe (`gray-*`/`dark:*` →
+tokens novos), sem mudança de estrutura ou de lógica do componente Livewire/Volt.
+
+`x-membros.header` espera `:initials` vindo de `$this->userInitials` (computed property Livewire, via
+trait `ComputesUserInitials` — usado por `Dashboard` e `Sobre` hoje). `profile.blade.php` é uma Blade
+view comum, sem componente Livewire por trás, então não tem `$this`. Solução: extrair a lógica de
+iniciais pra um accessor `User::initials()` (mesmo padrão de `Lesson::durationFormatted`), e
+`ComputesUserInitials::userInitials()` passa a só delegar (`return Auth::user()->initials;`).
+`profile.blade.php` chama `<x-membros.header :initials="auth()->user()->initials" />` diretamente.
+
+O botão "Sair" do dropdown do header usa hoje `wire:click="logout"`, que depende de um componente
+Livewire pai com método `logout()` (existe em `Dashboard`/`Sobre`). Fora de um componente Livewire —
+caso de `profile.blade.php` — isso não tem efeito nenhum (sem erro, o clique simplesmente não faz
+nada). Como o objetivo é o mesmo header funcionar em qualquer página, o botão passa a ser um form
+comum: `<form method="POST" action="{{ route('logout') }}">@csrf<button>Sair</button></form>`, com uma
+rota nova `POST /logout` (`App\Http\Controllers\Auth\LogoutController`, invokable, reaproveitando a
+mesma `App\Livewire\Actions\Logout` que os componentes já usam) registrada em `routes/auth.php`. Os
+métodos `logout()` de `Dashboard` e `Sobre` — e os testes que os chamam diretamente
+(`DashboardTest::test_user_can_log_out_from_dashboard`) — saem, substituídos por um teste único do
+fluxo de logout via rota (seção 7).
 
 Filament (`/admin`) **não muda** — é uma superfície separada, sem tokens de marca compartilhados
 hoje.
@@ -203,11 +240,18 @@ hoje.
   esperadas com `available` correto; abas indisponíveis não têm `href`.
 - `Tests\Feature\Membros\TierGatingTest` (novo): `tier:mentor` bloqueia `start`/`club` em
   `/membros/mentor` com redirect; `tier:mentor` libera `mentor`.
-- Ajustar `Tests\Feature\Livewire\Membros\DashboardTest` existente se alguma asserção depender de
-  classe/copy que o re-skin ou a home por persona alterarem.
+- `Tests\Feature\Auth\LogoutTest` (novo): `POST /logout` desloga o usuário autenticado e redireciona
+  pra `/login`; substitui a asserção de logout que hoje vive em `DashboardTest`.
+- Ajustar `Tests\Feature\Livewire\Membros\DashboardTest`: remover
+  `test_user_can_log_out_from_dashboard` (método `logout()` sai do componente) e trocar
+  `test_membros_page_renders_through_the_dark_layout` (`assertSee('bg-canvas', ...)`) por uma
+  asserção do token novo (`bg-paper`).
+- `Tests\Feature\ProfileTest` continua passando sem alteração (`assertSeeVolt` checa os 3
+  sub-componentes Volt, que não mudam de nome nem de comportamento — só a página em volta muda de
+  layout).
 - `npm run build` compila sem erro (mesma validação usada na spec de tokens de 2026-08-07).
-- Sem teste automatizado para os re-skins ponto a ponto de login/profile/sobre — validação visual
-  manual, como já é prática no projeto pra CSS.
+- Sem teste automatizado para os re-skins ponto a ponto de login/profile/sobre além do já listado —
+  validação visual manual, como já é prática no projeto pra CSS.
 
 ## 8. Fora de escopo (backlog)
 
