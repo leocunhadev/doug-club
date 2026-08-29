@@ -10,7 +10,7 @@ class PersonaNavigationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_start_tier_shows_inicio_as_a_link_and_the_rest_locked(): void
+    public function test_start_tier_shows_inicio_and_aulas_as_links_and_the_rest_locked(): void
     {
         $user = User::factory()->create(['tier' => 'start']);
         $this->actingAs($user);
@@ -21,8 +21,12 @@ class PersonaNavigationTest extends TestCase
             '#<a[^>]*href="http://localhost/membros"[^>]*>\s*Início\s*</a>#s',
             $html,
         );
+        $this->assertMatchesRegularExpression(
+            '#<a[^>]*href="http://localhost/membros/aulas"[^>]*>\s*Aulas\s*</a>#s',
+            $html,
+        );
 
-        foreach (['Aulas', 'Frameworks', 'Sessão 1:1'] as $label) {
+        foreach (['Frameworks', 'Sessão 1:1'] as $label) {
             $this->assertMatchesRegularExpression(
                 '#<span[^>]*title="Em breve"[^>]*>\s*'.preg_quote($label, '#').'#s',
                 $html,
@@ -30,7 +34,7 @@ class PersonaNavigationTest extends TestCase
         }
     }
 
-    public function test_club_tier_shows_inicio_as_a_link_and_six_tabs_locked(): void
+    public function test_club_tier_shows_inicio_and_aulas_as_links_and_five_tabs_locked(): void
     {
         $user = User::factory()->create(['tier' => 'club']);
         $this->actingAs($user);
@@ -41,8 +45,12 @@ class PersonaNavigationTest extends TestCase
             '#<a[^>]*href="http://localhost/membros"[^>]*>\s*Início\s*</a>#s',
             $html,
         );
+        $this->assertMatchesRegularExpression(
+            '#<a[^>]*href="http://localhost/membros/aulas"[^>]*>\s*Aulas\s*</a>#s',
+            $html,
+        );
 
-        foreach (['Aulas', 'Meu cofre', 'Minha sessão', 'Pessoas', 'Encontros', 'Frameworks'] as $label) {
+        foreach (['Meu cofre', 'Minha sessão', 'Pessoas', 'Encontros', 'Frameworks'] as $label) {
             $this->assertMatchesRegularExpression(
                 '#<span[^>]*title="Em breve"[^>]*>\s*'.preg_quote($label, '#').'#s',
                 $html,

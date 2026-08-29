@@ -419,14 +419,17 @@ class DashboardTest extends TestCase
 
         $html = Livewire::test(Dashboard::class)->html();
 
-        foreach (['Biblioteca de aulas', 'Frameworks DO', 'Marcar minha sessão'] as $label) {
+        foreach (['Frameworks DO', 'Marcar minha sessão'] as $label) {
             $this->assertMatchesRegularExpression(
                 '#<span[^>]*>\s*'.preg_quote($label, '#').'.*?🔒#s',
                 $html,
             );
         }
 
-        $this->assertStringNotContainsString('href="http://localhost/membros/aulas"', $html);
+        $this->assertMatchesRegularExpression(
+            '#<a[^>]*href="http://localhost/membros/aulas"[^>]*>\s*Biblioteca de aulas#s',
+            $html,
+        );
     }
 
     public function test_start_tier_quick_links_show_conhecer_o_club_as_the_third_link(): void

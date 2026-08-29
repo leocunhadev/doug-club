@@ -12,13 +12,13 @@ class PersonaNavigation
         return match ($tier) {
             'start' => [
                 ['label' => 'Início', 'route' => 'dashboard', 'available' => true],
-                ['label' => 'Aulas', 'route' => 'membros.aulas', 'available' => false],
+                ['label' => 'Aulas', 'route' => 'membros.aulas', 'available' => true],
                 ['label' => 'Frameworks', 'route' => 'membros.frameworks', 'available' => false],
                 ['label' => 'Sessão 1:1', 'route' => 'membros.upgrade', 'available' => false],
             ],
             'club' => [
                 ['label' => 'Início', 'route' => 'dashboard', 'available' => true],
-                ['label' => 'Aulas', 'route' => 'membros.aulas', 'available' => false],
+                ['label' => 'Aulas', 'route' => 'membros.aulas', 'available' => true],
                 ['label' => 'Meu cofre', 'route' => 'membros.cofre', 'available' => false],
                 ['label' => 'Minha sessão', 'route' => 'membros.agenda', 'available' => false],
                 ['label' => 'Pessoas', 'route' => 'membros.pessoas', 'available' => false],
