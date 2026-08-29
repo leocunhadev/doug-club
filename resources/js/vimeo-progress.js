@@ -7,7 +7,6 @@ export default function vimeoProgress({ lessonId, provider, initialSeconds, hasF
     return {
         player: null,
         completedSent: false,
-        showNps: false,
 
         init() {
             if (provider !== 'vimeo') {
@@ -52,18 +51,19 @@ export default function vimeoProgress({ lessonId, provider, initialSeconds, hasF
             this.$wire.markCompleted(lessonId);
 
             if (!hasFeedback) {
-                this.showNps = true;
+                window.dispatchEvent(new CustomEvent('open-nps-modal', {
+                    detail: {
+                        action: 'submitNpsScore',
+                        subjectId: lessonId,
+                        subtitle: 'De 0 a 10, o quanto essa aula te ajudou a decidir melhor?',
+                    },
+                }));
             }
         },
 
         async saveProgress() {
             const seconds = await this.player.getCurrentTime();
             this.$wire.updateProgress(lessonId, Math.floor(seconds));
-        },
-
-        submitNps(score) {
-            this.$wire.submitNpsScore(lessonId, score);
-            this.showNps = false;
         },
     };
 }

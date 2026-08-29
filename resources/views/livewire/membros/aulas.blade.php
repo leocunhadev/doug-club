@@ -12,6 +12,7 @@
         </div>
 
         <x-lesson-player :lesson="$this->featuredLesson" :progress="$this->featuredProgress" :has-feedback="$this->featuredHasFeedback" />
+        <x-nps-modal />
 
         <p class="mt-4 text-sm text-stone">
             Você está assistindo agora: <b class="font-semibold text-ink">{{ $this->featuredLesson && $this->featuredLesson->isAvailableFor(auth()->user()) ? $this->featuredLesson->title : '—' }}</b>

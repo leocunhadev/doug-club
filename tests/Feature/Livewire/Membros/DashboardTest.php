@@ -280,6 +280,16 @@ class DashboardTest extends TestCase
             ->assertSee('hasFeedback: true', false);
     }
 
+    public function test_the_shared_nps_modal_is_present_on_the_page(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user);
+
+        Livewire::test(Dashboard::class)
+            ->assertSee('open-nps-modal', false);
+    }
+
     public function test_hero_player_passes_the_saved_watched_seconds_into_the_alpine_component(): void
     {
         $user = User::factory()->create();
