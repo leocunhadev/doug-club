@@ -19,6 +19,11 @@
                 allowfullscreen
             ></iframe>
             <x-brand-logo icon-only class="pointer-events-none absolute top-3 right-3 h-6 w-auto drop-shadow" />
+            <span
+                x-data="lessonWatermark()"
+                :style="`top:${top}%;left:${left}%`"
+                class="pointer-events-none absolute select-none whitespace-nowrap text-xs font-medium text-white/40 [text-shadow:0_1px_2px_rgba(0,0,0,.6)]"
+            >{{ auth()->user()->email }}</span>
         </div>
     </div>
 
