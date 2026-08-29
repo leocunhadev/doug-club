@@ -10,12 +10,6 @@ trait ComputesUserInitials
     #[Computed]
     public function userInitials(): string
     {
-        $initials = collect(explode(' ', Auth::user()->name))
-            ->filter()
-            ->map(fn (string $part) => mb_substr($part, 0, 1))
-            ->take(2)
-            ->implode('');
-
-        return mb_strtoupper($initials);
+        return Auth::user()->initials;
     }
 }
