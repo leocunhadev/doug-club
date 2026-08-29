@@ -376,15 +376,17 @@ class DashboardTest extends TestCase
 
         $html = Livewire::test(Dashboard::class)->html();
 
-        foreach (['Frameworks DO', 'Marcar minha sessão'] as $label) {
-            $this->assertMatchesRegularExpression(
-                '#<span[^>]*>\s*'.preg_quote($label, '#').'.*?🔒#s',
-                $html,
-            );
-        }
+        $this->assertMatchesRegularExpression(
+            '#<span[^>]*>\s*Marcar minha sessão.*?🔒#s',
+            $html,
+        );
 
         $this->assertMatchesRegularExpression(
             '#<a[^>]*href="http://localhost/membros/aulas"[^>]*>\s*Biblioteca de aulas#s',
+            $html,
+        );
+        $this->assertMatchesRegularExpression(
+            '#<a[^>]*href="http://localhost/membros/frameworks"[^>]*>\s*Frameworks DO#s',
             $html,
         );
     }

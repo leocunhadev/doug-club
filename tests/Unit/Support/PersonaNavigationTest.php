@@ -7,16 +7,16 @@ use PHPUnit\Framework\TestCase;
 
 class PersonaNavigationTest extends TestCase
 {
-    public function test_start_tier_has_two_available_tabs_and_two_locked_tabs(): void
+    public function test_start_tier_has_three_available_tabs_and_one_locked_tab(): void
     {
         $tabs = (new PersonaNavigation)->tabs('start');
 
         $this->assertCount(4, $tabs);
         $this->assertSame(['Início', 'Aulas', 'Frameworks', 'Sessão 1:1'], array_column($tabs, 'label'));
-        $this->assertSame([true, true, false, false], array_column($tabs, 'available'));
+        $this->assertSame([true, true, true, false], array_column($tabs, 'available'));
     }
 
-    public function test_club_tier_has_two_available_tabs_and_five_locked_tabs(): void
+    public function test_club_tier_has_three_available_tabs_and_four_locked_tabs(): void
     {
         $tabs = (new PersonaNavigation)->tabs('club');
 
@@ -25,7 +25,7 @@ class PersonaNavigationTest extends TestCase
             ['Início', 'Aulas', 'Meu cofre', 'Minha sessão', 'Pessoas', 'Encontros', 'Frameworks'],
             array_column($tabs, 'label'),
         );
-        $this->assertSame([true, true, false, false, false, false, false], array_column($tabs, 'available'));
+        $this->assertSame([true, true, false, false, false, false, true], array_column($tabs, 'available'));
     }
 
     public function test_mentor_tier_has_one_available_tab_and_four_locked_tabs(): void

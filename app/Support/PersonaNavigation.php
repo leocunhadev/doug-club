@@ -13,7 +13,7 @@ class PersonaNavigation
             'start' => [
                 ['label' => 'Início', 'route' => 'dashboard', 'available' => true],
                 ['label' => 'Aulas', 'route' => 'membros.aulas', 'available' => true],
-                ['label' => 'Frameworks', 'route' => 'membros.frameworks', 'available' => false],
+                ['label' => 'Frameworks', 'route' => 'membros.frameworks', 'available' => true],
                 ['label' => 'Sessão 1:1', 'route' => 'membros.upgrade', 'available' => false],
             ],
             'club' => [
@@ -23,7 +23,7 @@ class PersonaNavigation
                 ['label' => 'Minha sessão', 'route' => 'membros.agenda', 'available' => false],
                 ['label' => 'Pessoas', 'route' => 'membros.pessoas', 'available' => false],
                 ['label' => 'Encontros', 'route' => 'membros.encontros', 'available' => false],
-                ['label' => 'Frameworks', 'route' => 'membros.frameworks', 'available' => false],
+                ['label' => 'Frameworks', 'route' => 'membros.frameworks', 'available' => true],
             ],
             'mentor' => [
                 ['label' => 'Painel', 'route' => 'mentor.placeholder', 'available' => true],
