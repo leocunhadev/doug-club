@@ -34,7 +34,7 @@ Route::get('membros/mentor', MentorPlaceholder::class)
     ->name('mentor.placeholder');
 
 Route::view('profile', 'profile')
-    ->middleware(['auth'])
+    ->middleware(['auth', 'verified', 'active'])
     ->name('profile');
 
 Route::post('webhooks/abacatepay', AbacatePayWebhookController::class)
