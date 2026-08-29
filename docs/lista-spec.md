@@ -1,8 +1,8 @@
 - [x] Personas/planos (Start/CLUB/Mentor) — tier/role no User, navegação e gating de conteúdo. Base de tudo.
   - `tier` no User (start/club/mentor), `hasClubAccess()`/`isMentor()`, `EnsureTier` middleware, `PersonaNavigation` (nav com abas trancadas 🔒), header/topbar/marquee reskin, rota placeholder do mentor, preview de persona pra admin.
-- [ ] Biblioteca de aulas com tiers + Frameworks DO — estende Course/Lesson existentes com gating por tier; novo tipo de conteúdo "Framework" (PDF + aula vinculada).
+- [x] Biblioteca de aulas com tiers + Frameworks DO — estende Course/Lesson existentes com gating por tier; novo tipo de conteúdo "Framework" (PDF + aula vinculada).
   - [x] Biblioteca de aulas com tiers — `category`+`tier` no Lesson, `/membros/aulas` (grid, filtro por categoria, player, gate de material por tier), aba destrancada no nav, Início voltou a ser só "continuar assistindo".
-  - [ ] Frameworks DO como tipo de conteúdo próprio (PDF + aula vinculada) — **próximo passo**, ver abaixo.
+  - [x] Frameworks DO como tipo de conteúdo próprio (PDF + aula vinculada) — model `Framework` (PDF upload/link externo + aula vinculada opcional), `/membros/frameworks` sem gate de tier, deep-link `?lesson=` na Biblioteca de aulas, admin Filament, aba destrancada no nav.
 - [ ] Perfil (upload de foto, nome) — pequeno, usado no topbar de todas as personas; checar o que já existe em profile.blade.php.
   - [x] Nome editável, layout no header de marca (já existia/foi migrado nesta spec).
   - [ ] Upload de foto.
