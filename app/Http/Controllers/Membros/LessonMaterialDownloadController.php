@@ -11,6 +11,8 @@ class LessonMaterialDownloadController extends Controller
 {
     public function __invoke(LessonMaterial $material): StreamedResponse
     {
+        abort_unless($material->lesson->isAvailableFor(request()->user()), 404);
+
         abort_unless(
             $material->hasUploadedFile() && Storage::disk('public')->exists($material->file_path),
             404,

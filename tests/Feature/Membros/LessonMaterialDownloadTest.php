@@ -80,6 +80,56 @@ class LessonMaterialDownloadTest extends TestCase
         $response->assertNotFound();
     }
 
+    public function test_start_tier_user_cannot_download_a_club_only_lessons_material(): void
+    {
+        Storage::fake('public');
+        $path = UploadedFile::fake()->create('apostila.pdf', 10, 'application/pdf')
+            ->store('lesson-materials', 'public');
+
+        $course = Course::create([
+            'label' => 'Módulo 1', 'title' => 'Fundamentos', 'description' => null, 'position' => 10,
+        ]);
+        $lesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula CLUB',
+            'video_provider' => 'youtube', 'video_id' => 'abc123', 'published_at' => '2026-01-01', 'position' => 10,
+            'tier' => 'club',
+        ]);
+        $material = LessonMaterial::create([
+            'lesson_id' => $lesson->id, 'title' => 'Apostila', 'file_path' => $path,
+        ]);
+
+        $this->actingAs(User::factory()->create(['tier' => 'start']));
+
+        $response = $this->get(route('membros.materials.download', $material));
+
+        $response->assertNotFound();
+    }
+
+    public function test_club_tier_user_can_download_a_club_only_lessons_material(): void
+    {
+        Storage::fake('public');
+        $path = UploadedFile::fake()->create('apostila.pdf', 10, 'application/pdf')
+            ->store('lesson-materials', 'public');
+
+        $course = Course::create([
+            'label' => 'Módulo 1', 'title' => 'Fundamentos', 'description' => null, 'position' => 10,
+        ]);
+        $lesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula CLUB',
+            'video_provider' => 'youtube', 'video_id' => 'abc123', 'published_at' => '2026-01-01', 'position' => 10,
+            'tier' => 'club',
+        ]);
+        $material = LessonMaterial::create([
+            'lesson_id' => $lesson->id, 'title' => 'Apostila', 'file_path' => $path,
+        ]);
+
+        $this->actingAs(User::factory()->create(['tier' => 'club']));
+
+        $response = $this->get(route('membros.materials.download', $material));
+
+        $response->assertOk();
+    }
+
     public function test_downloading_a_material_with_a_slash_in_the_title_does_not_error(): void
     {
         Storage::fake('public');
