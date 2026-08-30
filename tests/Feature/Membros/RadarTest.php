@@ -13,7 +13,9 @@ use App\Models\MentorCommitment;
 use App\Models\MentorNote;
 use App\Models\MentorSession;
 use App\Models\User;
+use App\Notifications\BridgeSuggestedNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -275,5 +277,69 @@ class RadarTest extends TestCase
         $matches = Livewire::test(Radar::class)->instance()->suggestedBridges();
 
         $this->assertCount(3, $matches);
+    }
+
+    public function test_make_bridge_creates_a_bridge_request_and_notifies_both_members(): void
+    {
+        Notification::fake();
+
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+        $learner = User::factory()->create(['tier' => 'club', 'name' => 'Ricardo Mendes']);
+        $teacher = User::factory()->create(['tier' => 'club', 'name' => 'Marina Alves']);
+
+        Livewire::test(Radar::class)->call('makeBridge', $learner->id, $teacher->id, 'precificação');
+
+        $this->assertDatabaseHas('bridge_requests', [
+            'requester_id' => $learner->id, 'target_id' => $teacher->id,
+        ]);
+
+        Notification::assertSentTo($learner, BridgeSuggestedNotification::class, function ($notification) use ($teacher) {
+            return $notification->otherMember->is($teacher) && $notification->iAmTheLearner === true;
+        });
+        Notification::assertSentTo($teacher, BridgeSuggestedNotification::class, function ($notification) use ($learner) {
+            return $notification->otherMember->is($learner) && $notification->iAmTheLearner === false;
+        });
+    }
+
+    public function test_make_bridge_is_a_no_op_when_the_pair_is_already_connected(): void
+    {
+        Notification::fake();
+
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+        $learner = User::factory()->create(['tier' => 'club']);
+        $teacher = User::factory()->create(['tier' => 'club']);
+        BridgeRequest::create(['requester_id' => $learner->id, 'target_id' => $teacher->id]);
+
+        Livewire::test(Radar::class)->call('makeBridge', $learner->id, $teacher->id, 'precificação');
+
+        $this->assertSame(1, BridgeRequest::query()->count());
+        Notification::assertNothingSent();
+    }
+
+    public function test_make_bridge_is_a_no_op_when_a_user_is_not_club_tier(): void
+    {
+        Notification::fake();
+
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+        $learner = User::factory()->create(['tier' => 'club']);
+        $notClub = User::factory()->create(['tier' => 'start']);
+
+        Livewire::test(Radar::class)->call('makeBridge', $learner->id, $notClub->id, 'precificação');
+
+        $this->assertDatabaseMissing('bridge_requests', ['requester_id' => $learner->id]);
+        Notification::assertNothingSent();
+    }
+
+    public function test_make_bridge_removes_the_pair_from_future_suggestions(): void
+    {
+        Notification::fake();
+
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+        $learner = User::factory()->create(['tier' => 'club', 'name' => 'Ricardo Mendes', 'learn_tags' => ['Precificação']]);
+        $teacher = User::factory()->create(['tier' => 'club', 'name' => 'Marina Alves', 'teach_tags' => ['precificação']]);
+
+        Livewire::test(Radar::class)
+            ->call('makeBridge', $learner->id, $teacher->id, 'Precificação')
+            ->assertSee('Nenhuma ponte sugerida no momento.');
     }
 }

@@ -10,6 +10,7 @@ use App\Models\MentorCommitment;
 use App\Models\MentorNote;
 use App\Models\MentorSession;
 use App\Models\User;
+use App\Notifications\BridgeSuggestedNotification;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -111,6 +112,32 @@ class Radar extends Component
         }
 
         return $matches->take(3);
+    }
+
+    public function makeBridge(int $learnerId, int $teacherId, string $tag): void
+    {
+        $learner = User::query()->where('id', $learnerId)->where('tier', 'club')->first();
+        $teacher = User::query()->where('id', $teacherId)->where('tier', 'club')->first();
+
+        if (! $learner || ! $teacher) {
+            return;
+        }
+
+        $alreadyConnected = BridgeRequest::query()
+            ->where(fn ($q) => $q->where('requester_id', $learnerId)->where('target_id', $teacherId))
+            ->orWhere(fn ($q) => $q->where('requester_id', $teacherId)->where('target_id', $learnerId))
+            ->exists();
+
+        if ($alreadyConnected) {
+            return;
+        }
+
+        BridgeRequest::create(['requester_id' => $learnerId, 'target_id' => $teacherId]);
+
+        $learner->notify(new BridgeSuggestedNotification($teacher, $tag, iAmTheLearner: true));
+        $teacher->notify(new BridgeSuggestedNotification($learner, $tag, iAmTheLearner: false));
+
+        unset($this->suggestedBridges);
     }
 
     public function lastNoteFor(int $memberId): ?MentorNote
