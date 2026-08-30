@@ -15,7 +15,6 @@ class MentorNote extends Model
         'mentor_id',
         'title',
         'body',
-        'created_at',
     ];
 
     public function member(): BelongsTo

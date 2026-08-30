@@ -111,8 +111,12 @@ class RadarTest extends TestCase
         $this->actingAs(User::factory()->create(['tier' => 'mentor']));
         $lesson = $this->lesson();
 
-        LessonFeedback::create(['user_id' => User::factory()->create()->id, 'lesson_id' => $lesson->id, 'score' => 10, 'created_at' => now()]);
-        LessonFeedback::create(['user_id' => User::factory()->create()->id, 'lesson_id' => $lesson->id, 'score' => 0, 'created_at' => now()->subDays(31)]);
+        LessonFeedback::create(['user_id' => User::factory()->create()->id, 'lesson_id' => $lesson->id, 'score' => 10])
+            ->forceFill(['created_at' => now()])
+            ->save();
+        LessonFeedback::create(['user_id' => User::factory()->create()->id, 'lesson_id' => $lesson->id, 'score' => 0])
+            ->forceFill(['created_at' => now()->subDays(31)])
+            ->save();
 
         Livewire::test(Radar::class)
             ->assertSee('10,0')
@@ -190,8 +194,12 @@ class RadarTest extends TestCase
         $member = User::factory()->create(['tier' => 'club', 'name' => 'Ricardo Mendes']);
 
         MentorSession::create(['mentor_id' => $mentor->id, 'member_id' => $member->id, 'scheduled_at' => now()->setTime(10, 0)]);
-        MentorNote::create(['member_id' => $member->id, 'mentor_id' => $mentor->id, 'title' => 'Antiga', 'body' => 'Nota antiga', 'created_at' => now()->subDays(2)]);
-        MentorNote::create(['member_id' => $member->id, 'mentor_id' => $mentor->id, 'title' => 'Recente', 'body' => 'Decidiu assumir o comercial.', 'created_at' => now()->subDay()]);
+        MentorNote::create(['member_id' => $member->id, 'mentor_id' => $mentor->id, 'title' => 'Antiga', 'body' => 'Nota antiga'])
+            ->forceFill(['created_at' => now()->subDays(2)])
+            ->save();
+        MentorNote::create(['member_id' => $member->id, 'mentor_id' => $mentor->id, 'title' => 'Recente', 'body' => 'Decidiu assumir o comercial.'])
+            ->forceFill(['created_at' => now()->subDay()])
+            ->save();
         MentorCommitment::create(['member_id' => $member->id, 'text' => 'Gravar 3 conversas de venda']);
 
         Livewire::test(Radar::class)

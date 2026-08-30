@@ -14,7 +14,6 @@ class LessonFeedback extends Model
         'user_id',
         'lesson_id',
         'score',
-        'created_at',
     ];
 
     public function user(): BelongsTo
