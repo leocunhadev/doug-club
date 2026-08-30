@@ -28,7 +28,7 @@ class PessoasTest extends TestCase
     public function test_lists_other_club_members_but_not_the_logged_in_user(): void
     {
         $me = User::factory()->create(['tier' => 'club', 'name' => 'Eu Mesmo']);
-        $other = User::factory()->create(['tier' => 'club', 'name' => 'Outro Membro']);
+        User::factory()->create(['tier' => 'club', 'name' => 'Outro Membro']);
         User::factory()->create(['tier' => 'mentor', 'name' => 'O Mentor']);
         User::factory()->create(['tier' => 'start', 'name' => 'Membro Start']);
 
