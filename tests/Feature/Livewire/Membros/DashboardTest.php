@@ -349,15 +349,13 @@ class DashboardTest extends TestCase
             'video_provider' => 'youtube', 'video_id' => 'dQw4w9WgXcQ', 'published_at' => '2026-07-17', 'position' => 1,
         ]);
         $lesson->materials()->create(['title' => 'Slides', 'file_url' => 'https://example.com/slides.pdf']);
-        $uploaded = $lesson->materials()->create(['title' => 'Apostila', 'file_path' => 'lesson-materials/apostila.pdf']);
+        $lesson->materials()->create(['title' => 'Apostila', 'file_path' => 'lesson-materials/apostila.pdf']);
 
         $this->actingAs($user);
 
         Livewire::test(Dashboard::class)
             ->assertSee('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ', false)
-            ->assertSee('Slides')
-            ->assertSee('Apostila')
-            ->assertSee(route('membros.materials.download', $uploaded), false);
+            ->assertSee(route('membros.aulas.materiais', $lesson), false);
     }
 
     public function test_membros_page_renders_through_the_paper_layout(): void

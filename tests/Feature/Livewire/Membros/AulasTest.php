@@ -410,4 +410,19 @@ class AulasTest extends TestCase
             ->set('search', 'termo-que-nao-existe')
             ->assertSee('Nenhuma aula encontrada para "termo-que-nao-existe".', false);
     }
+
+    public function test_materiais_de_aula_link_points_to_the_dedicated_materials_page(): void
+    {
+        $course = $this->course();
+        $lesson = Lesson::create([
+            'course_id' => $course->id, 'number' => 1, 'title' => 'Aula com materiais',
+            'video_provider' => 'youtube', 'video_id' => 'abc', 'published_at' => '2026-01-01', 'position' => 1,
+        ]);
+
+        $this->actingAs(User::factory()->create());
+
+        $this->get('/membros/aulas')
+            ->assertOk()
+            ->assertSee(route('membros.aulas.materiais', $lesson), false);
+    }
 }
