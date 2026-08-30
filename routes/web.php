@@ -14,6 +14,7 @@ use App\Livewire\Membros\Disponibilidade;
 use App\Livewire\Membros\Encontros;
 use App\Livewire\Membros\Frameworks;
 use App\Livewire\Membros\MentorPlaceholder;
+use App\Livewire\Membros\Pessoas;
 use App\Livewire\Membros\Sobre;
 use Illuminate\Support\Facades\Route;
 
@@ -62,6 +63,10 @@ Route::get('membros/encontros', Encontros::class)
 Route::get('membros/agenda', Agenda::class)
     ->middleware(['auth', 'verified', 'active', 'tier:club'])
     ->name('membros.agenda');
+
+Route::get('membros/pessoas', Pessoas::class)
+    ->middleware(['auth', 'verified', 'active', 'tier:club'])
+    ->name('membros.pessoas');
 
 Route::get('membros/frameworks', Frameworks::class)
     ->middleware(['auth', 'verified', 'active'])
