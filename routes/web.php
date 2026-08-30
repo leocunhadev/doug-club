@@ -16,6 +16,7 @@ use App\Livewire\Membros\Encontros;
 use App\Livewire\Membros\Frameworks;
 use App\Livewire\Membros\MentorPlaceholder;
 use App\Livewire\Membros\Pessoas;
+use App\Livewire\Membros\Radar;
 use App\Livewire\Membros\Sobre;
 use App\Livewire\Membros\Upgrade;
 use Illuminate\Support\Facades\Route;
@@ -89,6 +90,10 @@ Route::get('membros/mentor/disponibilidade', Disponibilidade::class)
 Route::get('membros/mentor/dossies', Dossies::class)
     ->middleware(['auth', 'verified', 'active', 'tier:mentor'])
     ->name('mentor.dossies');
+
+Route::get('membros/mentor/radar', Radar::class)
+    ->middleware(['auth', 'verified', 'active', 'tier:mentor'])
+    ->name('mentor.radar');
 
 Route::get('membros/mentor/conteudo', Conteudo::class)
     ->middleware(['auth', 'verified', 'active', 'tier:mentor'])
