@@ -11,6 +11,7 @@ use App\Livewire\Membros\Cofre;
 use App\Livewire\Membros\Conteudo;
 use App\Livewire\Membros\Dashboard;
 use App\Livewire\Membros\Disponibilidade;
+use App\Livewire\Membros\Dossies;
 use App\Livewire\Membros\Encontros;
 use App\Livewire\Membros\Frameworks;
 use App\Livewire\Membros\MentorPlaceholder;
@@ -84,6 +85,10 @@ Route::get('membros/mentor', MentorPlaceholder::class)
 Route::get('membros/mentor/disponibilidade', Disponibilidade::class)
     ->middleware(['auth', 'verified', 'active', 'tier:mentor'])
     ->name('mentor.disp');
+
+Route::get('membros/mentor/dossies', Dossies::class)
+    ->middleware(['auth', 'verified', 'active', 'tier:mentor'])
+    ->name('mentor.dossies');
 
 Route::get('membros/mentor/conteudo', Conteudo::class)
     ->middleware(['auth', 'verified', 'active', 'tier:mentor'])
