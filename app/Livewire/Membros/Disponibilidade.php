@@ -39,6 +39,19 @@ class Disponibilidade extends Component
             'endTime' => ['required', 'date_format:H:i', 'after:startTime'],
         ]);
 
+        $overlaps = MentorAvailability::query()
+            ->where('mentor_id', Auth::id())
+            ->where('day_of_week', $this->dayOfWeek)
+            ->get()
+            ->contains(fn (MentorAvailability $block) => $this->startTime < $block->end_time->format('H:i')
+                && $this->endTime > $block->start_time->format('H:i'));
+
+        if ($overlaps) {
+            $this->addError('startTime', 'Esse horário sobrepõe um bloco já cadastrado.');
+
+            return;
+        }
+
         MentorAvailability::create([
             'mentor_id' => Auth::id(),
             'day_of_week' => $this->dayOfWeek,

@@ -56,6 +56,63 @@ class DisponibilidadeTest extends TestCase
         $this->assertDatabaseMissing('mentor_availabilities', ['mentor_id' => $mentor->id]);
     }
 
+    public function test_overlapping_block_on_the_same_day_is_rejected(): void
+    {
+        $mentor = User::factory()->create(['tier' => 'mentor']);
+        MentorAvailability::create([
+            'mentor_id' => $mentor->id, 'day_of_week' => 2, 'start_time' => '09:00', 'end_time' => '12:00',
+        ]);
+
+        $this->actingAs($mentor);
+
+        Livewire::test(Disponibilidade::class)
+            ->set('dayOfWeek', '2')
+            ->set('startTime', '11:00')
+            ->set('endTime', '13:00')
+            ->call('addBlock')
+            ->assertHasErrors('startTime');
+
+        $this->assertSame(1, MentorAvailability::where('mentor_id', $mentor->id)->count());
+    }
+
+    public function test_non_overlapping_block_on_the_same_day_is_accepted(): void
+    {
+        $mentor = User::factory()->create(['tier' => 'mentor']);
+        MentorAvailability::create([
+            'mentor_id' => $mentor->id, 'day_of_week' => 2, 'start_time' => '09:00', 'end_time' => '12:00',
+        ]);
+
+        $this->actingAs($mentor);
+
+        Livewire::test(Disponibilidade::class)
+            ->set('dayOfWeek', '2')
+            ->set('startTime', '14:00')
+            ->set('endTime', '16:00')
+            ->call('addBlock')
+            ->assertHasNoErrors();
+
+        $this->assertSame(2, MentorAvailability::where('mentor_id', $mentor->id)->count());
+    }
+
+    public function test_overlapping_block_on_a_different_day_is_accepted(): void
+    {
+        $mentor = User::factory()->create(['tier' => 'mentor']);
+        MentorAvailability::create([
+            'mentor_id' => $mentor->id, 'day_of_week' => 2, 'start_time' => '09:00', 'end_time' => '12:00',
+        ]);
+
+        $this->actingAs($mentor);
+
+        Livewire::test(Disponibilidade::class)
+            ->set('dayOfWeek', '3')
+            ->set('startTime', '09:00')
+            ->set('endTime', '12:00')
+            ->call('addBlock')
+            ->assertHasNoErrors();
+
+        $this->assertSame(2, MentorAvailability::where('mentor_id', $mentor->id)->count());
+    }
+
     public function test_mentor_can_remove_their_own_block(): void
     {
         $mentor = User::factory()->create(['tier' => 'mentor']);
