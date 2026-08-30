@@ -10,7 +10,7 @@ class PersonaNavigationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_start_tier_shows_inicio_aulas_and_frameworks_as_links_and_the_rest_locked(): void
+    public function test_start_tier_shows_inicio_aulas_frameworks_and_upgrade_as_links(): void
     {
         $user = User::factory()->create(['tier' => 'start']);
         $this->actingAs($user);
@@ -21,17 +21,13 @@ class PersonaNavigationTest extends TestCase
             ['href' => 'http://localhost/membros', 'label' => 'Início'],
             ['href' => 'http://localhost/membros/aulas', 'label' => 'Aulas'],
             ['href' => 'http://localhost/membros/frameworks', 'label' => 'Frameworks'],
+            ['href' => 'http://localhost/membros/upgrade', 'label' => 'Sessão 1:1'],
         ] as $link) {
             $this->assertMatchesRegularExpression(
                 '#<a[^>]*href="'.preg_quote($link['href'], '#').'"[^>]*>\s*'.preg_quote($link['label'], '#').'\s*</a>#s',
                 $html,
             );
         }
-
-        $this->assertMatchesRegularExpression(
-            '#<span[^>]*title="Em breve"[^>]*>\s*Sessão 1:1#s',
-            $html,
-        );
     }
 
     public function test_club_tier_shows_inicio_aulas_cofre_agenda_pessoas_encontros_and_frameworks_as_links(): void

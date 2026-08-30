@@ -14,7 +14,7 @@ class PersonaNavigation
                 ['label' => 'Início', 'route' => 'dashboard', 'available' => true],
                 ['label' => 'Aulas', 'route' => 'membros.aulas', 'available' => true],
                 ['label' => 'Frameworks', 'route' => 'membros.frameworks', 'available' => true],
-                ['label' => 'Sessão 1:1', 'route' => 'membros.upgrade', 'available' => false],
+                ['label' => 'Sessão 1:1', 'route' => 'membros.upgrade', 'available' => true],
             ],
             'club' => [
                 ['label' => 'Início', 'route' => 'dashboard', 'available' => true],

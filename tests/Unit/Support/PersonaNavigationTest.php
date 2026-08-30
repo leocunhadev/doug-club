@@ -7,13 +7,13 @@ use PHPUnit\Framework\TestCase;
 
 class PersonaNavigationTest extends TestCase
 {
-    public function test_start_tier_has_three_available_tabs_and_one_locked_tab(): void
+    public function test_start_tier_has_four_available_tabs(): void
     {
         $tabs = (new PersonaNavigation)->tabs('start');
 
         $this->assertCount(4, $tabs);
         $this->assertSame(['Início', 'Aulas', 'Frameworks', 'Sessão 1:1'], array_column($tabs, 'label'));
-        $this->assertSame([true, true, true, false], array_column($tabs, 'available'));
+        $this->assertSame([true, true, true, true], array_column($tabs, 'available'));
     }
 
     public function test_club_tier_has_seven_available_tabs(): void
