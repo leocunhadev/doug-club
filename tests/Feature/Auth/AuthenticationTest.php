@@ -20,6 +20,40 @@ class AuthenticationTest extends TestCase
             ->assertSeeVolt('pages.auth.login');
     }
 
+    public function test_login_screen_renders_in_portuguese(): void
+    {
+        $this->get('/login')
+            ->assertSee('E-mail')
+            ->assertSee('Senha')
+            ->assertSee('Lembrar de mim')
+            ->assertSee('Esqueceu sua senha?')
+            ->assertSee('Entrar')
+            ->assertDontSee('Remember me')
+            ->assertDontSee('Log in');
+    }
+
+    public function test_login_screen_uses_the_wordmark_logo_instead_of_the_icon_logo(): void
+    {
+        $this->get('/login')
+            ->assertSee('id="wmark"', false)
+            ->assertSee('DO.ing <span>CLUB</span>', false)
+            ->assertDontSee('aria-label="DO.ing Club"', false);
+    }
+
+    public function test_invalid_credentials_show_a_portuguese_error_message(): void
+    {
+        $user = User::factory()->create();
+
+        $component = Volt::test('pages.auth.login')
+            ->set('form.email', $user->email)
+            ->set('form.password', 'wrong-password');
+
+        $component->call('login');
+
+        $component->assertHasErrors('form.email');
+        $this->assertSame('Essas credenciais não correspondem aos nossos registros.', $component->errors()->first('form.email'));
+    }
+
     public function test_users_can_authenticate_using_the_login_screen(): void
     {
         $user = User::factory()->create();

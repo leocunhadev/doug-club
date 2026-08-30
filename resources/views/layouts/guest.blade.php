@@ -17,8 +17,8 @@
     <body class="font-sans text-ink antialiased">
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-paper">
             <div>
-                <a href="/" wire:navigate>
-                    <x-brand-logo class="h-14 w-auto text-black" />
+                <a href="/" wire:navigate class="wordmark" id="wmark">
+                    DO.ing <span>CLUB</span>
                 </a>
             </div>
 

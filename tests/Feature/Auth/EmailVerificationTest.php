@@ -24,6 +24,17 @@ class EmailVerificationTest extends TestCase
             ->assertStatus(200);
     }
 
+    public function test_email_verification_screen_renders_in_portuguese(): void
+    {
+        $user = User::factory()->unverified()->create();
+
+        $this->actingAs($user)->get('/verify-email')
+            ->assertSee('Reenviar e-mail de verificação')
+            ->assertSee('Sair')
+            ->assertDontSee('Resend Verification Email')
+            ->assertDontSee('Log Out');
+    }
+
     public function test_email_can_be_verified(): void
     {
         $user = User::factory()->unverified()->create();

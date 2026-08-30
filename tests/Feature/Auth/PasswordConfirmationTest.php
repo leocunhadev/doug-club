@@ -22,6 +22,30 @@ class PasswordConfirmationTest extends TestCase
             ->assertStatus(200);
     }
 
+    public function test_confirm_password_screen_renders_in_portuguese(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->get('/confirm-password')
+            ->assertSee('Senha')
+            ->assertSee('Confirmar')
+            ->assertDontSee('Confirm Password');
+    }
+
+    public function test_wrong_password_shows_a_portuguese_error_message(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user);
+
+        $component = Volt::test('pages.auth.confirm-password')
+            ->set('password', 'wrong-password')
+            ->call('confirmPassword');
+
+        $component->assertHasErrors('password');
+        $this->assertSame('A senha informada está incorreta.', $component->errors()->first('password'));
+    }
+
     public function test_password_can_be_confirmed(): void
     {
         $user = User::factory()->create();

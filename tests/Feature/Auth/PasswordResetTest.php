@@ -22,6 +22,28 @@ class PasswordResetTest extends TestCase
             ->assertStatus(200);
     }
 
+    public function test_forgot_password_screen_renders_in_portuguese(): void
+    {
+        $this->get('/forgot-password')
+            ->assertSee('Esqueceu sua senha?')
+            ->assertSee('E-mail')
+            ->assertSee('Enviar link de redefinição')
+            ->assertDontSee('Email Password Reset Link');
+    }
+
+    public function test_password_reset_link_sent_status_renders_in_portuguese(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create();
+
+        Volt::test('pages.auth.forgot-password')
+            ->set('email', $user->email)
+            ->call('sendPasswordResetLink')
+            ->assertSet('email', '')
+            ->assertSee('Enviamos por e-mail o link de redefinição de senha.');
+    }
+
     public function test_reset_password_link_can_be_requested(): void
     {
         Notification::fake();
@@ -51,6 +73,28 @@ class PasswordResetTest extends TestCase
             $response
                 ->assertSeeVolt('pages.auth.reset-password')
                 ->assertStatus(200);
+
+            return true;
+        });
+    }
+
+    public function test_reset_password_screen_renders_in_portuguese(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create();
+
+        Volt::test('pages.auth.forgot-password')
+            ->set('email', $user->email)
+            ->call('sendPasswordResetLink');
+
+        Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
+            $this->get('/reset-password/'.$notification->token)
+                ->assertSee('E-mail')
+                ->assertSee('Nova senha')
+                ->assertSee('Confirmar nova senha')
+                ->assertSee('Redefinir senha')
+                ->assertDontSee('Reset Password');
 
             return true;
         });
