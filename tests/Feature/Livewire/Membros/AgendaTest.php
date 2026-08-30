@@ -1,0 +1,151 @@
+<?php
+
+namespace Tests\Feature\Livewire\Membros;
+
+use App\Livewire\Membros\Agenda;
+use App\Models\MentorAvailability;
+use App\Models\MentorSession;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+use Tests\TestCase;
+
+class AgendaTest extends TestCase
+{
+    use RefreshDatabase;
+
+    private function mentor(): User
+    {
+        return User::factory()->create(['tier' => 'mentor']);
+    }
+
+    public function test_guests_are_redirected_to_login(): void
+    {
+        $this->get('/membros/agenda')->assertRedirect('/login');
+    }
+
+    public function test_start_tier_is_redirected_to_the_dashboard(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'start']));
+
+        $this->get('/membros/agenda')->assertRedirect('/membros');
+    }
+
+    public function test_club_member_without_a_session_sees_the_booking_calendar(): void
+    {
+        $mentor = $this->mentor();
+        $targetDate = now()->addDays(5)->startOfDay();
+        MentorAvailability::create([
+            'mentor_id' => $mentor->id, 'day_of_week' => $targetDate->dayOfWeek,
+            'start_time' => '09:00', 'end_time' => '10:30',
+        ]);
+
+        $this->actingAs(User::factory()->create(['tier' => 'club']));
+
+        Livewire::test(Agenda::class)
+            ->assertSee($targetDate->format('d'))
+            ->assertDontSee('Cancelar sessão');
+    }
+
+    public function test_club_member_with_an_upcoming_session_sees_it_instead_of_the_calendar(): void
+    {
+        $mentor = $this->mentor();
+        $member = User::factory()->create(['tier' => 'club']);
+        MentorSession::create([
+            'mentor_id' => $mentor->id, 'member_id' => $member->id,
+            'scheduled_at' => now()->addDays(3)->setTime(9, 0),
+        ]);
+
+        $this->actingAs($member);
+
+        Livewire::test(Agenda::class)
+            ->assertSee('Cancelar sessão');
+    }
+
+    public function test_booking_a_valid_slot_creates_the_session(): void
+    {
+        $mentor = $this->mentor();
+        $targetDate = now()->addDays(5)->startOfDay();
+        MentorAvailability::create([
+            'mentor_id' => $mentor->id, 'day_of_week' => $targetDate->dayOfWeek,
+            'start_time' => '09:00', 'end_time' => '10:30',
+        ]);
+
+        $member = User::factory()->create(['tier' => 'club']);
+        $this->actingAs($member);
+
+        $slot = $targetDate->copy()->setTime(9, 0);
+
+        Livewire::test(Agenda::class)
+            ->call('bookSlot', $slot->toIso8601String())
+            ->assertSee('Cancelar sessão');
+
+        $this->assertDatabaseHas('mentor_sessions', [
+            'mentor_id' => $mentor->id, 'member_id' => $member->id,
+        ]);
+    }
+
+    public function test_booking_a_slot_not_in_the_available_list_is_ignored(): void
+    {
+        $mentor = $this->mentor();
+        // No availability created at all — every slot is invalid.
+        $member = User::factory()->create(['tier' => 'club']);
+        $this->actingAs($member);
+
+        $bogusSlot = now()->addDays(5)->setTime(9, 0);
+
+        Livewire::test(Agenda::class)
+            ->call('bookSlot', $bogusSlot->toIso8601String());
+
+        $this->assertDatabaseMissing('mentor_sessions', ['member_id' => $member->id]);
+    }
+
+    public function test_cancelling_more_than_24_hours_ahead_cancels_the_session(): void
+    {
+        $mentor = $this->mentor();
+        $member = User::factory()->create(['tier' => 'club']);
+        $session = MentorSession::create([
+            'mentor_id' => $mentor->id, 'member_id' => $member->id,
+            'scheduled_at' => now()->addDays(3),
+        ]);
+
+        $this->actingAs($member);
+
+        Livewire::test(Agenda::class)->call('cancelSession');
+
+        $this->assertNotNull($session->fresh()->cancelled_at);
+    }
+
+    public function test_cancelling_inside_24_hours_is_ignored(): void
+    {
+        $mentor = $this->mentor();
+        $member = User::factory()->create(['tier' => 'club']);
+        $session = MentorSession::create([
+            'mentor_id' => $mentor->id, 'member_id' => $member->id,
+            'scheduled_at' => now()->addHours(12),
+        ]);
+
+        $this->actingAs($member);
+
+        Livewire::test(Agenda::class)->call('cancelSession');
+
+        $this->assertNull($session->fresh()->cancelled_at);
+    }
+
+    public function test_cannot_cancel_another_members_session(): void
+    {
+        $mentor = $this->mentor();
+        $owner = User::factory()->create(['tier' => 'club']);
+        $otherMember = User::factory()->create(['tier' => 'club']);
+        $session = MentorSession::create([
+            'mentor_id' => $mentor->id, 'member_id' => $owner->id,
+            'scheduled_at' => now()->addDays(3),
+        ]);
+
+        $this->actingAs($otherMember);
+
+        Livewire::test(Agenda::class)->call('cancelSession');
+
+        $this->assertNull($session->fresh()->cancelled_at);
+    }
+}

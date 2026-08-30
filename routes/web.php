@@ -4,6 +4,7 @@ use App\Http\Controllers\Membros\FrameworkPdfDownloadController;
 use App\Http\Controllers\Membros\LessonMaterialDownloadController;
 use App\Http\Controllers\Membros\PreviewPersonaController;
 use App\Http\Controllers\Webhooks\AbacatePayWebhookController;
+use App\Livewire\Membros\Agenda;
 use App\Livewire\Membros\Aulas;
 use App\Livewire\Membros\Dashboard;
 use App\Livewire\Membros\Encontros;
@@ -45,6 +46,10 @@ Route::get('membros/aulas', Aulas::class)
 Route::get('membros/encontros', Encontros::class)
     ->middleware(['auth', 'verified', 'active', 'tier:club'])
     ->name('membros.encontros');
+
+Route::get('membros/agenda', Agenda::class)
+    ->middleware(['auth', 'verified', 'active', 'tier:club'])
+    ->name('membros.agenda');
 
 Route::get('membros/frameworks', Frameworks::class)
     ->middleware(['auth', 'verified', 'active'])
