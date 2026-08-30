@@ -44,13 +44,14 @@
                                 Assistir agora
                             </button>
                         @endif
-                    @else
+                    @elseif ($card = $this->nextSessionCard)
                         <p class="text-xs font-bold uppercase tracking-widest text-white/50">Sua próxima sessão 1:1</p>
-                        <p class="font-display text-xl leading-tight">Agenda chega em breve</p>
-                        <p class="text-sm text-white/70">Em breve você vai poder marcar sua sessão com o Douglas direto por aqui.</p>
-                        <span class="mt-1 self-start rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white/50 cursor-not-allowed">
-                            Em breve
-                        </span>
+                        <p class="font-display text-xl leading-tight">{{ $card['title'] }}</p>
+                        <p class="text-sm text-white/70">{{ $card['subtitle'] }}</p>
+                        <a href="{{ route($card['ctaRoute']) }}" wire:navigate
+                           class="mt-1 self-start rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white hover:brightness-110">
+                            {{ $card['ctaLabel'] }}
+                        </a>
                     @endif
                 </div>
 

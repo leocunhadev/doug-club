@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\LessonFeedback;
 use App\Models\LessonProgress;
+use App\Models\MentorSession;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -325,6 +326,15 @@ class DashboardTest extends TestCase
         Livewire::test(Dashboard::class)->assertSee('id="wmark"', false)->assertSee('DO.ing', false);
     }
 
+    public function test_user_dropdown_links_to_the_sobre_page(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        Livewire::test(Dashboard::class)
+            ->assertSee('Sobre')
+            ->assertSee(route('membros.sobre'), false);
+    }
+
     public function test_video_watermark_uses_the_brand_icon_not_the_default_jetstream_logo(): void
     {
         $user = User::factory()->create();
@@ -374,15 +384,16 @@ class DashboardTest extends TestCase
         Livewire::test(Dashboard::class)->call('watchLesson', 999999);
     }
 
-    public function test_footer_renders_privacy_about_links_and_copyright(): void
+    public function test_footer_renders_brand_and_tagline(): void
     {
         $this->actingAs(User::factory()->create());
 
         Livewire::test(Dashboard::class)
-            ->assertSee('Política de Privacidade')
-            ->assertSee('Sobre')
-            ->assertSee('DO.ing Club')
-            ->assertSee('Todos os direitos reservados')
+            ->assertSee('DO.ing CLUB')
+            ->assertSee('Decisão Orientada')
+            ->assertSee('Tudo é gente. Até o software.')
+            ->assertDontSee('Política de Privacidade')
+            ->assertDontSee('Todos os direitos reservados')
             ->assertDontSee('Flávio Augusto')
             ->assertDontSee('Geração de Valor');
     }
@@ -497,15 +508,100 @@ class DashboardTest extends TestCase
             ->assertSet('featuredLessonId', $newest->id);
     }
 
-    public function test_club_tier_sees_a_locked_next_session_card_with_no_fake_date(): void
+    public function test_club_member_without_a_booked_session_sees_a_cta_to_book_one(): void
     {
         $this->actingAs(User::factory()->create(['tier' => 'club']));
 
         Livewire::test(Dashboard::class)
             ->assertSee('Sua próxima sessão 1:1')
-            ->assertSee('Agenda chega em breve')
+            ->assertSee('Marque sua sessão')
+            ->assertSee(route('membros.agenda'), false)
             ->assertDontSee('09 de julho')
             ->assertDontSee('Adicionar ao calendário');
+    }
+
+    public function test_club_member_with_a_booked_session_sees_the_real_date(): void
+    {
+        $mentor = User::factory()->create(['tier' => 'mentor']);
+        $member = User::factory()->create(['tier' => 'club']);
+        $session = MentorSession::create([
+            'mentor_id' => $mentor->id, 'member_id' => $member->id,
+            'scheduled_at' => now()->addDays(3)->setTime(9, 0),
+        ]);
+
+        $this->actingAs($member);
+
+        Livewire::test(Dashboard::class)
+            ->assertSee('Sua próxima sessão 1:1')
+            ->assertSee($session->scheduled_at->format('d/m/Y \à\s H:i'))
+            ->assertSee('Sessão 1:1 · 90 minutos.')
+            ->assertSee(route('membros.agenda'), false)
+            ->assertDontSee('Marque sua sessão');
+    }
+
+    public function test_club_member_does_not_see_another_members_booked_session(): void
+    {
+        $mentor = User::factory()->create(['tier' => 'mentor']);
+        $otherMember = User::factory()->create(['tier' => 'club']);
+        MentorSession::create([
+            'mentor_id' => $mentor->id, 'member_id' => $otherMember->id,
+            'scheduled_at' => now()->addDays(3)->setTime(9, 0),
+        ]);
+
+        $this->actingAs(User::factory()->create(['tier' => 'club']));
+
+        Livewire::test(Dashboard::class)->assertSee('Marque sua sessão');
+    }
+
+    public function test_club_member_does_not_see_a_cancelled_session(): void
+    {
+        $mentor = User::factory()->create(['tier' => 'mentor']);
+        $member = User::factory()->create(['tier' => 'club']);
+        MentorSession::create([
+            'mentor_id' => $mentor->id, 'member_id' => $member->id,
+            'scheduled_at' => now()->addDays(3)->setTime(9, 0),
+            'cancelled_at' => now(),
+        ]);
+
+        $this->actingAs($member);
+
+        Livewire::test(Dashboard::class)->assertSee('Marque sua sessão');
+    }
+
+    public function test_mentor_without_an_upcoming_session_sees_a_cta_to_configure_availability(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+
+        Livewire::test(Dashboard::class)
+            ->assertSee('Sua próxima sessão 1:1')
+            ->assertSee('Nenhuma sessão marcada')
+            ->assertSee(route('mentor.disp'), false);
+    }
+
+    public function test_mentor_with_an_upcoming_session_sees_the_member_name_and_real_date(): void
+    {
+        $mentor = User::factory()->create(['tier' => 'mentor']);
+        $member = User::factory()->create(['tier' => 'club', 'name' => 'Carla Nunes']);
+        $session = MentorSession::create([
+            'mentor_id' => $mentor->id, 'member_id' => $member->id,
+            'scheduled_at' => now()->addDays(3)->setTime(9, 0),
+        ]);
+
+        $this->actingAs($mentor);
+
+        Livewire::test(Dashboard::class)
+            ->assertSee('Sua próxima sessão 1:1')
+            ->assertSee($session->scheduled_at->format('d/m/Y \à\s H:i'))
+            ->assertSee('Sessão 1:1 com Carla Nunes.')
+            ->assertSee(route('mentor.radar'), false)
+            ->assertDontSee('Nenhuma sessão marcada');
+    }
+
+    public function test_start_tier_never_sees_the_session_card(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'start']));
+
+        Livewire::test(Dashboard::class)->assertDontSee('Sua próxima sessão 1:1');
     }
 
     public function test_hero_player_refuses_to_render_a_club_only_lesson_for_a_start_tier_viewer(): void
