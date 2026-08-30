@@ -6,6 +6,7 @@ use App\Http\Controllers\Membros\PreviewPersonaController;
 use App\Http\Controllers\Membros\VaultDocumentOpenController;
 use App\Http\Controllers\Webhooks\AbacatePayWebhookController;
 use App\Livewire\Membros\Agenda;
+use App\Livewire\Membros\AulaMateriais;
 use App\Livewire\Membros\Aulas;
 use App\Livewire\Membros\Cofre;
 use App\Livewire\Membros\Conteudo;
@@ -54,6 +55,10 @@ Route::get('membros/sobre', Sobre::class)
 Route::get('membros/aulas', Aulas::class)
     ->middleware(['auth', 'verified', 'active'])
     ->name('membros.aulas');
+
+Route::get('membros/aulas/{lesson}/materiais', AulaMateriais::class)
+    ->middleware(['auth', 'verified', 'active'])
+    ->name('membros.aulas.materiais');
 
 Route::get('membros/cofre', Cofre::class)
     ->middleware(['auth', 'verified', 'active', 'tier:club'])
