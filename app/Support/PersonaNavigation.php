@@ -29,7 +29,7 @@ class PersonaNavigation
                 ['label' => 'Painel', 'route' => 'mentor.placeholder', 'available' => true],
                 ['label' => 'Radar', 'route' => 'mentor.radar', 'available' => false],
                 ['label' => 'Dossiês', 'route' => 'mentor.dossies', 'available' => false],
-                ['label' => 'Publicar', 'route' => 'mentor.conteudo', 'available' => false],
+                ['label' => 'Publicar', 'route' => 'mentor.conteudo', 'available' => true],
                 ['label' => 'Disponibilidade', 'route' => 'mentor.disp', 'available' => true],
             ],
             default => [],

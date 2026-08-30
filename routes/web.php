@@ -6,6 +6,7 @@ use App\Http\Controllers\Membros\PreviewPersonaController;
 use App\Http\Controllers\Webhooks\AbacatePayWebhookController;
 use App\Livewire\Membros\Agenda;
 use App\Livewire\Membros\Aulas;
+use App\Livewire\Membros\Conteudo;
 use App\Livewire\Membros\Dashboard;
 use App\Livewire\Membros\Disponibilidade;
 use App\Livewire\Membros\Encontros;
@@ -63,6 +64,10 @@ Route::get('membros/mentor', MentorPlaceholder::class)
 Route::get('membros/mentor/disponibilidade', Disponibilidade::class)
     ->middleware(['auth', 'verified', 'active', 'tier:mentor'])
     ->name('mentor.disp');
+
+Route::get('membros/mentor/conteudo', Conteudo::class)
+    ->middleware(['auth', 'verified', 'active', 'tier:mentor'])
+    ->name('mentor.conteudo');
 
 Route::get('membros/preview-persona/{tier}', PreviewPersonaController::class)
     ->middleware(['auth', 'verified', 'active'])

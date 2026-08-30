@@ -62,19 +62,24 @@ class PersonaNavigationTest extends TestCase
         }
     }
 
-    public function test_mentor_tier_shows_disponibilidade_as_a_link_and_three_tabs_locked(): void
+    public function test_mentor_tier_shows_disponibilidade_and_publicar_as_links_and_two_tabs_locked(): void
     {
         $user = User::factory()->create(['tier' => 'mentor']);
         $this->actingAs($user);
 
         $html = $this->get('/membros/mentor')->assertOk()->getContent();
 
-        $this->assertMatchesRegularExpression(
-            '#<a[^>]*href="http://localhost/membros/mentor/disponibilidade"[^>]*>\s*Disponibilidade\s*</a>#s',
-            $html,
-        );
+        foreach ([
+            ['href' => 'http://localhost/membros/mentor/disponibilidade', 'label' => 'Disponibilidade'],
+            ['href' => 'http://localhost/membros/mentor/conteudo', 'label' => 'Publicar'],
+        ] as $link) {
+            $this->assertMatchesRegularExpression(
+                '#<a[^>]*href="'.preg_quote($link['href'], '#').'"[^>]*>\s*'.preg_quote($link['label'], '#').'\s*</a>#s',
+                $html,
+            );
+        }
 
-        foreach (['Radar', 'Dossiês', 'Publicar'] as $label) {
+        foreach (['Radar', 'Dossiês'] as $label) {
             $this->assertMatchesRegularExpression(
                 '#<span[^>]*title="Em breve"[^>]*>\s*'.preg_quote($label, '#').'#s',
                 $html,
