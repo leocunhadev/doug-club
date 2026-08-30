@@ -7,6 +7,7 @@ use App\Http\Controllers\Webhooks\AbacatePayWebhookController;
 use App\Livewire\Membros\Agenda;
 use App\Livewire\Membros\Aulas;
 use App\Livewire\Membros\Dashboard;
+use App\Livewire\Membros\Disponibilidade;
 use App\Livewire\Membros\Encontros;
 use App\Livewire\Membros\Frameworks;
 use App\Livewire\Membros\MentorPlaceholder;
@@ -58,6 +59,10 @@ Route::get('membros/frameworks', Frameworks::class)
 Route::get('membros/mentor', MentorPlaceholder::class)
     ->middleware(['auth', 'verified', 'active', 'tier:mentor'])
     ->name('mentor.placeholder');
+
+Route::get('membros/mentor/disponibilidade', Disponibilidade::class)
+    ->middleware(['auth', 'verified', 'active', 'tier:mentor'])
+    ->name('mentor.disp');
 
 Route::get('membros/preview-persona/{tier}', PreviewPersonaController::class)
     ->middleware(['auth', 'verified', 'active'])
