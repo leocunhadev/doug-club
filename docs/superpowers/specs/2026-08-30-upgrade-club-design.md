@@ -202,7 +202,8 @@ Porta as classes do protótipo pro padrão já estabelecido no projeto:
 .upg::after { content: "CLUB"; position: absolute; right: -20px; bottom: -38px;
   font-family: 'Syne', sans-serif; font-weight: 800; font-size: 160px; color: transparent;
   -webkit-text-stroke: 1px rgba(255,81,0,.35); pointer-events: none; }
-.upg .eyebrow { color: theme('colors.brand'); }
+.upg .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  color: theme('colors.brand'); }
 .upg h2 { font-size: clamp(26px,4.4vw,40px); line-height: 1.05; margin: 10px 0 14px; max-width: 560px; }
 .upg p { color: #B9B4AB; max-width: 520px; }
 .upg ul { list-style: none; margin: 20px 0 26px; display: flex; flex-direction: column; gap: 11px;
@@ -216,8 +217,10 @@ O wrapper do card aplica o cantos/sombra do padrão já estabelecido diretamente
 (`rounded-[18px] shadow-[0_1px_2px_rgba(11,11,12,.05),0_10px_28px_rgba(11,11,12,.07)]`) junto da classe
 `.upg`, que cuida do fundo preto/padding/pseudo-elemento — mesma composição já usada no `.person` do
 Pessoas (Tailwind pro shell do card, classe customizada pro que não tem equivalente Tailwind direto).
-Só `.upg .eyebrow` é usado nesta feature — sem o `.eyebrow` genérico do protótipo (sem `.upg` na
-frente), que nenhuma tela real usa ainda; YAGNI.
+`.upg .eyebrow` já inclui todo o estilo do texto (tamanho/peso/tracking/maiúsculas), não só a cor —
+o protótipo tem um `.eyebrow` genérico reaproveitado em várias telas com um `.upg .eyebrow` só de cor
+por cima, mas como nenhuma outra tela real usa `.eyebrow` ainda, portar a regra genérica separada
+seria CSS morto; a versão aqui fica autocontida em `.upg .eyebrow`.
 
 ## 8. Navegação
 
