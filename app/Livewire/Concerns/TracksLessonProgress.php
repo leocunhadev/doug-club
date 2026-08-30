@@ -53,7 +53,7 @@ trait TracksLessonProgress
     #[Computed]
     public function featuredLesson(): ?Lesson
     {
-        return Lesson::query()->with(['course', 'materials'])->find($this->featuredLessonId);
+        return Lesson::query()->with(['course'])->find($this->featuredLessonId);
     }
 
     #[Computed]

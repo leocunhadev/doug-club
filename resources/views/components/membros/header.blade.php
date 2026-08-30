@@ -59,8 +59,8 @@
                 <a
                     href="{{ route($tab['route']) }}"
                     wire:navigate
-                    @if (request()->routeIs($tab['route'])) aria-current="page" @endif
-                    class="shrink-0 px-3 py-1.5 rounded-full text-sm font-medium {{ request()->routeIs($tab['route']) ? 'bg-black text-white' : 'text-stone hover:text-ink' }}"
+                    @if (request()->routeIs($tab['route']) || request()->routeIs($tab['route'].'.*')) aria-current="page" @endif
+                    class="shrink-0 px-3 py-1.5 rounded-full text-sm font-medium {{ request()->routeIs($tab['route']) || request()->routeIs($tab['route'].'.*') ? 'bg-black text-white' : 'text-stone hover:text-ink' }}"
                 >
                     {{ $tab['label'] }}
                 </a>

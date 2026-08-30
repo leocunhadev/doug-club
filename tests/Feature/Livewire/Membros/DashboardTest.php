@@ -348,8 +348,6 @@ class DashboardTest extends TestCase
             'course_id' => $course->id, 'number' => 5, 'title' => 'Aula 05',
             'video_provider' => 'youtube', 'video_id' => 'dQw4w9WgXcQ', 'published_at' => '2026-07-17', 'position' => 1,
         ]);
-        $lesson->materials()->create(['title' => 'Slides', 'file_url' => 'https://example.com/slides.pdf']);
-        $lesson->materials()->create(['title' => 'Apostila', 'file_path' => 'lesson-materials/apostila.pdf']);
 
         $this->actingAs($user);
 
