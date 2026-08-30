@@ -209,4 +209,93 @@ class ProfileTest extends TestCase
         $this->assertNull($user->fresh()->photo_path);
         Storage::disk('public')->assertMissing($path);
     }
+
+    public function test_network_profile_section_is_visible_for_club_tier(): void
+    {
+        $user = User::factory()->create(['tier' => 'club']);
+
+        $response = $this->actingAs($user)->get('/profile');
+
+        $response->assertOk();
+        $response->assertSee('Perfil na rede CLUB');
+    }
+
+    public function test_network_profile_section_is_hidden_for_start_tier(): void
+    {
+        $user = User::factory()->create(['tier' => 'start']);
+
+        $response = $this->actingAs($user)->get('/profile');
+
+        $response->assertOk();
+        $response->assertDontSee('Perfil na rede CLUB');
+    }
+
+    public function test_network_profile_can_be_updated(): void
+    {
+        $user = User::factory()->create(['tier' => 'club']);
+
+        $this->actingAs($user);
+
+        Volt::test('profile.update-profile-information-form')
+            ->set('company', 'Estúdio Beta')
+            ->set('bio', 'Ajudo empresas a crescer com dados.')
+            ->set('teachTagsInput', 'Vendas, Copywriting')
+            ->set('learnTagsInput', 'Gestão de equipe')
+            ->call('updateNetworkProfile')
+            ->assertHasNoErrors();
+
+        $user->refresh();
+
+        $this->assertSame('Estúdio Beta', $user->company);
+        $this->assertSame('Ajudo empresas a crescer com dados.', $user->bio);
+        $this->assertSame(['Vendas', 'Copywriting'], $user->teach_tags);
+        $this->assertSame(['Gestão de equipe'], $user->learn_tags);
+    }
+
+    public function test_network_profile_tags_are_trimmed_and_empty_entries_are_removed(): void
+    {
+        $user = User::factory()->create(['tier' => 'club']);
+
+        $this->actingAs($user);
+
+        Volt::test('profile.update-profile-information-form')
+            ->set('teachTagsInput', 'Vendas,  Copywriting ,,Gestão')
+            ->call('updateNetworkProfile')
+            ->assertHasNoErrors();
+
+        $this->assertSame(['Vendas', 'Copywriting', 'Gestão'], $user->fresh()->teach_tags);
+    }
+
+    public function test_network_profile_empty_tags_input_results_in_empty_array(): void
+    {
+        $user = User::factory()->create(['tier' => 'club', 'teach_tags' => ['Vendas']]);
+
+        $this->actingAs($user);
+
+        Volt::test('profile.update-profile-information-form')
+            ->set('teachTagsInput', '')
+            ->call('updateNetworkProfile')
+            ->assertHasNoErrors();
+
+        $this->assertSame([], $user->fresh()->teach_tags);
+    }
+
+    public function test_network_profile_fields_are_populated_on_mount(): void
+    {
+        $user = User::factory()->create([
+            'tier' => 'club',
+            'company' => 'Estúdio Beta',
+            'bio' => 'Ajudo empresas a crescer com dados.',
+            'teach_tags' => ['Vendas', 'Copywriting'],
+            'learn_tags' => ['Gestão de equipe'],
+        ]);
+
+        $this->actingAs($user);
+
+        Volt::test('profile.update-profile-information-form')
+            ->assertSet('company', 'Estúdio Beta')
+            ->assertSet('bio', 'Ajudo empresas a crescer com dados.')
+            ->assertSet('teachTagsInput', 'Vendas, Copywriting')
+            ->assertSet('learnTagsInput', 'Gestão de equipe');
+    }
 }

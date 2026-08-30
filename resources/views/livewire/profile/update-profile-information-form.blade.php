@@ -16,6 +16,10 @@ new class extends Component
     public string $name = '';
     public string $email = '';
     public ?UploadedFile $photo = null;
+    public string $company = '';
+    public string $bio = '';
+    public string $teachTagsInput = '';
+    public string $learnTagsInput = '';
 
     /**
      * Mount the component.
@@ -24,6 +28,10 @@ new class extends Component
     {
         $this->name = Auth::user()->name;
         $this->email = Auth::user()->email;
+        $this->company = Auth::user()->company ?? '';
+        $this->bio = Auth::user()->bio ?? '';
+        $this->teachTagsInput = implode(', ', Auth::user()->teach_tags ?? []);
+        $this->learnTagsInput = implode(', ', Auth::user()->learn_tags ?? []);
     }
 
     /**
@@ -104,6 +112,40 @@ new class extends Component
     }
 
     /**
+     * Update the network-profile fields (company, bio, teach/learn tags).
+     */
+    public function updateNetworkProfile(): void
+    {
+        $validated = $this->validate([
+            'company' => ['nullable', 'string', 'max:255'],
+            'bio' => ['nullable', 'string', 'max:500'],
+            'teachTagsInput' => ['nullable', 'string', 'max:255'],
+            'learnTagsInput' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $user = Auth::user();
+        $user->company = $validated['company'] ?: null;
+        $user->bio = $validated['bio'] ?: null;
+        $user->teach_tags = $this->parseTags($validated['teachTagsInput']);
+        $user->learn_tags = $this->parseTags($validated['learnTagsInput']);
+        $user->save();
+
+        $this->dispatch('network-profile-updated');
+    }
+
+    /**
+     * Split a comma-separated tag string into a trimmed, non-empty array.
+     */
+    private function parseTags(?string $input): array
+    {
+        return collect(explode(',', $input ?? ''))
+            ->map(fn (string $tag) => trim($tag))
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    /**
      * Send an email verification notification to the current user.
      */
     public function sendVerification(): void
@@ -122,6 +164,7 @@ new class extends Component
     }
 }; ?>
 
+<div>
 <section>
     <header>
         <h2 class="text-lg font-medium text-ink">
@@ -200,3 +243,54 @@ new class extends Component
         </div>
     </form>
 </section>
+@if (auth()->user()->tier === 'club')
+    <section class="mt-10 pt-10 border-t border-sand">
+        <header>
+            <h2 class="text-lg font-medium text-ink">
+                Perfil na rede CLUB
+            </h2>
+
+            <p class="mt-1 text-sm text-stone">
+                Apareça pros outros membros do CLUB em "Pessoas" — conte o que você faz, no que pode ajudar e o que quer aprender.
+            </p>
+        </header>
+
+        <form wire:submit="updateNetworkProfile" class="mt-6 space-y-6">
+            <div>
+                <x-input-label for="company" value="Empresa" />
+                <x-text-input wire:model="company" id="company" name="company" type="text" class="mt-1 block w-full" />
+                <x-input-error class="mt-2" :messages="$errors->get('company')" />
+            </div>
+
+            <div>
+                <x-input-label for="bio" value="Bio" />
+                <textarea wire:model="bio" id="bio" name="bio" rows="3"
+                    class="mt-1 block w-full border-sand text-ink focus:border-brand focus:ring-brand rounded-md shadow-sm"></textarea>
+                <x-input-error class="mt-2" :messages="$errors->get('bio')" />
+            </div>
+
+            <div>
+                <x-input-label for="teachTagsInput" value="Pode ensinar" />
+                <x-text-input wire:model="teachTagsInput" id="teachTagsInput" name="teachTagsInput" type="text"
+                    class="mt-1 block w-full" placeholder="Vendas, Copywriting, Gestão" />
+                <x-input-error class="mt-2" :messages="$errors->get('teachTagsInput')" />
+            </div>
+
+            <div>
+                <x-input-label for="learnTagsInput" value="Quer aprender" />
+                <x-text-input wire:model="learnTagsInput" id="learnTagsInput" name="learnTagsInput" type="text"
+                    class="mt-1 block w-full" placeholder="Vendas, Copywriting, Gestão" />
+                <x-input-error class="mt-2" :messages="$errors->get('learnTagsInput')" />
+            </div>
+
+            <div class="flex items-center gap-4">
+                <x-primary-button>Salvar</x-primary-button>
+
+                <x-action-message class="me-3" on="network-profile-updated">
+                    Salvo.
+                </x-action-message>
+            </div>
+        </form>
+    </section>
+@endif
+</div>
