@@ -21,9 +21,9 @@ class MentorSessionsTable
                     ->sortable(),
                 TextColumn::make('cancelled_at')
                     ->label('Status')
-                    ->formatStateUsing(fn (?string $state) => $state ? 'Cancelada' : 'Confirmada')
+                    ->formatStateUsing(fn (mixed $state) => $state ? 'Cancelada' : 'Confirmada')
                     ->badge()
-                    ->color(fn (?string $state) => $state ? 'gray' : 'success'),
+                    ->color(fn (mixed $state) => $state ? 'gray' : 'success'),
             ])
             ->defaultSort('scheduled_at', 'desc')
             ->recordActions([
