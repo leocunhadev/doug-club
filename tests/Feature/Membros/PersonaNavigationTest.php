@@ -34,7 +34,7 @@ class PersonaNavigationTest extends TestCase
         );
     }
 
-    public function test_club_tier_shows_inicio_aulas_cofre_agenda_encontros_and_frameworks_as_links_and_one_tab_locked(): void
+    public function test_club_tier_shows_inicio_aulas_cofre_agenda_pessoas_encontros_and_frameworks_as_links(): void
     {
         $user = User::factory()->create(['tier' => 'club']);
         $this->actingAs($user);
@@ -46,6 +46,7 @@ class PersonaNavigationTest extends TestCase
             ['href' => 'http://localhost/membros/aulas', 'label' => 'Aulas'],
             ['href' => 'http://localhost/membros/cofre', 'label' => 'Meu cofre'],
             ['href' => 'http://localhost/membros/agenda', 'label' => 'Minha sessão'],
+            ['href' => 'http://localhost/membros/pessoas', 'label' => 'Pessoas'],
             ['href' => 'http://localhost/membros/encontros', 'label' => 'Encontros'],
             ['href' => 'http://localhost/membros/frameworks', 'label' => 'Frameworks'],
         ] as $link) {
@@ -54,11 +55,6 @@ class PersonaNavigationTest extends TestCase
                 $html,
             );
         }
-
-        $this->assertMatchesRegularExpression(
-            '#<span[^>]*title="Em breve"[^>]*>\s*Pessoas#s',
-            $html,
-        );
     }
 
     public function test_mentor_tier_shows_disponibilidade_and_publicar_as_links_and_two_tabs_locked(): void
