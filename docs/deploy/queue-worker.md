@@ -45,6 +45,8 @@ Este projeto usa fila de e-mails (notificações de sessão 1:1, issue #27) via 
 
 Depois de configurar o worker, confirme que ele está processando jobs de verdade:
 
+**Antes de tudo**, confirme que `APP_URL` no `.env` de produção é o domínio real do projeto. Os links dos e-mails enfileirados (ex: o botão "Ver minha agenda") são gerados pelo worker, que roda em contexto de linha de comando — sem uma requisição HTTP real para herdar o host, o Laravel usa exatamente o que está em `config('app.url')`. Se `APP_URL` estiver errado, todo link nos e-mails de confirmação e lembrete aponta pro lugar errado, sem nenhum erro visível.
+
 1. No servidor, rode `php artisan tinker`.
 2. Marque uma sessão de teste (ou use o próprio fluxo da Agenda como membro/mentor de teste) para gerar uma notificação real na fila.
 3. Rode `tail -f storage/logs/worker.log` e confirme que o job aparece como processado (`Processed: App\Jobs\SendSessionReminderJob` ou `App\Notifications\...`) em poucos segundos.
@@ -61,3 +63,22 @@ O Supervisor reinicia o processo automaticamente (`autorestart=true`). Se o VPS 
 sudo systemctl is-enabled supervisor
 ```
 Se não estiver `enabled`, rode `sudo systemctl enable supervisor`.
+
+## Depois de cada deploy
+
+O worker mantém o código da aplicação carregado em memória enquanto roda — ele não percebe sozinho que o código mudou. Depois de todo deploy, rode:
+```bash
+php artisan queue:restart
+```
+Isso sinaliza o worker pra terminar o job atual e reiniciar (o Supervisor sobe um processo novo automaticamente, graças a `autorestart=true`). Sem esse passo, o worker continua rodando o código antigo até ser reiniciado manualmente.
+
+## Jobs que falharam
+
+Com `--tries=3`, um job que falha (ex: erro de SMTP, ou uma sessão apagada antes do lembrete rodar) esgota as tentativas e cai na tabela `failed_jobs`, sem gerar nenhum alerta automático (fora de escopo desta issue). Pra checar manualmente:
+```bash
+php artisan queue:failed
+```
+Pra reprocessar todos os jobs falhados depois de corrigir a causa:
+```bash
+php artisan queue:retry all
+```

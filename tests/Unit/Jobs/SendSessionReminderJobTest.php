@@ -54,4 +54,17 @@ class SendSessionReminderJobTest extends TestCase
 
         Notification::assertNothingSent();
     }
+
+    public function test_does_not_notify_when_the_session_is_cancelled_after_the_job_is_created(): void
+    {
+        Notification::fake();
+        $session = $this->createSession();
+        $job = new SendSessionReminderJob($session);
+
+        MentorSession::find($session->id)->update(['cancelled_at' => now()]);
+
+        $job->handle();
+
+        Notification::assertNothingSent();
+    }
 }
