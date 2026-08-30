@@ -15,7 +15,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 
-#[Fillable(['name', 'email', 'password', 'is_admin', 'access_revoked_at', 'email_verified_at', 'tier', 'photo_path'])]
+#[Fillable(['name', 'email', 'password', 'is_admin', 'access_revoked_at', 'email_verified_at', 'tier', 'photo_path', 'company', 'bio', 'teach_tags', 'learn_tags'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements FilamentUser
 {
@@ -34,6 +34,8 @@ class User extends Authenticatable implements FilamentUser
             'password' => 'hashed',
             'is_admin' => 'boolean',
             'access_revoked_at' => 'datetime',
+            'teach_tags' => 'array',
+            'learn_tags' => 'array',
         ];
     }
 
