@@ -25,6 +25,23 @@ class AulasTest extends TestCase
         $this->get('/membros/aulas')->assertRedirect('/login');
     }
 
+    public function test_regular_user_sees_the_lock_when_the_catalog_has_no_lessons_at_all(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        Livewire::test(Aulas::class)
+            ->assertSee('Sua biblioteca de aulas está sendo preparada.');
+    }
+
+    public function test_mentor_sees_the_real_page_even_when_the_catalog_has_no_lessons_at_all(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+
+        Livewire::test(Aulas::class)
+            ->assertSee('Nenhuma aula nesta categoria ainda.')
+            ->assertDontSee('Sua biblioteca de aulas está sendo preparada.');
+    }
+
     public function test_start_tier_only_sees_start_tier_lessons(): void
     {
         $course = $this->course();

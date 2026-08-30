@@ -41,11 +41,20 @@ class FrameworksTest extends TestCase
         Livewire::test(Frameworks::class)->assertSee('Consumidor 4S');
     }
 
-    public function test_empty_state_shown_with_no_frameworks_published(): void
+    public function test_empty_state_shows_the_lock_for_a_regular_user_with_no_frameworks_published(): void
     {
         $this->actingAs(User::factory()->create());
 
-        Livewire::test(Frameworks::class)->assertSee('Nenhum framework publicado ainda.');
+        Livewire::test(Frameworks::class)->assertSee('Os frameworks estão sendo preparados.');
+    }
+
+    public function test_mentor_sees_the_real_empty_state_with_no_frameworks_published(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+
+        Livewire::test(Frameworks::class)
+            ->assertSee('Nenhum framework publicado ainda.')
+            ->assertDontSee('Os frameworks estão sendo preparados.');
     }
 
     public function test_download_link_shown_for_an_uploaded_pdf(): void
