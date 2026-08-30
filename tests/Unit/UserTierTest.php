@@ -31,6 +31,13 @@ class UserTierTest extends TestCase
         $this->assertFalse(User::factory()->create(['tier' => 'start'])->isMentor());
     }
 
+    public function test_is_start_is_true_only_for_start_tier(): void
+    {
+        $this->assertTrue(User::factory()->create(['tier' => 'start'])->isStart());
+        $this->assertFalse(User::factory()->create(['tier' => 'club'])->isStart());
+        $this->assertFalse(User::factory()->create(['tier' => 'mentor'])->isStart());
+    }
+
     public function test_initials_are_computed_from_the_users_name(): void
     {
         $user = User::factory()->create(['name' => 'Ana Souza']);

@@ -15,6 +15,7 @@ class EnsureTier
         $allowed = match ($minTier) {
             'club' => $user?->hasClubAccess() ?? false,
             'mentor' => $user?->isMentor() ?? false,
+            'start' => $user?->isStart() ?? false,
             default => false,
         };
 

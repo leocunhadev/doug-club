@@ -59,6 +59,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->tier === 'mentor';
     }
 
+    public function isStart(): bool
+    {
+        return $this->tier === 'start';
+    }
+
     /**
      * The tier to render the UI for. Admins can preview another persona via
      * the plan switcher — this never changes `tier` itself, and route gating
