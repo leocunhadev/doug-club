@@ -2,8 +2,11 @@
 
 namespace App\Actions;
 
+use App\Jobs\SendSessionReminderJob;
 use App\Models\MentorSession;
 use App\Models\User;
+use App\Notifications\MentorSessionBookedForMentorNotification;
+use App\Notifications\MentorSessionBookedNotification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -22,11 +25,18 @@ class BookMentorSession
                 return null;
             }
 
-            return MentorSession::create([
+            $session = MentorSession::create([
                 'mentor_id' => $mentor->id,
                 'member_id' => $member->id,
                 'scheduled_at' => $scheduledAt,
             ]);
+
+            $session->member->notify(new MentorSessionBookedNotification($session));
+            $session->mentor->notify(new MentorSessionBookedForMentorNotification($session));
+
+            SendSessionReminderJob::dispatch($session)->delay($scheduledAt->copy()->subHour());
+
+            return $session;
         });
     }
 }

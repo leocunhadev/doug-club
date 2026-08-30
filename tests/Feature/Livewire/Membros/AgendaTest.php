@@ -7,6 +7,8 @@ use App\Models\MentorAvailability;
 use App\Models\MentorSession;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Queue;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -74,6 +76,9 @@ class AgendaTest extends TestCase
 
     public function test_booking_a_valid_slot_creates_the_session(): void
     {
+        Notification::fake();
+        Queue::fake();
+
         $mentor = $this->mentor();
         $targetDate = now()->addDays(5)->startOfDay();
         MentorAvailability::create([
@@ -112,6 +117,8 @@ class AgendaTest extends TestCase
 
     public function test_cancelling_more_than_24_hours_ahead_cancels_the_session(): void
     {
+        Notification::fake();
+
         $mentor = $this->mentor();
         $member = User::factory()->create(['tier' => 'club']);
         $session = MentorSession::create([
