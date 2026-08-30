@@ -3,6 +3,7 @@
 namespace Tests\Feature\Membros;
 
 use App\Livewire\Membros\Radar;
+use App\Models\BridgeRequest;
 use App\Models\Course;
 use App\Models\Encontro;
 use App\Models\EncontroFeedback;
@@ -218,5 +219,61 @@ class RadarTest extends TestCase
 
         Livewire::test(Radar::class)
             ->assertSee('Nenhuma nota registrada ainda.');
+    }
+
+    public function test_suggested_bridges_shows_a_match_when_tags_overlap_case_insensitively(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+        User::factory()->create(['tier' => 'club', 'name' => 'Ricardo Mendes', 'learn_tags' => ['Precificação']]);
+        User::factory()->create(['tier' => 'club', 'name' => 'Marina Alves', 'teach_tags' => ['precificação']]);
+
+        Livewire::test(Radar::class)
+            ->assertSee('Pontes sugeridas')
+            ->assertSee('Ricardo Mendes')
+            ->assertSee('Marina Alves')
+            ->assertSee('Precificação')
+            ->assertDontSee('Nenhuma ponte sugerida no momento.');
+    }
+
+    public function test_suggested_bridges_shows_the_empty_state_when_there_are_no_matches(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+        User::factory()->create(['tier' => 'club', 'name' => 'Ricardo Mendes', 'learn_tags' => ['Vendas']]);
+        User::factory()->create(['tier' => 'club', 'name' => 'Marina Alves', 'teach_tags' => ['Marketing']]);
+
+        Livewire::test(Radar::class)->assertSee('Nenhuma ponte sugerida no momento.');
+    }
+
+    public function test_suggested_bridges_excludes_a_pair_with_an_existing_bridge_request(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+        $learner = User::factory()->create(['tier' => 'club', 'name' => 'Ricardo Mendes', 'learn_tags' => ['Precificação']]);
+        $teacher = User::factory()->create(['tier' => 'club', 'name' => 'Marina Alves', 'teach_tags' => ['precificação']]);
+        BridgeRequest::create(['requester_id' => $learner->id, 'target_id' => $teacher->id]);
+
+        Livewire::test(Radar::class)->assertSee('Nenhuma ponte sugerida no momento.');
+    }
+
+    public function test_suggested_bridges_excludes_members_without_matching_tags(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+        User::factory()->create(['tier' => 'club', 'name' => 'Sem Tags']);
+        User::factory()->create(['tier' => 'club', 'name' => 'Também Sem Tags']);
+
+        Livewire::test(Radar::class)->assertSee('Nenhuma ponte sugerida no momento.');
+    }
+
+    public function test_suggested_bridges_caps_results_at_three(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+
+        for ($i = 1; $i <= 4; $i++) {
+            User::factory()->create(['tier' => 'club', 'name' => "Aluno {$i}", 'learn_tags' => ["assunto-{$i}"]]);
+            User::factory()->create(['tier' => 'club', 'name' => "Professor {$i}", 'teach_tags' => ["assunto-{$i}"]]);
+        }
+
+        $matches = Livewire::test(Radar::class)->instance()->suggestedBridges();
+
+        $this->assertCount(3, $matches);
     }
 }

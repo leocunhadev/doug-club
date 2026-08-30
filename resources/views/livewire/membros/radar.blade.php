@@ -42,6 +42,25 @@
             </div>
         </div>
 
+        <h3 class="text-[17px] font-semibold mb-3">Pontes sugeridas</h3>
+        @forelse ($this->suggestedBridges as $match)
+            <div class="match rounded-[18px] border border-sand bg-card shadow-[0_1px_2px_rgba(11,11,12,.05),0_10px_28px_rgba(11,11,12,.07)]">
+                <div class="duo">
+                    <div class="avatar">{{ $match['learner']->initials }}</div>
+                    <div class="avatar o">{{ $match['teacher']->initials }}</div>
+                </div>
+                <div class="d">
+                    <b>{{ $match['learner']->name }}</b> quer aprender <em>{{ $match['tag'] }}</em> e <b>{{ $match['teacher']->name }}</b> pode ensinar isso.
+                </div>
+                <button type="button" wire:click="makeBridge({{ $match['learner']->id }}, {{ $match['teacher']->id }}, '{{ $match['tag'] }}')"
+                        class="px-3.5 py-1.5 rounded-full text-sm font-semibold bg-black text-white hover:bg-brand">
+                    Fazer a ponte
+                </button>
+            </div>
+        @empty
+            <p class="text-stone mb-6">Nenhuma ponte sugerida no momento.</p>
+        @endforelse
+
         <h3 class="text-[17px] font-semibold mb-3">Antes das sessões de hoje</h3>
         @forelse ($this->todaySessions as $session)
             <div class="rounded-[18px] border border-sand bg-card shadow-[0_1px_2px_rgba(11,11,12,.05),0_10px_28px_rgba(11,11,12,.07)] briefing-card border-l-4 border-brand p-[22px] mb-3">

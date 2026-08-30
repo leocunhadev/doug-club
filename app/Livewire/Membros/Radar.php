@@ -3,6 +3,7 @@
 namespace App\Livewire\Membros;
 
 use App\Livewire\Concerns\ComputesUserInitials;
+use App\Models\BridgeRequest;
 use App\Models\EncontroFeedback;
 use App\Models\LessonFeedback;
 use App\Models\MentorCommitment;
@@ -69,6 +70,47 @@ class Radar extends Component
             ->filter(fn (array $entry) => $entry['days_since'] > self::NO_SESSION_ALERT_THRESHOLD_DAYS)
             ->sortByDesc('days_since')
             ->values();
+    }
+
+    #[Computed]
+    public function suggestedBridges(): Collection
+    {
+        $members = User::query()
+            ->where('tier', 'club')
+            ->get(['id', 'name', 'teach_tags', 'learn_tags']);
+
+        $connectedPairs = BridgeRequest::query()
+            ->get(['requester_id', 'target_id'])
+            ->flatMap(fn (BridgeRequest $br) => ["{$br->requester_id}-{$br->target_id}", "{$br->target_id}-{$br->requester_id}"])
+            ->flip();
+
+        $matches = collect();
+
+        foreach ($members as $learner) {
+            foreach ($members as $teacher) {
+                if ($learner->id === $teacher->id) {
+                    continue;
+                }
+
+                if (isset($connectedPairs["{$learner->id}-{$teacher->id}"])) {
+                    continue;
+                }
+
+                $matchedTag = collect($learner->learn_tags ?? [])
+                    ->first(fn (string $tag) => collect($teacher->teach_tags ?? [])
+                        ->contains(fn (string $t) => mb_strtolower($t) === mb_strtolower($tag)));
+
+                if ($matchedTag !== null) {
+                    $matches->push([
+                        'learner' => $learner,
+                        'teacher' => $teacher,
+                        'tag' => $matchedTag,
+                    ]);
+                }
+            }
+        }
+
+        return $matches->take(3);
     }
 
     public function lastNoteFor(int $memberId): ?MentorNote

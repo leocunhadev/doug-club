@@ -333,3 +333,8 @@
 .kpi.alerta { border-color: #FFD2BC; background: theme('colors.brand-soft'); }
 .kpi.alerta b { color: theme('colors.brand'); }
 .briefing-card { border-left-color: theme('colors.brand'); }
+.match { padding: 18px 22px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; }
+.match .duo { display: flex; align-items: center; }
+.match .duo .avatar:last-child { margin-left: -12px; border: 2px solid theme('colors.card'); }
+.match .d { flex: 1; min-width: 220px; font-size: 14px; }
+.match .d em { font-style: normal; color: theme('colors.brand'); font-weight: 700; }
