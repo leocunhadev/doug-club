@@ -44,7 +44,7 @@
 
         <h3 class="text-[17px] font-semibold mb-3">Antes das sessões de hoje</h3>
         @forelse ($this->todaySessions as $session)
-            <div class="rounded-[18px] border border-sand bg-card shadow-[0_1px_2px_rgba(11,11,12,.05),0_10px_28px_rgba(11,11,12,.07)] border-l-4 border-brand p-[22px] mb-3">
+            <div class="rounded-[18px] border border-sand bg-card shadow-[0_1px_2px_rgba(11,11,12,.05),0_10px_28px_rgba(11,11,12,.07)] briefing-card border-l-4 border-brand p-[22px] mb-3">
                 <p class="eyebrow laranja">{{ $session->member->name }} · {{ $session->scheduled_at->format('H\hi') }}</p>
                 <p class="mt-2 text-[15px]">
                     @if ($lastNote = $this->lastNoteFor($session->member_id))

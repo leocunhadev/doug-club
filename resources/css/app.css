@@ -332,3 +332,4 @@
 .kpi small { color: theme('colors.stone'); }
 .kpi.alerta { border-color: #FFD2BC; background: theme('colors.brand-soft'); }
 .kpi.alerta b { color: theme('colors.brand'); }
+.briefing-card { border-left-color: theme('colors.brand'); }
