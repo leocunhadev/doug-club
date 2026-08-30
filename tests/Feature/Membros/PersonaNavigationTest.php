@@ -53,7 +53,7 @@ class PersonaNavigationTest extends TestCase
         }
     }
 
-    public function test_mentor_tier_shows_disponibilidade_publicar_and_dossies_as_links_and_radar_locked(): void
+    public function test_mentor_tier_shows_disponibilidade_publicar_dossies_and_radar_as_links(): void
     {
         $user = User::factory()->create(['tier' => 'mentor']);
         $this->actingAs($user);
@@ -64,17 +64,13 @@ class PersonaNavigationTest extends TestCase
             ['href' => 'http://localhost/membros/mentor/disponibilidade', 'label' => 'Disponibilidade'],
             ['href' => 'http://localhost/membros/mentor/conteudo', 'label' => 'Publicar'],
             ['href' => 'http://localhost/membros/mentor/dossies', 'label' => 'Dossiês'],
+            ['href' => 'http://localhost/membros/mentor/radar', 'label' => 'Radar'],
         ] as $link) {
             $this->assertMatchesRegularExpression(
                 '#<a[^>]*href="'.preg_quote($link['href'], '#').'"[^>]*>\s*'.preg_quote($link['label'], '#').'\s*</a>#s',
                 $html,
             );
         }
-
-        $this->assertMatchesRegularExpression(
-            '#<span[^>]*title="Em breve"[^>]*>\s*Radar#s',
-            $html,
-        );
     }
 
     public function test_header_logout_button_posts_to_the_logout_route(): void
