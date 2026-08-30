@@ -49,4 +49,16 @@ class BridgeRequestTest extends TestCase
 
         $this->assertDatabaseMissing('bridge_requests', ['id' => $bridgeRequest->id]);
     }
+
+    public function test_duplicate_requester_target_pair_violates_the_unique_constraint(): void
+    {
+        $requester = User::factory()->create(['tier' => 'club']);
+        $target = User::factory()->create(['tier' => 'club']);
+
+        BridgeRequest::create(['requester_id' => $requester->id, 'target_id' => $target->id]);
+
+        $this->expectException(\Illuminate\Database\QueryException::class);
+
+        BridgeRequest::create(['requester_id' => $requester->id, 'target_id' => $target->id]);
+    }
 }

@@ -53,7 +53,7 @@ class Pessoas extends Component
             return;
         }
 
-        BridgeRequest::create([
+        BridgeRequest::firstOrCreate([
             'requester_id' => Auth::id(),
             'target_id' => $targetId,
         ]);
