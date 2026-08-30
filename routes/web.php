@@ -40,7 +40,7 @@ Route::get('membros/frameworks/{framework}/download', FrameworkPdfDownloadContro
     ->name('membros.frameworks.download');
 
 Route::get('membros/cofre/{document}/abrir', VaultDocumentOpenController::class)
-    ->middleware(['auth', 'verified', 'active'])
+    ->middleware(['auth', 'verified', 'active', 'tier:club'])
     ->name('membros.cofre.open');
 
 Route::get('membros/sobre', Sobre::class)

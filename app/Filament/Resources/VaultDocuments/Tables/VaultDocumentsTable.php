@@ -21,6 +21,9 @@ class VaultDocumentsTable
                 TextColumn::make('title')
                     ->label('Título')
                     ->searchable(),
+                TextColumn::make('type')
+                    ->label('Tipo')
+                    ->state(fn ($record) => $record->hasUploadedFile() ? 'Upload' : 'Link'),
                 TextColumn::make('opened_at')
                     ->label('Aberto em')
                     ->dateTime('d/m/Y H:i')

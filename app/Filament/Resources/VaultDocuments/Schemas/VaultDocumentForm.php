@@ -32,6 +32,16 @@ class VaultDocumentForm
                     ->label('File')
                     ->disk('public')
                     ->directory('vault-documents')
+                    ->acceptedFileTypes([
+                        'application/pdf',
+                        'video/mp4',
+                        'video/quicktime',
+                        'video/webm',
+                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        'application/vnd.ms-excel',
+                        'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    ])
                     ->requiredWithout('file_url'),
             ]);
     }

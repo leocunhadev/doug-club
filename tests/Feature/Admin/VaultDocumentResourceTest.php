@@ -45,6 +45,27 @@ class VaultDocumentResourceTest extends TestCase
             ->assertCanSeeTableRecords([$document]);
     }
 
+    public function test_list_shows_upload_or_link_type_indicator(): void
+    {
+        $mentor = User::factory()->create(['tier' => 'mentor']);
+        $member = User::factory()->create(['tier' => 'club']);
+        $uploaded = VaultDocument::create([
+            'member_id' => $member->id, 'mentor_id' => $mentor->id,
+            'title' => 'Documento com upload', 'file_path' => 'vault-documents/a.pdf',
+        ]);
+        $linked = VaultDocument::create([
+            'member_id' => $member->id, 'mentor_id' => $mentor->id,
+            'title' => 'Documento com link', 'file_url' => 'https://example.com/a.pdf',
+        ]);
+
+        $this->actingAs($this->admin());
+
+        Livewire::test(ListVaultDocuments::class)
+            ->assertCanSeeTableRecords([$uploaded, $linked])
+            ->assertSee('Upload')
+            ->assertSee('Link');
+    }
+
     public function test_admin_can_create_a_document_with_an_external_link(): void
     {
         User::factory()->create(['tier' => 'mentor']);
