@@ -16,6 +16,7 @@ use App\Livewire\Membros\Frameworks;
 use App\Livewire\Membros\MentorPlaceholder;
 use App\Livewire\Membros\Pessoas;
 use App\Livewire\Membros\Sobre;
+use App\Livewire\Membros\Upgrade;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -71,6 +72,10 @@ Route::get('membros/pessoas', Pessoas::class)
 Route::get('membros/frameworks', Frameworks::class)
     ->middleware(['auth', 'verified', 'active'])
     ->name('membros.frameworks');
+
+Route::get('membros/upgrade', Upgrade::class)
+    ->middleware(['auth', 'verified', 'active', 'tier:start'])
+    ->name('membros.upgrade');
 
 Route::get('membros/mentor', MentorPlaceholder::class)
     ->middleware(['auth', 'verified', 'active', 'tier:mentor'])

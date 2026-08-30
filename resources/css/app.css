@@ -275,3 +275,18 @@
 .tag { display:inline-block; font-size:12px; font-weight:500; padding:4px 10px; border-radius:99px;
   background: theme('colors.paper'); border:1px solid theme('colors.sand'); margin:0 4px 6px 0; }
 .tag.ensina { background: theme('colors.brand-soft'); border-color:#FFD2BC; color:#B23800; }
+
+.upg { background: theme('colors.black'); border: none; color: #fff; padding: clamp(28px,5vw,48px);
+  position: relative; overflow: hidden; }
+.upg::after { content: "CLUB"; position: absolute; right: -20px; bottom: -38px;
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 160px; color: transparent;
+  -webkit-text-stroke: 1px rgba(255,81,0,.35); pointer-events: none; }
+.upg .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  color: theme('colors.brand'); }
+.upg h2 { font-size: clamp(26px,4.4vw,40px); line-height: 1.05; margin: 10px 0 14px; max-width: 560px; }
+.upg p { color: #B9B4AB; max-width: 520px; }
+.upg ul { list-style: none; margin: 20px 0 26px; display: flex; flex-direction: column; gap: 11px;
+  max-width: 520px; }
+.upg li { display: flex; gap: 12px; font-size: 14.5px; }
+.upg li::before { content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: theme('colors.brand'); flex-shrink: 0; margin-top: 7px; }
