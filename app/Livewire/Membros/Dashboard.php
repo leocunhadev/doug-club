@@ -5,6 +5,7 @@ namespace App\Livewire\Membros;
 use App\Livewire\Concerns\ComputesUserInitials;
 use App\Livewire\Concerns\TracksLessonProgress;
 use App\Models\Lesson;
+use App\Models\MentorNote;
 use App\Models\MentorSession;
 use App\Support\PersonaNavigation;
 use Illuminate\Support\Facades\Auth;
@@ -68,6 +69,21 @@ class Dashboard extends Component
             'ctaLabel' => $user->isMentor() ? 'Configurar disponibilidade' : 'Marcar sessão',
             'ctaRoute' => $user->isMentor() ? 'mentor.disp' : 'membros.agenda',
         ];
+    }
+
+    #[Computed]
+    public function latestMentorNote(): ?MentorNote
+    {
+        $user = Auth::user();
+
+        if ($user->tier !== 'club') {
+            return null;
+        }
+
+        return MentorNote::query()
+            ->where('member_id', $user->id)
+            ->latest()
+            ->first();
     }
 
     /**

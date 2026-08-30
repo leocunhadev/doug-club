@@ -14,6 +14,15 @@
                     Sua próxima <span class="text-brand">decisão</span> começa aqui.
                 @endif
             </h1>
+            @if ($note = $this->latestMentorNote)
+                <div class="mt-4 flex gap-3 items-start max-w-2xl">
+                    <div class="w-1 rounded-full bg-brand self-stretch shrink-0"></div>
+                    <div>
+                        <p class="text-[15px] text-ink/80">"{{ $note->body }}"</p>
+                        <small class="block text-stone mt-1 text-xs">Onde paramos · nota de {{ $note->mentor->name }} · {{ $note->created_at->format('d/m') }}</small>
+                    </div>
+                </div>
+            @endif
             @if (auth()->user()->hasClubAccess())
                 <p class="mt-3 max-w-2xl text-stone">
                     Acompanhe as transmissões ao vivo e os conteúdos gravados de Douglas Oliveira. Tudo em um lugar só,

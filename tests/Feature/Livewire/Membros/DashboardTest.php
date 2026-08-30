@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\LessonFeedback;
 use App\Models\LessonProgress;
+use App\Models\MentorNote;
 use App\Models\MentorSession;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -602,6 +603,72 @@ class DashboardTest extends TestCase
         $this->actingAs(User::factory()->create(['tier' => 'start']));
 
         Livewire::test(Dashboard::class)->assertDontSee('Sua próxima sessão 1:1');
+    }
+
+    public function test_club_member_with_a_note_sees_the_where_we_left_off_block(): void
+    {
+        $mentor = User::factory()->create(['tier' => 'mentor', 'name' => 'Douglas Oliveira']);
+        $member = User::factory()->create(['tier' => 'club']);
+        MentorNote::create([
+            'member_id' => $member->id, 'mentor_id' => $mentor->id,
+            'title' => 'Discurso de venda', 'body' => 'Você decidiu assumir o discurso de venda.',
+        ]);
+
+        $this->actingAs($member);
+
+        Livewire::test(Dashboard::class)
+            ->assertSee('Você decidiu assumir o discurso de venda.')
+            ->assertSee('Onde paramos · nota de Douglas Oliveira')
+            ->assertDontSee('Discurso de venda');
+    }
+
+    public function test_club_member_without_a_note_does_not_see_the_where_we_left_off_block(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'club']));
+
+        Livewire::test(Dashboard::class)->assertDontSee('Onde paramos');
+    }
+
+    public function test_club_member_sees_only_their_own_latest_note(): void
+    {
+        $mentor = User::factory()->create(['tier' => 'mentor']);
+        $member = User::factory()->create(['tier' => 'club']);
+        MentorNote::create([
+            'member_id' => $member->id, 'mentor_id' => $mentor->id,
+            'title' => 'Nota antiga', 'body' => 'Primeira nota.',
+        ]);
+        $newest = MentorNote::create([
+            'member_id' => $member->id, 'mentor_id' => $mentor->id,
+            'title' => 'Nota recente', 'body' => 'Segunda nota, mais recente.',
+        ]);
+        $newest->forceFill(['created_at' => now()->addMinute()])->save();
+
+        $otherMember = User::factory()->create(['tier' => 'club']);
+        MentorNote::create([
+            'member_id' => $otherMember->id, 'mentor_id' => $mentor->id,
+            'title' => 'Nota de outro membro', 'body' => 'Isso não deveria aparecer.',
+        ]);
+
+        $this->actingAs($member);
+
+        Livewire::test(Dashboard::class)
+            ->assertSee('Segunda nota, mais recente.')
+            ->assertDontSee('Primeira nota.')
+            ->assertDontSee('Isso não deveria aparecer.');
+    }
+
+    public function test_mentor_never_sees_the_where_we_left_off_block(): void
+    {
+        $mentor = User::factory()->create(['tier' => 'mentor']);
+        $member = User::factory()->create(['tier' => 'club']);
+        MentorNote::create([
+            'member_id' => $member->id, 'mentor_id' => $mentor->id,
+            'title' => 'Nota', 'body' => 'Isso é sobre o membro, não sobre o mentor.',
+        ]);
+
+        $this->actingAs($mentor);
+
+        Livewire::test(Dashboard::class)->assertDontSee('Onde paramos');
     }
 
     public function test_hero_player_refuses_to_render_a_club_only_lesson_for_a_start_tier_viewer(): void
