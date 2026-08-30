@@ -152,4 +152,30 @@ class DossiesTest extends TestCase
             'text' => null,
         ]);
     }
+
+    public function test_selected_member_id_cannot_be_set_directly_by_a_client_payload(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+        User::factory()->create(['tier' => 'club']);
+        $startUser = User::factory()->create(['tier' => 'start']);
+
+        $this->expectException(\Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException::class);
+
+        Livewire::test(Dossies::class)->set('selectedMemberId', $startUser->id);
+    }
+
+    public function test_page_does_not_crash_when_the_selected_member_is_deleted_mid_session(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+        $first = User::factory()->create(['tier' => 'club']);
+        $second = User::factory()->create(['tier' => 'club']);
+
+        $component = Livewire::test(Dossies::class)
+            ->call('selectMember', $second->id)
+            ->assertSet('selectedMemberId', $second->id);
+
+        $second->delete();
+
+        $component->call('saveCommitment')->assertOk();
+    }
 }

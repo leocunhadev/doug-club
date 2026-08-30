@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 #[Layout('layouts.membros')]
@@ -16,6 +17,7 @@ class Dossies extends Component
 {
     use ComputesUserInitials;
 
+    #[Locked]
     public ?int $selectedMemberId = null;
 
     public string $noteTitle = '';
@@ -42,14 +44,14 @@ class Dossies extends Component
     #[Computed]
     public function selectedMember(): ?User
     {
-        return $this->members->firstWhere('id', $this->selectedMemberId);
+        return $this->members->firstWhere('id', $this->selectedMemberId) ?? $this->members->first();
     }
 
     #[Computed]
     public function notes()
     {
         return MentorNote::query()
-            ->where('member_id', $this->selectedMemberId)
+            ->where('member_id', $this->selectedMember?->id)
             ->orderByDesc('created_at')
             ->get();
     }
@@ -67,13 +69,17 @@ class Dossies extends Component
 
     public function addNote(): void
     {
+        if (! $this->selectedMember) {
+            return;
+        }
+
         $this->validate([
             'noteTitle' => ['required', 'string', 'max:255'],
             'noteBody' => ['required', 'string', 'max:2000'],
         ]);
 
         MentorNote::create([
-            'member_id' => $this->selectedMemberId,
+            'member_id' => $this->selectedMember->id,
             'mentor_id' => Auth::id(),
             'title' => $this->noteTitle,
             'body' => $this->noteBody,
@@ -84,12 +90,16 @@ class Dossies extends Component
 
     public function saveCommitment(): void
     {
+        if (! $this->selectedMember) {
+            return;
+        }
+
         $this->validate([
             'commitmentInput' => ['nullable', 'string', 'max:500'],
         ]);
 
         MentorCommitment::updateOrCreate(
-            ['member_id' => $this->selectedMemberId],
+            ['member_id' => $this->selectedMember->id],
             ['text' => trim($this->commitmentInput) ?: null],
         );
     }
@@ -97,7 +107,7 @@ class Dossies extends Component
     private function loadCommitmentInput(): void
     {
         $this->commitmentInput = MentorCommitment::query()
-            ->where('member_id', $this->selectedMemberId)
+            ->where('member_id', $this->selectedMember?->id)
             ->value('text') ?? '';
     }
 
