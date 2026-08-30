@@ -175,3 +175,42 @@
     background: theme('colors.brand');
     border-color: theme('colors.brand');
 }
+.disp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+}
+.disp-block {
+    padding: 16px;
+    text-align: left;
+    border-color: theme('colors.brand');
+}
+.disp-block b {
+    font-family: 'Syne', sans-serif;
+    display: block;
+    font-size: 15px;
+}
+.disp-block small {
+    color: theme('colors.stone');
+    font-size: 12.5px;
+}
+.disp-block .sw {
+    margin-top: 12px;
+    width: 44px;
+    height: 24px;
+    border-radius: 99px;
+    background: theme('colors.brand');
+    position: relative;
+    transition: .2s;
+}
+.disp-block .sw::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 23px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    transition: .2s;
+}

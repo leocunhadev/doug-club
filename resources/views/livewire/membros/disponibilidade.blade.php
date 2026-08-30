@@ -14,7 +14,7 @@
         <form wire:submit="addBlock" class="flex flex-wrap items-end gap-3 mb-8 max-w-xl">
             <div>
                 <label class="block text-xs font-semibold text-stone mb-1">Dia da semana</label>
-                <select wire:model="dayOfWeek" class="rounded-lg border border-sand bg-card px-3 py-2 text-sm">
+                <select wire:model="dayOfWeek" class="rounded-xl border border-sand bg-paper px-3.5 py-2.5 text-sm focus:outline-none focus:border-black">
                     <option value="0">Domingo</option>
                     <option value="1">Segunda</option>
                     <option value="2">Terça</option>
@@ -27,35 +27,31 @@
 
             <div>
                 <label class="block text-xs font-semibold text-stone mb-1">Início</label>
-                <input type="time" wire:model="startTime" class="rounded-lg border border-sand bg-card px-3 py-2 text-sm">
+                <input type="time" wire:model="startTime" class="rounded-xl border border-sand bg-paper px-3.5 py-2.5 text-sm focus:outline-none focus:border-black">
                 @error('startTime') <p class="text-xs text-brand mt-1">{{ $message }}</p> @enderror
             </div>
 
             <div>
                 <label class="block text-xs font-semibold text-stone mb-1">Fim</label>
-                <input type="time" wire:model="endTime" class="rounded-lg border border-sand bg-card px-3 py-2 text-sm">
+                <input type="time" wire:model="endTime" class="rounded-xl border border-sand bg-paper px-3.5 py-2.5 text-sm focus:outline-none focus:border-black">
                 @error('endTime') <p class="text-xs text-brand mt-1">{{ $message }}</p> @enderror
             </div>
 
-            <button type="submit" class="px-4 py-2 rounded-full text-sm font-semibold bg-black text-white hover:brightness-110">
+            <button type="submit" class="px-[15px] py-2 rounded-full text-[13px] font-bold bg-brand text-white hover:brightness-110">
                 Adicionar
             </button>
         </form>
 
-        <div class="flex flex-col gap-2 max-w-xl">
+        <div class="disp-grid max-w-3xl">
             @forelse ($this->blocks as $block)
-                <div class="flex items-center justify-between px-4 py-3 rounded-xl border border-sand bg-card">
-                    <span class="text-sm">
-                        {{ ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'][$block->day_of_week] }}
-                        · {{ $block->start_time->format('H:i') }} às {{ $block->end_time->format('H:i') }}
-                    </span>
-                    <button type="button" wire:click="removeBlock({{ $block->id }})"
-                            class="text-xs font-semibold text-stone hover:text-ink">
-                        Remover
-                    </button>
-                </div>
+                <button type="button" wire:click="removeBlock({{ $block->id }})"
+                        class="disp-block rounded-[18px] border border-sand bg-card shadow-[0_1px_2px_rgba(11,11,12,.05),0_10px_28px_rgba(11,11,12,.07)]">
+                    <b>{{ ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'][$block->day_of_week] }}</b>
+                    <small>{{ $block->start_time->format('H:i') }} às {{ $block->end_time->format('H:i') }}</small>
+                    <div class="sw"></div>
+                </button>
             @empty
-                <p class="text-stone">Nenhum bloco de disponibilidade ainda.</p>
+                <p class="text-stone col-span-full">Nenhum bloco de disponibilidade ainda.</p>
             @endforelse
         </div>
     </div>
