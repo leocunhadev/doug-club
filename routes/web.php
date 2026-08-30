@@ -3,6 +3,7 @@
 use App\Http\Controllers\Membros\FrameworkPdfDownloadController;
 use App\Http\Controllers\Membros\LessonMaterialDownloadController;
 use App\Http\Controllers\Membros\PreviewPersonaController;
+use App\Http\Controllers\Membros\VaultDocumentOpenController;
 use App\Http\Controllers\Webhooks\AbacatePayWebhookController;
 use App\Livewire\Membros\Agenda;
 use App\Livewire\Membros\Aulas;
@@ -36,6 +37,10 @@ Route::get('membros/materiais/{material}/download', LessonMaterialDownloadContro
 Route::get('membros/frameworks/{framework}/download', FrameworkPdfDownloadController::class)
     ->middleware(['auth', 'verified', 'active'])
     ->name('membros.frameworks.download');
+
+Route::get('membros/cofre/{document}/abrir', VaultDocumentOpenController::class)
+    ->middleware(['auth', 'verified', 'active'])
+    ->name('membros.cofre.open');
 
 Route::get('membros/sobre', Sobre::class)
     ->middleware(['auth', 'verified', 'active'])
