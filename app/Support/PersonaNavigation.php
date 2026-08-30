@@ -19,7 +19,7 @@ class PersonaNavigation
             'club' => [
                 ['label' => 'Início', 'route' => 'dashboard', 'available' => true],
                 ['label' => 'Aulas', 'route' => 'membros.aulas', 'available' => true],
-                ['label' => 'Meu cofre', 'route' => 'membros.cofre', 'available' => false],
+                ['label' => 'Meu cofre', 'route' => 'membros.cofre', 'available' => true],
                 ['label' => 'Minha sessão', 'route' => 'membros.agenda', 'available' => true],
                 ['label' => 'Pessoas', 'route' => 'membros.pessoas', 'available' => false],
                 ['label' => 'Encontros', 'route' => 'membros.encontros', 'available' => true],
