@@ -458,7 +458,7 @@ class DashboardTest extends TestCase
         $html = Livewire::test(Dashboard::class)->html();
 
         $this->assertMatchesRegularExpression(
-            '#<span[^>]*>\s*Marcar minha sessão.*?🔒#s',
+            '#<a[^>]*href="http://localhost/membros/agenda"[^>]*>\s*Marcar minha sessão#s',
             $html,
         );
 

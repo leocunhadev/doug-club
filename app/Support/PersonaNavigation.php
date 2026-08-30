@@ -20,7 +20,7 @@ class PersonaNavigation
                 ['label' => 'Início', 'route' => 'dashboard', 'available' => true],
                 ['label' => 'Aulas', 'route' => 'membros.aulas', 'available' => true],
                 ['label' => 'Meu cofre', 'route' => 'membros.cofre', 'available' => false],
-                ['label' => 'Minha sessão', 'route' => 'membros.agenda', 'available' => false],
+                ['label' => 'Minha sessão', 'route' => 'membros.agenda', 'available' => true],
                 ['label' => 'Pessoas', 'route' => 'membros.pessoas', 'available' => false],
                 ['label' => 'Encontros', 'route' => 'membros.encontros', 'available' => true],
                 ['label' => 'Frameworks', 'route' => 'membros.frameworks', 'available' => true],
@@ -30,7 +30,7 @@ class PersonaNavigation
                 ['label' => 'Radar', 'route' => 'mentor.radar', 'available' => false],
                 ['label' => 'Dossiês', 'route' => 'mentor.dossies', 'available' => false],
                 ['label' => 'Publicar', 'route' => 'mentor.conteudo', 'available' => false],
-                ['label' => 'Disponibilidade', 'route' => 'mentor.disp', 'available' => false],
+                ['label' => 'Disponibilidade', 'route' => 'mentor.disp', 'available' => true],
             ],
             default => [],
         };
