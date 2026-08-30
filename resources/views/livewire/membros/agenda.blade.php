@@ -38,42 +38,46 @@
                 @endif
             </div>
         @elseif ($this->mentor)
-            <div class="flex flex-wrap gap-2">
-                @php
-                    $slotsByDay = $this->availableSlots->groupBy(fn ($slot) => $slot->format('Y-m-d'));
-                @endphp
-
-                @for ($i = 0; $i < 14; $i++)
+            @if ($this->availableSlots->isEmpty())
+                <p class="text-stone">Nenhum horário disponível no momento.</p>
+            @else
+                <div class="flex flex-wrap gap-2">
                     @php
-                        $date = today()->addDays($i);
-                        $key = $date->format('Y-m-d');
-                        $hasSlots = $slotsByDay->has($key);
+                        $slotsByDay = $this->availableSlots->groupBy(fn ($slot) => $slot->format('Y-m-d'));
                     @endphp
 
-                    @if ($hasSlots)
-                        <button type="button" wire:click="selectDate('{{ $key }}')"
-                                class="flex flex-col items-center px-3 py-2 rounded-xl border text-sm {{ $selectedDate === $key ? 'bg-black text-white border-black' : 'bg-card text-ink border-sand hover:border-black' }}">
-                            <small class="uppercase text-xs">{{ $date->translatedFormat('D') }}</small>
-                            <b>{{ $date->format('d') }}</b>
-                        </button>
-                    @else
-                        <span class="flex flex-col items-center px-3 py-2 rounded-xl border border-sand text-sm text-stone/50 cursor-not-allowed">
-                            <small class="uppercase text-xs">{{ $date->translatedFormat('D') }}</small>
-                            <b>{{ $date->format('d') }}</b>
-                        </span>
-                    @endif
-                @endfor
-            </div>
+                    @for ($i = 0; $i < 14; $i++)
+                        @php
+                            $date = today()->addDays($i);
+                            $key = $date->format('Y-m-d');
+                            $hasSlots = $slotsByDay->has($key);
+                        @endphp
 
-            @if ($selectedDate && $slotsByDay->has($selectedDate))
-                <div class="mt-4 flex flex-wrap gap-2">
-                    @foreach ($slotsByDay->get($selectedDate) as $slot)
-                        <button type="button" wire:click="bookSlot('{{ $slot->toIso8601String() }}')"
-                                class="px-3.5 py-1.5 rounded-full text-sm font-medium border border-sand bg-card text-ink hover:border-black">
-                            {{ $slot->format('H:i') }}
-                        </button>
-                    @endforeach
+                        @if ($hasSlots)
+                            <button type="button" wire:click="selectDate('{{ $key }}')"
+                                    class="flex flex-col items-center px-3 py-2 rounded-xl border text-sm {{ $selectedDate === $key ? 'bg-black text-white border-black' : 'bg-card text-ink border-sand hover:border-black' }}">
+                                <small class="uppercase text-xs">{{ $date->translatedFormat('D') }}</small>
+                                <b>{{ $date->format('d') }}</b>
+                            </button>
+                        @else
+                            <span class="flex flex-col items-center px-3 py-2 rounded-xl border border-sand text-sm text-stone/50 cursor-not-allowed">
+                                <small class="uppercase text-xs">{{ $date->translatedFormat('D') }}</small>
+                                <b>{{ $date->format('d') }}</b>
+                            </span>
+                        @endif
+                    @endfor
                 </div>
+
+                @if ($selectedDate && $slotsByDay->has($selectedDate))
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        @foreach ($slotsByDay->get($selectedDate) as $slot)
+                            <button type="button" wire:click="bookSlot('{{ $slot->toIso8601String() }}')"
+                                    class="px-3.5 py-1.5 rounded-full text-sm font-medium border border-sand bg-card text-ink hover:border-black">
+                                {{ $slot->format('H:i') }}
+                            </button>
+                        @endforeach
+                    </div>
+                @endif
             @endif
         @else
             <p class="text-stone">Nenhum mentor disponível no momento.</p>

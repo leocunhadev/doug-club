@@ -47,6 +47,16 @@ class AgendaTest extends TestCase
             ->assertDontSee('Cancelar sessão');
     }
 
+    public function test_club_member_sees_an_empty_state_when_the_mentor_has_no_available_slots(): void
+    {
+        $this->mentor();
+
+        $this->actingAs(User::factory()->create(['tier' => 'club']));
+
+        Livewire::test(Agenda::class)
+            ->assertSee('Nenhum horário disponível no momento.');
+    }
+
     public function test_club_member_with_an_upcoming_session_sees_it_instead_of_the_calendar(): void
     {
         $mentor = $this->mentor();
