@@ -24,6 +24,13 @@ class DashboardTest extends TestCase
         $this->get('/membros')->assertRedirect('/login');
     }
 
+    public function test_the_global_toast_component_is_present_on_the_page(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        Livewire::test(Dashboard::class)->assertSeeHtml('x-on:toast.window');
+    }
+
     public function test_featured_lesson_defaults_to_first_lesson_of_highest_position_course(): void
     {
         $user = User::factory()->create();

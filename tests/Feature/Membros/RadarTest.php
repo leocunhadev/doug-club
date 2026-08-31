@@ -306,6 +306,19 @@ class RadarTest extends TestCase
         });
     }
 
+    public function test_make_bridge_dispatches_a_success_toast(): void
+    {
+        Notification::fake();
+
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+        $learner = User::factory()->create(['tier' => 'club', 'name' => 'Ricardo Mendes']);
+        $teacher = User::factory()->create(['tier' => 'club', 'name' => 'Marina Alves']);
+
+        Livewire::test(Radar::class)
+            ->call('makeBridge', $learner->id, $teacher->id, 'precificação')
+            ->assertDispatched('toast', message: 'Apresentação enviada para Ricardo Mendes e Marina Alves.');
+    }
+
     public function test_make_bridge_is_a_no_op_when_the_pair_is_already_connected(): void
     {
         Notification::fake();

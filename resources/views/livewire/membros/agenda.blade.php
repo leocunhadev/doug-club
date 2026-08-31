@@ -11,10 +11,6 @@
             </p>
         </div>
 
-        @if (session('agenda-error'))
-            <p class="mb-4 text-sm text-brand">{{ session('agenda-error') }}</p>
-        @endif
-
         @if ($this->upcomingSession)
             <div class="max-w-md rounded-[18px] border border-sand bg-card p-6">
                 <p class="text-xs font-bold uppercase tracking-widest text-stone mb-1">Sua próxima sessão</p>

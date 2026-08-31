@@ -69,7 +69,7 @@ class Agenda extends Component
         $session = $action->handle($this->mentor, Auth::user(), $scheduledAt);
 
         if (! $session) {
-            session()->flash('agenda-error', 'Esse horário acabou de ser preenchido. Escolha outro.');
+            $this->dispatch('toast', message: 'Esse horário acabou de ser preenchido. Escolha outro.');
         }
 
         unset($this->availableSlots, $this->upcomingSession);

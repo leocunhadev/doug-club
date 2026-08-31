@@ -1,10 +1,6 @@
 <div class="min-h-screen text-ink">
     <x-membros.header :initials="$this->userInitials" />
 
-    @if (session('bridge-made'))
-        <p class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 text-sm text-brand">{{ session('bridge-made') }}</p>
-    @endif
-
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div class="mb-8">
             <h1 class="text-[clamp(26px,4vw,38px)] leading-[1.05] font-display font-extrabold tracking-[-0.015em] text-black">

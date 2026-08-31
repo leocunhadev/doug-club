@@ -338,3 +338,23 @@
 .match .duo .avatar:last-child { margin-left: -12px; border: 2px solid theme('colors.card'); }
 .match .d { flex: 1; min-width: 220px; font-size: 14px; }
 .match .d em { font-style: normal; color: theme('colors.brand'); font-weight: 700; }
+
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 26px;
+    transform: translateX(-50%) translateY(80px);
+    background: theme('colors.black');
+    color: theme('colors.card');
+    padding: 14px 22px;
+    border-radius: 99px;
+    font-weight: 500;
+    font-size: 14px;
+    opacity: 0;
+    transition: .3s;
+    z-index: 200;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .25);
+    max-width: calc(100vw - 40px);
+    text-align: center;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }

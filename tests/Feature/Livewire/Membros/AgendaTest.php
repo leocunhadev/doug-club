@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Livewire\Membros;
 
+use App\Actions\BookMentorSession;
 use App\Livewire\Membros\Agenda;
 use App\Models\MentorAvailability;
 use App\Models\MentorSession;
@@ -111,6 +112,37 @@ class AgendaTest extends TestCase
 
         Livewire::test(Agenda::class)
             ->call('bookSlot', $bogusSlot->toIso8601String());
+
+        $this->assertDatabaseMissing('mentor_sessions', ['member_id' => $member->id]);
+    }
+
+    public function test_booking_a_slot_that_was_just_taken_dispatches_a_toast(): void
+    {
+        $mentor = $this->mentor();
+        $targetDate = now()->addDays(5)->startOfDay();
+        MentorAvailability::create([
+            'mentor_id' => $mentor->id, 'day_of_week' => $targetDate->dayOfWeek,
+            'start_time' => '09:00', 'end_time' => '10:30',
+        ]);
+        $member = User::factory()->create(['tier' => 'club']);
+        $this->actingAs($member);
+
+        $slot = $targetDate->copy()->setTime(9, 0);
+
+        // Forces the "someone else grabbed this slot" branch (BookMentorSession returning
+        // null) regardless of DB state — the race itself is pre-existing, already-tested
+        // behavior; this test only verifies the toast fires on that outcome.
+        $this->app->bind(BookMentorSession::class, fn () => new class extends BookMentorSession
+        {
+            public function handle($mentor, $member, $scheduledAt): ?MentorSession
+            {
+                return null;
+            }
+        });
+
+        Livewire::test(Agenda::class)
+            ->call('bookSlot', $slot->toIso8601String())
+            ->assertDispatched('toast', message: 'Esse horário acabou de ser preenchido. Escolha outro.');
 
         $this->assertDatabaseMissing('mentor_sessions', ['member_id' => $member->id]);
     }

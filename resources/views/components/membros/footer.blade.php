@@ -1,12 +1,11 @@
-<footer class="border-t border-sand mt-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col items-center justify-center gap-2 text-center text-sm text-stone">
-        <div class="flex gap-4">
-            <a href="#" class="hover:text-ink">Política de Privacidade</a>
-            <a href="{{ route('membros.sobre') }}" wire:navigate class="hover:text-ink">Sobre</a>
-        </div>
-        <p>&copy; DO.ing Club &middot; {{ now()->year }} Todos os direitos reservados.</p>
+<footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mt-14 pt-5 pb-8 border-t border-sand flex flex-wrap justify-between gap-3 text-[13px] text-stone">
+        <div><b class="font-display text-black">DO.ing CLUB</b> &middot; Decisão Orientada</div>
+        <div>Tudo é gente. Até o software.</div>
     </div>
 </footer>
+
+<x-toast />
 
 @if ($whatsappNumber = config('services.whatsapp.number'))
     <a href="https://wa.me/{{ $whatsappNumber }}" target="_blank" rel="noopener"
