@@ -84,6 +84,18 @@
                             Guardar
                         </button>
                     </form>
+
+                    <form wire:submit="sendToVault" class="nota-add">
+                        <input type="text" wire:model="docTitle" class="inp" placeholder="Título do documento...">
+                        @error('docTitle') <p class="text-xs text-brand">{{ $message }}</p> @enderror
+                        <input type="url" wire:model="docUrl"
+                               class="inp" placeholder="Enviar insight ou documento para o cofre de {{ explode(' ', $this->selectedMember->name)[0] }}...">
+                        @error('docUrl') <p class="text-xs text-brand">{{ $message }}</p> @enderror
+                        <button type="submit"
+                                class="self-start rounded-full bg-brand text-white text-xs font-semibold px-4 py-2 hover:brightness-110">
+                            Enviar ao cofre
+                        </button>
+                    </form>
                 </div>
             </div>
         @endif

@@ -6,6 +6,8 @@ use App\Livewire\Concerns\ComputesUserInitials;
 use App\Models\MentorCommitment;
 use App\Models\MentorNote;
 use App\Models\User;
+use App\Models\VaultDocument;
+use App\Notifications\VaultDocumentAddedNotification;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -25,6 +27,10 @@ class Dossies extends Component
     public string $noteBody = '';
 
     public string $commitmentInput = '';
+
+    public string $docTitle = '';
+
+    public string $docUrl = '';
 
     public function mount(): void
     {
@@ -63,7 +69,7 @@ class Dossies extends Component
         }
 
         $this->selectedMemberId = $memberId;
-        $this->reset('noteTitle', 'noteBody');
+        $this->reset('noteTitle', 'noteBody', 'docTitle', 'docUrl');
         $this->loadCommitmentInput();
     }
 
@@ -86,6 +92,31 @@ class Dossies extends Component
         ]);
 
         $this->reset('noteTitle', 'noteBody');
+    }
+
+    public function sendToVault(): void
+    {
+        if (! $this->selectedMember) {
+            return;
+        }
+
+        $this->validate([
+            'docTitle' => ['required', 'string', 'max:255'],
+            'docUrl' => ['required', 'url', 'max:2048'],
+        ]);
+
+        VaultDocument::create([
+            'member_id' => $this->selectedMember->id,
+            'mentor_id' => Auth::id(),
+            'title' => $this->docTitle,
+            'file_url' => $this->docUrl,
+        ]);
+
+        $this->selectedMember->notify(new VaultDocumentAddedNotification($this->docTitle));
+
+        $this->dispatch('toast', message: "Documento enviado pro cofre de {$this->selectedMember->name}.");
+
+        $this->reset('docTitle', 'docUrl');
     }
 
     public function saveCommitment(): void

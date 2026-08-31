@@ -5,7 +5,9 @@ namespace Tests\Feature\Membros;
 use App\Livewire\Membros\Dossies;
 use App\Models\MentorCommitment;
 use App\Models\User;
+use App\Notifications\VaultDocumentAddedNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -103,6 +105,57 @@ class DossiesTest extends TestCase
             ->set('noteBody', '')
             ->call('addNote')
             ->assertHasErrors(['noteTitle', 'noteBody']);
+    }
+
+    public function test_send_to_vault_creates_a_vault_document_authored_by_the_logged_in_mentor(): void
+    {
+        $mentor = User::factory()->create(['tier' => 'mentor']);
+        $this->actingAs($mentor);
+        $member = User::factory()->create(['tier' => 'club']);
+
+        Livewire::test(Dossies::class)
+            ->set('docTitle', 'Planilha de precificação')
+            ->set('docUrl', 'https://drive.google.com/precificacao')
+            ->call('sendToVault');
+
+        $this->assertDatabaseHas('vault_documents', [
+            'member_id' => $member->id,
+            'mentor_id' => $mentor->id,
+            'title' => 'Planilha de precificação',
+            'file_url' => 'https://drive.google.com/precificacao',
+        ]);
+    }
+
+    public function test_send_to_vault_requires_title_and_a_valid_url(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+        User::factory()->create(['tier' => 'club']);
+
+        Livewire::test(Dossies::class)
+            ->set('docTitle', '')
+            ->set('docUrl', 'not-a-url')
+            ->call('sendToVault')
+            ->assertHasErrors(['docTitle', 'docUrl']);
+    }
+
+    public function test_send_to_vault_notifies_the_member_and_resets_the_form(): void
+    {
+        Notification::fake();
+
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+        $member = User::factory()->create(['tier' => 'club']);
+
+        Livewire::test(Dossies::class)
+            ->set('docTitle', 'Planilha de precificação')
+            ->set('docUrl', 'https://drive.google.com/precificacao')
+            ->call('sendToVault')
+            ->assertSet('docTitle', '')
+            ->assertSet('docUrl', '')
+            ->assertDispatched('toast', message: "Documento enviado pro cofre de {$member->name}.");
+
+        Notification::assertSentTo($member, VaultDocumentAddedNotification::class, function ($notification) {
+            return $notification->title === 'Planilha de precificação';
+        });
     }
 
     public function test_save_commitment_creates_the_record_on_first_save(): void
