@@ -101,4 +101,3 @@ Route::post('webhooks/abacatepay', AbacatePayWebhookController::class)
     ->name('webhooks.abacatepay');
 
 require __DIR__.'/auth.php';
-require __DIR__.'/prototype.php';
