@@ -8,6 +8,7 @@ use App\Services\PdfWatermarker;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use League\Flysystem\UnableToRetrieveMetadata;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
 
@@ -41,7 +42,13 @@ class VaultDocumentOpenController extends Controller
 
     private function downloadWatermarkedPdf(VaultDocument $document, PdfWatermarker $watermarker, string $filename): StreamedResponse
     {
-        if (Storage::disk('local')->size($document->file_path) > 20 * 1024 * 1024) {
+        try {
+            $size = Storage::disk('local')->size($document->file_path);
+        } catch (UnableToRetrieveMetadata $e) {
+            abort(404);
+        }
+
+        if ($size > 20 * 1024 * 1024) {
             return Storage::disk('local')->download($document->file_path, $filename);
         }
 
