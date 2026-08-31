@@ -29,8 +29,10 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@example.com',
             'password' => Hash::make('123456789'),
             'is_admin' => true,
+            'tier' => 'mentor',
         ]);
 
         $this->call(LmsSeeder::class);
+        $this->call(DemoDataSeeder::class);
     }
 }
