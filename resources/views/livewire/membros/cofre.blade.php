@@ -13,7 +13,7 @@
 
         <div class="cofre-note max-w-3xl">
             <span aria-hidden="true">🔒</span>
-            Documentos com seu nome gravado em cada página. Este espaço é individual e intransferível.
+            PDFs baixados aqui trazem seu nome e e-mail carimbados em cada página. Este espaço é individual e intransferível.
         </div>
 
         <div class="max-w-3xl rounded-[18px] border border-sand bg-card shadow-[0_1px_2px_rgba(11,11,12,.05),0_10px_28px_rgba(11,11,12,.07)] overflow-hidden">

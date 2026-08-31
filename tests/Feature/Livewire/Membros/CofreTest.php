@@ -67,4 +67,13 @@ class CofreTest extends TestCase
 
         Livewire::test(Cofre::class)->assertSee('Nenhum documento no seu cofre ainda.');
     }
+
+    public function test_banner_scopes_the_watermark_promise_to_pdfs(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'club']));
+
+        Livewire::test(Cofre::class)
+            ->assertSee('PDFs baixados aqui trazem seu nome e e-mail carimbados em cada página.')
+            ->assertDontSee('Documentos com seu nome gravado em cada página.');
+    }
 }
