@@ -10,6 +10,25 @@
     display: none; /* Chrome/Safari/Edge Chromium */
 }
 
+@keyframes page-enter {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.page-enter header ~ * {
+    animation: page-enter .22s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+    .page-enter header ~ * {
+        animation: none;
+    }
+}
+
 .marquee {
     overflow: hidden;
     background: theme('colors.black');

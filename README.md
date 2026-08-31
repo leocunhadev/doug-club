@@ -1,58 +1,76 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# DO.ing Club
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Plataforma de membros da mentoria de Douglas Oliveira. Laravel 13 + Livewire 3/Volt no front, Filament 4 no admin, SQLite em dev.
 
-## About Laravel
+## Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 8.3, Laravel 13, Livewire 3.6 + Volt
+- Filament 4 (painel administrativo)
+- Tailwind CSS 3
+- FPDI/FPDF (marca d'água em PDF)
+- SQLite (dev)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Planos e papéis
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Cada usuário tem um `tier`: `start` (plano de entrada), `club` (plano pago, acesso completo) ou `mentor` (Douglas). Um flag `is_admin` separado dá acesso ao painel Filament. O acesso pode ser revogado (`access_revoked_at`) sem apagar a conta — usado no cancelamento/estorno de pagamento.
 
-## Learning Laravel
+## Funcionalidades para membros (`start` / `club`)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **Login e conta** — autenticação via Laravel Breeze (Livewire), reset de senha por e-mail, verificação de e-mail, confirmação de senha, tela de login com identidade visual própria.
+- **Dashboard (`/`)** — página inicial personalizada por tier: continuar assistindo, nota do mentor ("onde paramos"), atalhos, CTA de próxima sessão 1:1 (club) ou de upgrade (start).
+- **Biblioteca de aulas (`/aulas`)** — grid com busca e filtro por categoria (Encontros, Convidados, Frameworks), player em destaque com progresso salvo, barra "assistindo agora", página de materiais por aula com download.
+- **Frameworks (`/frameworks`)** — catálogo de frameworks em PDF vinculados a uma aula, com bloqueio por tier e download rastreado (`FrameworkDownload`).
+- **Cofre (`/cofre`, só `club`)** — documentos privados por membro (upload ou link externo), PDFs baixados recebem marca d'água com nome e e-mail do titular, arquivos servidos por um controller autenticado (sem exposição direta em disco público).
+- **Agenda de sessões 1:1 (`/agenda`, só `club`)** — visualização dos horários disponíveis do mentor, seleção de dia/horário com etapa de confirmação antes de reservar.
+- **Encontros ao vivo (`/encontros`, só `club`)** — calendário de eventos com link de acesso, gravação disponibilizada depois na biblioteca, avaliação por NPS.
+- **Pessoas do CLUB (`/pessoas`, só `club`)** — diretório de membros com tags do que cada um ensina/quer aprender, pedido de "ponte" (introdução) entre mentorados (`BridgeRequest`).
+- **Upgrade (`/upgrade`, só `start`)** — apresentação do plano CLUB e envio de candidatura (`ClubApplication`).
+- **Sobre (`/sobre`)** — página institucional da mentoria.
+- **Perfil (`/profile`)** — edição de dados da conta (Breeze).
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Funcionalidades para o mentor (`tier: mentor`)
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+- **Radar do dia (`/mentor/radar`)** — painel com briefings dos próximos encontros/sessões, sugestão de abertura de conversa, KPIs de engajamento e sugestões de "pontes" entre mentorados.
+- **Dossiês (`/mentor/dossies`)** — histórico ("fio da mentoria") por mentorado, anotações privadas do mentor e envio de documentos direto para o Cofre do mentorado.
+- **Disponibilidade (`/mentor/disponibilidade`)** — cadastro de blocos recorrentes de horário para sessões 1:1, com opção de desativar um bloco sem excluí-lo.
+- **Publicar conteúdo (`/mentor/conteudo`)** — publicação de aulas e encontros sem precisar do painel admin.
 
-## Agentic Development
+## Painel administrativo (Filament, `is_admin`)
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+CRUD completo para:
+- Cursos e aulas (`Courses`, `Lessons`), com materiais como relation manager
+- Encontros ao vivo (`Encontros`)
+- Frameworks em PDF (`Frameworks`)
+- Sessões de mentoria (`MentorSessions`)
+- Documentos do Cofre (`VaultDocuments`)
+- Pedidos de ponte entre membros (`BridgeRequests`)
+- Candidaturas ao CLUB (`ClubApplications`)
+
+## Pagamentos
+
+Ativação e revogação de acesso automatizadas via webhook do AbacatePay (`/webhooks/abacatepay`, validado por assinatura): checkout/assinatura concluída ativa o usuário no tier correto; reembolso, disputa ou cancelamento revoga o acesso.
+
+## Progresso e engajamento
+
+- Progresso de aula por segundo assistido, com marcação automática de "concluída" (`LessonProgress`)
+- NPS unificado pós-aula e pós-encontro (`LessonFeedback`, `EncontroFeedback`)
+- Notificações por e-mail (novo documento no Cofre, sessão 1:1 marcada)
+
+## Desenvolvimento
 
 ```bash
-composer require laravel/boost --dev
+composer install
+npm install
 
-php artisan boost:install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+
+composer dev   # servidor + queue + logs + vite, tudo junto
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Rodar a suíte de testes:
 
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+php artisan test
+```
