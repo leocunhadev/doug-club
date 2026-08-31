@@ -10,7 +10,7 @@ class PersonaNavigationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_start_tier_shows_inicio_aulas_frameworks_and_upgrade_as_links(): void
+    public function test_start_tier_shows_inicio_aulas_and_frameworks_as_unlocked_links(): void
     {
         $user = User::factory()->create(['tier' => 'start']);
         $this->actingAs($user);
@@ -21,10 +21,29 @@ class PersonaNavigationTest extends TestCase
             ['href' => 'http://localhost/membros', 'label' => 'Início'],
             ['href' => 'http://localhost/membros/aulas', 'label' => 'Aulas'],
             ['href' => 'http://localhost/membros/frameworks', 'label' => 'Frameworks'],
-            ['href' => 'http://localhost/membros/upgrade', 'label' => 'Sessão 1:1'],
         ] as $link) {
             $this->assertMatchesRegularExpression(
                 '#<a[^>]*href="'.preg_quote($link['href'], '#').'"[^>]*>\s*'.preg_quote($link['label'], '#').'\s*</a>#s',
+                $html,
+            );
+        }
+    }
+
+    public function test_start_tier_shows_club_only_tabs_as_locked_but_clickable_links(): void
+    {
+        $user = User::factory()->create(['tier' => 'start']);
+        $this->actingAs($user);
+
+        $html = $this->get('/membros')->assertOk()->getContent();
+
+        foreach ([
+            ['href' => 'http://localhost/membros/cofre', 'label' => 'Meu cofre'],
+            ['href' => 'http://localhost/membros/agenda', 'label' => 'Minha sessão'],
+            ['href' => 'http://localhost/membros/pessoas', 'label' => 'Pessoas'],
+            ['href' => 'http://localhost/membros/encontros', 'label' => 'Encontros'],
+        ] as $link) {
+            $this->assertMatchesRegularExpression(
+                '#<a[^>]*href="'.preg_quote($link['href'], '#').'"[^>]*>\s*'.preg_quote($link['label'], '#').'\s*🔒\s*</a>#su',
                 $html,
             );
         }
@@ -58,7 +77,7 @@ class PersonaNavigationTest extends TestCase
         $user = User::factory()->create(['tier' => 'mentor']);
         $this->actingAs($user);
 
-        $html = $this->get('/membros/mentor')->assertOk()->getContent();
+        $html = $this->get('/membros/mentor/radar')->assertOk()->getContent();
 
         foreach ([
             ['href' => 'http://localhost/membros/mentor/disponibilidade', 'label' => 'Disponibilidade'],

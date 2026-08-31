@@ -22,7 +22,7 @@ class PessoasTest extends TestCase
     {
         $this->actingAs(User::factory()->create(['tier' => 'start']));
 
-        $this->get('/membros/pessoas')->assertRedirect(route('dashboard'));
+        $this->get('/membros/pessoas')->assertRedirect(route('membros.upgrade'));
     }
 
     public function test_lists_other_club_members_but_not_the_logged_in_user(): void

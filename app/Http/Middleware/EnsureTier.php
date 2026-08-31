@@ -20,6 +20,10 @@ class EnsureTier
         };
 
         if (! $allowed) {
+            if ($minTier === 'club') {
+                return redirect()->route('membros.upgrade');
+            }
+
             return redirect()->route('dashboard')
                 ->with('status', "Esse conteúdo está disponível no {$minTier}.");
         }

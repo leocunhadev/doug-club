@@ -7,13 +7,16 @@ use PHPUnit\Framework\TestCase;
 
 class PersonaNavigationTest extends TestCase
 {
-    public function test_start_tier_has_four_available_tabs(): void
+    public function test_start_tier_has_seven_tabs_with_club_only_ones_locked(): void
     {
         $tabs = (new PersonaNavigation)->tabs('start');
 
-        $this->assertCount(4, $tabs);
-        $this->assertSame(['Início', 'Aulas', 'Frameworks', 'Sessão 1:1'], array_column($tabs, 'label'));
-        $this->assertSame([true, true, true, true], array_column($tabs, 'available'));
+        $this->assertCount(7, $tabs);
+        $this->assertSame(
+            ['Início', 'Aulas', 'Meu cofre', 'Minha sessão', 'Pessoas', 'Encontros', 'Frameworks'],
+            array_column($tabs, 'label'),
+        );
+        $this->assertSame([true, true, false, false, false, false, true], array_column($tabs, 'available'));
     }
 
     public function test_club_tier_has_seven_available_tabs(): void
@@ -28,13 +31,13 @@ class PersonaNavigationTest extends TestCase
         $this->assertSame([true, true, true, true, true, true, true], array_column($tabs, 'available'));
     }
 
-    public function test_mentor_tier_has_five_available_tabs(): void
+    public function test_mentor_tier_has_four_available_tabs(): void
     {
         $tabs = (new PersonaNavigation)->tabs('mentor');
 
-        $this->assertCount(5, $tabs);
-        $this->assertSame(['Painel', 'Radar', 'Dossiês', 'Publicar', 'Disponibilidade'], array_column($tabs, 'label'));
-        $this->assertSame([true, true, true, true, true], array_column($tabs, 'available'));
+        $this->assertCount(4, $tabs);
+        $this->assertSame(['Radar', 'Dossiês', 'Publicar', 'Disponibilidade'], array_column($tabs, 'label'));
+        $this->assertSame([true, true, true, true], array_column($tabs, 'available'));
     }
 
     public function test_unknown_tier_returns_no_tabs(): void

@@ -39,11 +39,11 @@ class EncontrosTest extends TestCase
         $this->get('/membros/encontros')->assertRedirect('/login');
     }
 
-    public function test_start_tier_is_redirected_to_the_dashboard(): void
+    public function test_start_tier_is_redirected_to_the_upgrade_pitch(): void
     {
         $this->actingAs(User::factory()->create(['tier' => 'start']));
 
-        $this->get('/membros/encontros')->assertRedirect('/membros');
+        $this->get('/membros/encontros')->assertRedirect(route('membros.upgrade'));
     }
 
     public function test_club_tier_can_access_the_page(): void

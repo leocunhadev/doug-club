@@ -36,6 +36,10 @@
                         Meu perfil
                     </a>
 
+                    <a href="{{ route('membros.sobre') }}" wire:navigate class="block px-4 py-2 text-sm text-ink hover:bg-paper">
+                        Sobre
+                    </a>
+
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button type="submit" class="w-full text-start px-4 py-2 text-sm text-ink hover:bg-paper">
@@ -55,20 +59,14 @@
 
     <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-3 flex gap-1 overflow-x-auto" aria-label="Navegação principal">
         @foreach ((new \App\Support\PersonaNavigation)->tabs(auth()->user()->viewingTier()) as $tab)
-            @if ($tab['available'])
-                <a
-                    href="{{ route($tab['route']) }}"
-                    wire:navigate
-                    @if (request()->routeIs($tab['route']) || request()->routeIs($tab['route'].'.*')) aria-current="page" @endif
-                    class="shrink-0 px-3 py-1.5 rounded-full text-sm font-medium {{ request()->routeIs($tab['route']) || request()->routeIs($tab['route'].'.*') ? 'bg-black text-white' : 'text-stone hover:text-ink' }}"
-                >
-                    {{ $tab['label'] }}
-                </a>
-            @else
-                <span class="shrink-0 px-3 py-1.5 rounded-full text-sm font-medium text-stone/50 cursor-not-allowed" title="Em breve">
-                    {{ $tab['label'] }} 🔒
-                </span>
-            @endif
+            <a
+                href="{{ route($tab['route']) }}"
+                wire:navigate
+                @if ($tab['available'] && (request()->routeIs($tab['route']) || request()->routeIs($tab['route'].'.*'))) aria-current="page" @endif
+                class="shrink-0 px-3 py-1.5 rounded-full text-sm font-medium {{ ! $tab['available'] ? 'text-stone/50' : (request()->routeIs($tab['route']) || request()->routeIs($tab['route'].'.*') ? 'bg-black text-white' : 'text-stone hover:text-ink') }}"
+            >
+                {{ $tab['label'] }}{{ $tab['available'] ? '' : ' 🔒' }}
+            </a>
         @endforeach
     </nav>
 </header>

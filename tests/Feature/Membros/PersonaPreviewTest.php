@@ -52,13 +52,14 @@ class PersonaPreviewTest extends TestCase
         $admin = User::factory()->create(['is_admin' => true, 'tier' => 'club']);
         $this->actingAs($admin);
 
-        $this->get(route('membros.preview-persona', ['tier' => 'start']))->assertRedirect();
+        $this->get(route('membros.preview-persona', ['tier' => 'start']))->assertRedirect(route('dashboard'));
 
         $html = $this->get('/membros')->assertOk()->getContent();
 
-        // Start-tier-only nav label, not present in the real club-tier nav.
-        $this->assertStringContainsString('Sessão 1:1', $html);
-        $this->assertStringNotContainsString('Meu cofre', $html);
+        // The full club-only nav is shown even when previewing as start,
+        // but locked (with a padlock) — unlike the real club-tier nav.
+        $this->assertStringContainsString('Meu cofre', $html);
+        $this->assertStringContainsString('🔒', $html);
     }
 
     public function test_admin_previewing_start_sees_the_start_badge_on_the_wordmark(): void
@@ -88,6 +89,21 @@ class PersonaPreviewTest extends TestCase
             ->assertDontSee('class="start-tag"', false);
     }
 
+    public function test_switching_persona_lands_on_each_tiers_default_view(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true, 'tier' => 'club']);
+        $this->actingAs($admin);
+
+        $this->get(route('membros.preview-persona', ['tier' => 'start']))
+            ->assertRedirect(route('dashboard'));
+
+        $this->get(route('membros.preview-persona', ['tier' => 'mentor']))
+            ->assertRedirect(route('mentor.radar'));
+
+        $this->get(route('membros.preview-persona', ['tier' => 'club']))
+            ->assertRedirect(route('dashboard'));
+    }
+
     public function test_preview_never_changes_the_real_tier_gated_route_access(): void
     {
         $admin = User::factory()->create(['is_admin' => true, 'tier' => 'club']);
@@ -96,6 +112,6 @@ class PersonaPreviewTest extends TestCase
         $this->get(route('membros.preview-persona', ['tier' => 'mentor']));
 
         // Previewing "mentor" must not grant real access to the mentor-only route.
-        $this->get('/membros/mentor')->assertRedirect(route('dashboard'));
+        $this->get('/membros/mentor/radar')->assertRedirect(route('dashboard'));
     }
 }
