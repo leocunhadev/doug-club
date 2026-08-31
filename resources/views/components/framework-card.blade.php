@@ -1,6 +1,6 @@
 @props(['framework'])
 
-<div class="flex flex-col gap-2.5 p-6 rounded-[18px] border border-sand bg-card shadow-[0_1px_2px_rgba(11,11,12,.05),0_10px_28px_rgba(11,11,12,.07)]">
+<div class="flex flex-col gap-2.5 p-6 rounded-[18px] border border-sand bg-card shadow-[0_1px_2px_rgba(11,11,12,.05),0_10px_28px_rgba(11,11,12,.07)] overflow-hidden">
     <div class="framework-card-code">{{ $framework->code }}</div>
     <h3 class="font-display text-base">{{ $framework->title }}</h3>
     <p class="text-sm text-ink/80 flex-1">{{ $framework->description }}</p>
