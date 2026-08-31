@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Membros;
 
 use App\Http\Controllers\Controller;
+use App\Support\PersonaNavigation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -10,7 +11,7 @@ class PreviewPersonaController extends Controller
 {
     private const TIERS = ['start', 'club', 'mentor'];
 
-    public function __invoke(Request $request, string $tier): RedirectResponse
+    public function __invoke(Request $request, string $tier, PersonaNavigation $navigation): RedirectResponse
     {
         abort_unless($request->user()->is_admin, 403);
         abort_unless(in_array($tier, self::TIERS, true), 404);
@@ -21,6 +22,8 @@ class PreviewPersonaController extends Controller
             $request->session()->put('admin_persona_preview', $tier);
         }
 
-        return back();
+        $default = $navigation->tabs($tier)[0]['route'] ?? 'dashboard';
+
+        return redirect()->route($default);
     }
 }

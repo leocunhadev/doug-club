@@ -40,6 +40,6 @@ class SobreTest extends TestCase
     {
         $this->actingAs(User::factory()->create());
 
-        Livewire::test(Sobre::class)->assertSee('Todos os direitos reservados');
+        Livewire::test(Sobre::class)->assertSee('Tudo é gente. Até o software.');
     }
 }

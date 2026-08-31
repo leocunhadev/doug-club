@@ -15,7 +15,7 @@ class VerifyEmailController extends Controller
     public function __invoke(EmailVerificationRequest $request): RedirectResponse
     {
         $default = $request->user()->isMentor()
-            ? route('mentor.placeholder', absolute: false)
+            ? route('mentor.radar', absolute: false)
             : route('dashboard', absolute: false);
 
         if ($request->user()->hasVerifiedEmail()) {

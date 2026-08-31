@@ -22,7 +22,7 @@ new #[Layout('layouts.guest')] class extends Component
         Session::regenerate();
 
         $default = Auth::user()->isMentor()
-            ? route('mentor.placeholder', absolute: false)
+            ? route('mentor.radar', absolute: false)
             : route('dashboard', absolute: false);
 
         $this->redirectIntended(default: $default, navigate: true);

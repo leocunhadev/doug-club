@@ -54,7 +54,7 @@ class EmailVerificationTest extends TestCase
         $response->assertRedirect(route('dashboard', absolute: false).'?verified=1');
     }
 
-    public function test_mentor_tier_is_redirected_to_the_mentor_placeholder_after_verification(): void
+    public function test_mentor_tier_is_redirected_to_the_mentor_radar_after_verification(): void
     {
         $user = User::factory()->unverified()->create(['tier' => 'mentor']);
 
@@ -70,7 +70,7 @@ class EmailVerificationTest extends TestCase
 
         Event::assertDispatched(Verified::class);
         $this->assertTrue($user->fresh()->hasVerifiedEmail());
-        $response->assertRedirect(route('mentor.placeholder', absolute: false).'?verified=1');
+        $response->assertRedirect(route('mentor.radar', absolute: false).'?verified=1');
     }
 
     public function test_email_is_not_verified_with_invalid_hash(): void

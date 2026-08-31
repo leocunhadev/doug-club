@@ -121,7 +121,7 @@ class AuthenticationTest extends TestCase
             ->assertDontSee('Quero fazer parte');
     }
 
-    public function test_mentor_tier_lands_on_the_mentor_placeholder_after_login(): void
+    public function test_mentor_tier_lands_on_the_mentor_radar_after_login(): void
     {
         $user = User::factory()->create(['tier' => 'mentor']);
 
@@ -133,15 +133,15 @@ class AuthenticationTest extends TestCase
 
         $component
             ->assertHasNoErrors()
-            ->assertRedirect(route('mentor.placeholder', absolute: false));
+            ->assertRedirect(route('mentor.radar', absolute: false));
     }
 
-    public function test_root_redirects_mentor_tier_to_the_mentor_placeholder(): void
+    public function test_root_redirects_mentor_tier_to_the_mentor_radar(): void
     {
         $user = User::factory()->create(['tier' => 'mentor']);
         $this->actingAs($user);
 
-        $this->get('/')->assertRedirect(route('mentor.placeholder'));
+        $this->get('/')->assertRedirect(route('mentor.radar'));
     }
 
     public function test_root_redirects_club_tier_to_the_dashboard(): void

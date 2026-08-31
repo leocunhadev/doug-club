@@ -15,7 +15,6 @@ use App\Livewire\Membros\Disponibilidade;
 use App\Livewire\Membros\Dossies;
 use App\Livewire\Membros\Encontros;
 use App\Livewire\Membros\Frameworks;
-use App\Livewire\Membros\MentorPlaceholder;
 use App\Livewire\Membros\Pessoas;
 use App\Livewire\Membros\Radar;
 use App\Livewire\Membros\Sobre;
@@ -28,7 +27,7 @@ Route::get('/', function () {
     }
 
     return auth()->user()->isMentor()
-        ? redirect()->route('mentor.placeholder')
+        ? redirect()->route('mentor.radar')
         : redirect()->route('dashboard');
 });
 
@@ -84,10 +83,6 @@ Route::get('membros/upgrade', Upgrade::class)
     ->middleware(['auth', 'verified', 'active', 'tier:start'])
     ->name('membros.upgrade');
 
-Route::get('membros/mentor', MentorPlaceholder::class)
-    ->middleware(['auth', 'verified', 'active', 'tier:mentor'])
-    ->name('mentor.placeholder');
-
 Route::get('membros/mentor/disponibilidade', Disponibilidade::class)
     ->middleware(['auth', 'verified', 'active', 'tier:mentor'])
     ->name('mentor.disp');
@@ -116,3 +111,4 @@ Route::post('webhooks/abacatepay', AbacatePayWebhookController::class)
     ->name('webhooks.abacatepay');
 
 require __DIR__.'/auth.php';
+require __DIR__.'/prototype.php';
