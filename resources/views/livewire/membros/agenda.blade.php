@@ -54,11 +54,13 @@
                                     class="flex flex-col items-center px-3 py-2 rounded-xl border text-sm {{ $selectedDate === $key ? 'bg-black text-white border-black' : 'bg-card text-ink border-sand hover:border-black' }}">
                                 <small class="uppercase text-xs">{{ $date->translatedFormat('D') }}</small>
                                 <b>{{ $date->format('d') }}</b>
+                                <span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-brand"></span>
                             </button>
                         @else
                             <span class="flex flex-col items-center px-3 py-2 rounded-xl border border-sand text-sm text-stone/50 cursor-not-allowed">
                                 <small class="uppercase text-xs">{{ $date->translatedFormat('D') }}</small>
                                 <b>{{ $date->format('d') }}</b>
+                                <span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-transparent"></span>
                             </span>
                         @endif
                     @endfor
