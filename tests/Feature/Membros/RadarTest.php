@@ -361,7 +361,8 @@ class RadarTest extends TestCase
         Livewire::test(Radar::class)
             ->assertSee('1 membro Start')
             ->assertSee('Ana Beatriz')
-            ->assertSee('Prontos para o convite ao CLUB.');
+            ->assertSee('assistiu todas as aulas e baixou 2+ frameworks')
+            ->assertSee('Pronto para o convite ao CLUB.');
     }
 
     public function test_engaged_start_member_not_shown_when_only_one_framework_downloaded(): void
@@ -408,7 +409,48 @@ class RadarTest extends TestCase
     public function test_no_engaged_start_members_card_when_there_are_no_start_lessons(): void
     {
         $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+        $member = User::factory()->create(['tier' => 'start', 'name' => 'Zelda Furtado']);
+        FrameworkDownload::create(['user_id' => $member->id, 'framework_id' => Framework::create(['code' => 'A', 'title' => 'Framework A', 'description' => 'x', 'position' => 1])->id]);
+        FrameworkDownload::create(['user_id' => $member->id, 'framework_id' => Framework::create(['code' => 'B', 'title' => 'Framework B', 'description' => 'x', 'position' => 2])->id]);
 
-        Livewire::test(Radar::class)->assertDontSee('Prontos para o convite ao CLUB.');
+        Livewire::test(Radar::class)->assertDontSee('Zelda Furtado');
+    }
+
+    public function test_club_and_mentor_tier_members_never_appear_even_with_qualifying_data(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+        $lesson = $this->lesson(['tier' => 'start']);
+        $clubMember = User::factory()->create(['tier' => 'club', 'name' => 'Fabio Costa']);
+        $mentorMember = User::factory()->create(['tier' => 'mentor', 'name' => 'Gabriela Dias']);
+
+        foreach ([$clubMember, $mentorMember] as $index => $user) {
+            LessonProgress::create(['user_id' => $user->id, 'lesson_id' => $lesson->id, 'status' => 'completed']);
+            FrameworkDownload::create(['user_id' => $user->id, 'framework_id' => Framework::create(['code' => 'A'.$index, 'title' => 'Framework A'.$index, 'description' => 'x', 'position' => 1])->id]);
+            FrameworkDownload::create(['user_id' => $user->id, 'framework_id' => Framework::create(['code' => 'B'.$index, 'title' => 'Framework B'.$index, 'description' => 'x', 'position' => 2])->id]);
+        }
+
+        Livewire::test(Radar::class)
+            ->assertDontSee('Fabio Costa')
+            ->assertDontSee('Gabriela Dias');
+    }
+
+    public function test_engaged_start_members_card_pluralizes_correctly_with_two_or_more(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+        $lesson = $this->lesson(['tier' => 'start']);
+
+        foreach (['Helena Prado', 'Igor Matos'] as $index => $name) {
+            $member = User::factory()->create(['tier' => 'start', 'name' => $name]);
+            LessonProgress::create(['user_id' => $member->id, 'lesson_id' => $lesson->id, 'status' => 'completed']);
+            FrameworkDownload::create(['user_id' => $member->id, 'framework_id' => Framework::create(['code' => 'A'.$index, 'title' => 'Framework A'.$index, 'description' => 'x', 'position' => 1])->id]);
+            FrameworkDownload::create(['user_id' => $member->id, 'framework_id' => Framework::create(['code' => 'B'.$index, 'title' => 'Framework B'.$index, 'description' => 'x', 'position' => 2])->id]);
+        }
+
+        Livewire::test(Radar::class)
+            ->assertSee('2 membros Start')
+            ->assertSee('Helena Prado')
+            ->assertSee('Igor Matos')
+            ->assertSee('assistiram todas as aulas e baixaram 2+ frameworks')
+            ->assertSee('Prontos para o convite ao CLUB.');
     }
 }

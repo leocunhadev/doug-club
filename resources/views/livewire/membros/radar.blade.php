@@ -68,9 +68,13 @@
         @if ($this->engagedStartMembers->isNotEmpty())
             <div class="match rounded-[18px] border border-sand bg-card shadow-[0_1px_2px_rgba(11,11,12,.05),0_10px_28px_rgba(11,11,12,.07)]">
                 <div class="d">
-                    <b>{{ $this->engagedStartMembers->count() }} {{ Str::plural('membro', $this->engagedStartMembers->count()) }} Start</b>
-                    assistiram todas as aulas e baixaram 2+ frameworks: {{ $this->engagedStartMembers->pluck('name')->join(', ') }}.
-                    <em>Prontos para o convite ao CLUB.</em>
+                    @if ($this->engagedStartMembers->count() === 1)
+                        <b>1 membro Start</b> assistiu todas as aulas e baixou 2+ frameworks: {{ $this->engagedStartMembers->pluck('name')->join(', ') }}.
+                        <em>Pronto para o convite ao CLUB.</em>
+                    @else
+                        <b>{{ $this->engagedStartMembers->count() }} membros Start</b> assistiram todas as aulas e baixaram 2+ frameworks: {{ $this->engagedStartMembers->pluck('name')->join(', ') }}.
+                        <em>Prontos para o convite ao CLUB.</em>
+                    @endif
                 </div>
             </div>
         @endif
