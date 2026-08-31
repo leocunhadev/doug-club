@@ -89,6 +89,9 @@
                         Compromisso: {{ $commitment->text }}.
                     @endif
                 </p>
+                @if ($suggestion = $this->openingSuggestionFor($session->member_id))
+                    <p class="mt-1 text-[15px] text-ink/70 italic">{{ $suggestion }}</p>
+                @endif
             </div>
         @empty
             <p class="text-stone">Nenhuma sessão hoje.</p>

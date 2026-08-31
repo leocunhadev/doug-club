@@ -226,6 +226,44 @@ class RadarTest extends TestCase
             ->assertSee('Nenhuma nota registrada ainda.');
     }
 
+    public function test_briefing_suggests_an_opening_based_on_the_active_commitment(): void
+    {
+        $mentor = User::factory()->create(['tier' => 'mentor']);
+        $this->actingAs($mentor);
+        $member = User::factory()->create(['tier' => 'club']);
+
+        MentorSession::create(['mentor_id' => $mentor->id, 'member_id' => $member->id, 'scheduled_at' => now()->setTime(10, 0)]);
+        MentorCommitment::create(['member_id' => $member->id, 'text' => 'Gravar 3 conversas de venda']);
+
+        Livewire::test(Radar::class)
+            ->assertSee('Abra perguntando sobre: Gravar 3 conversas de venda.');
+    }
+
+    public function test_briefing_suggests_a_generic_opening_when_there_is_a_note_but_no_commitment(): void
+    {
+        $mentor = User::factory()->create(['tier' => 'mentor']);
+        $this->actingAs($mentor);
+        $member = User::factory()->create(['tier' => 'club']);
+
+        MentorSession::create(['mentor_id' => $mentor->id, 'member_id' => $member->id, 'scheduled_at' => now()->setTime(10, 0)]);
+        MentorNote::create(['member_id' => $member->id, 'mentor_id' => $mentor->id, 'title' => 'Nota', 'body' => 'Definiu o ICP.']);
+
+        Livewire::test(Radar::class)
+            ->assertSee('Abra perguntando como está desde a última conversa.');
+    }
+
+    public function test_briefing_shows_no_opening_suggestion_when_there_is_no_note_or_commitment(): void
+    {
+        $mentor = User::factory()->create(['tier' => 'mentor']);
+        $this->actingAs($mentor);
+        $member = User::factory()->create(['tier' => 'club']);
+
+        MentorSession::create(['mentor_id' => $mentor->id, 'member_id' => $member->id, 'scheduled_at' => now()->setTime(10, 0)]);
+
+        Livewire::test(Radar::class)
+            ->assertDontSee('Abra perguntando');
+    }
+
     public function test_suggested_bridges_shows_a_match_when_tags_overlap_case_insensitively(): void
     {
         $this->actingAs(User::factory()->create(['tier' => 'mentor']));

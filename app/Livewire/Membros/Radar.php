@@ -196,6 +196,21 @@ class Radar extends Component
             ->first();
     }
 
+    public function openingSuggestionFor(int $memberId): ?string
+    {
+        if ($commitment = $this->activeCommitmentFor($memberId)) {
+            if ($commitment->text) {
+                return "Abra perguntando sobre: {$commitment->text}.";
+            }
+        }
+
+        if ($this->lastNoteFor($memberId)) {
+            return 'Abra perguntando como está desde a última conversa.';
+        }
+
+        return null;
+    }
+
     public function render()
     {
         return view('livewire.membros.radar');
