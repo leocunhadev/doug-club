@@ -20,7 +20,7 @@
         <input class="inp" id="loginSenha" name="senha" type="password" placeholder="••••••••">
         <button class="btn laranja" type="submit" style="width:100%">Entrar na plataforma</button>
       </form>
-      <button class="btn" style="width:100%;margin-top:12px;color:#8f8a82;font-size:13px" onclick="toast('Link mágico enviado. No protótipo, use o botão &quot;Entrar na plataforma&quot;.')">Esqueci a senha · entrar com link mágico</button>
+      <button class="btn" style="width:100%;margin-top:12px;color:#8f8a82;font-size:13px" onclick="toast('E-mail de redefinição enviado. No protótipo, use o botão &quot;Entrar na plataforma&quot;.')">Esqueci a senha · redefinir por e-mail</button>
     </div>
     <p class="login-hint">Acesso individual e intransferível, com sessão única por conta.<br>Entrar em um novo aparelho <b>desconecta o anterior</b>.</p>
   </div>
