@@ -40,6 +40,13 @@ class AuthenticationTest extends TestCase
             ->assertDontSee('aria-label="DO.ing Club"', false);
     }
 
+    public function test_login_screen_shows_the_branded_dark_layout(): void
+    {
+        $this->get('/login')
+            ->assertSee('Decisão Orientada. Tudo é gente.')
+            ->assertSee('Acesso individual e intransferível');
+    }
+
     public function test_invalid_credentials_show_a_portuguese_error_message(): void
     {
         $user = User::factory()->create();

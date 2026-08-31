@@ -31,6 +31,13 @@ class PasswordResetTest extends TestCase
             ->assertDontSee('Email Password Reset Link');
     }
 
+    public function test_forgot_password_screen_shows_the_branded_dark_layout_without_the_login_hint(): void
+    {
+        $this->get('/forgot-password')
+            ->assertSee('Decisão Orientada. Tudo é gente.')
+            ->assertDontSee('Acesso individual e intransferível');
+    }
+
     public function test_password_reset_link_sent_status_renders_in_portuguese(): void
     {
         Notification::fake();
@@ -95,6 +102,25 @@ class PasswordResetTest extends TestCase
                 ->assertSee('Confirmar nova senha')
                 ->assertSee('Redefinir senha')
                 ->assertDontSee('Reset Password');
+
+            return true;
+        });
+    }
+
+    public function test_reset_password_screen_shows_the_branded_dark_layout_without_the_login_hint(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create();
+
+        Volt::test('pages.auth.forgot-password')
+            ->set('email', $user->email)
+            ->call('sendPasswordResetLink');
+
+        Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
+            $this->get('/reset-password/'.$notification->token)
+                ->assertSee('Decisão Orientada. Tudo é gente.')
+                ->assertDontSee('Acesso individual e intransferível');
 
             return true;
         });

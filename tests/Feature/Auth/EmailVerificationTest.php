@@ -35,6 +35,15 @@ class EmailVerificationTest extends TestCase
             ->assertDontSee('Log Out');
     }
 
+    public function test_email_verification_screen_shows_the_branded_dark_layout_without_the_login_hint(): void
+    {
+        $user = User::factory()->unverified()->create();
+
+        $this->actingAs($user)->get('/verify-email')
+            ->assertSee('Decisão Orientada. Tudo é gente.')
+            ->assertDontSee('Acesso individual e intransferível');
+    }
+
     public function test_email_can_be_verified(): void
     {
         $user = User::factory()->unverified()->create();

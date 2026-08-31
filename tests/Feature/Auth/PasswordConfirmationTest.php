@@ -32,6 +32,15 @@ class PasswordConfirmationTest extends TestCase
             ->assertDontSee('Confirm Password');
     }
 
+    public function test_confirm_password_screen_shows_the_branded_dark_layout_without_the_login_hint(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->get('/confirm-password')
+            ->assertSee('Decisão Orientada. Tudo é gente.')
+            ->assertDontSee('Acesso individual e intransferível');
+    }
+
     public function test_wrong_password_shows_a_portuguese_error_message(): void
     {
         $user = User::factory()->create();

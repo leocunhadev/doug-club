@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
-new #[Layout('layouts.guest')] class extends Component
+new #[Layout('layouts.auth')] class extends Component
 {
     /**
      * Send an email verification notification to the user.
@@ -47,11 +47,11 @@ new #[Layout('layouts.guest')] class extends Component
     @endif
 
     <div class="mt-4 flex items-center justify-between">
-        <x-primary-button wire:click="sendVerification">
+        <x-primary-button wire:click="sendVerification" class="!bg-brand hover:!brightness-110">
             Reenviar e-mail de verificação
         </x-primary-button>
 
-        <button wire:click="logout" type="submit" class="underline text-sm text-stone hover:text-ink rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand">
+        <button wire:click="logout" type="submit" class="underline text-sm text-stone hover:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand">
             Sair
         </button>
     </div>

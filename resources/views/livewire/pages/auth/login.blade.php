@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
-new #[Layout('layouts.guest')] class extends Component
+new #[Layout('layouts.auth', ['showHint' => true])] class extends Component
 {
     public LoginForm $form;
 
@@ -68,14 +68,14 @@ new #[Layout('layouts.guest')] class extends Component
                 </a>
             @endif
 
-            <x-primary-button class="ms-3">
+            <x-primary-button class="ms-3 !bg-brand hover:!brightness-110">
                 Entrar
             </x-primary-button>
         </div>
     </form>
 
     @if ($paymentLinkUrl = config('services.abacatepay.payment_link_url'))
-        <div class="mt-6 pt-6 border-t border-sand text-center">
+        <div class="mt-6 pt-6 border-t border-white/10 text-center">
             <p class="text-sm text-stone">
                 Ainda não é membro?
             </p>
