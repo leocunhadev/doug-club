@@ -226,15 +226,17 @@ class RadarTest extends TestCase
     public function test_suggested_bridges_shows_a_match_when_tags_overlap_case_insensitively(): void
     {
         $this->actingAs(User::factory()->create(['tier' => 'mentor']));
-        User::factory()->create(['tier' => 'club', 'name' => 'Ricardo Mendes', 'learn_tags' => ['Precificação']]);
-        User::factory()->create(['tier' => 'club', 'name' => 'Marina Alves', 'teach_tags' => ['precificação']]);
+        $learner = User::factory()->create(['tier' => 'club', 'name' => 'Ricardo Mendes', 'learn_tags' => ['Precificação']]);
+        $teacher = User::factory()->create(['tier' => 'club', 'name' => 'Marina Alves', 'teach_tags' => ['precificação']]);
 
         Livewire::test(Radar::class)
             ->assertSee('Pontes sugeridas')
             ->assertSee('Ricardo Mendes')
             ->assertSee('Marina Alves')
             ->assertSee('Precificação')
-            ->assertDontSee('Nenhuma ponte sugerida no momento.');
+            ->assertDontSee('Nenhuma ponte sugerida no momento.')
+            ->assertSeeHtml('<b>Ricardo Mendes</b> quer aprender <em>Precificação</em> e <b>Marina Alves</b> pode ensinar isso.')
+            ->assertSeeHtml('wire:click="makeBridge('.$learner->id.', '.$teacher->id.',');
     }
 
     public function test_suggested_bridges_shows_the_empty_state_when_there_are_no_matches(): void

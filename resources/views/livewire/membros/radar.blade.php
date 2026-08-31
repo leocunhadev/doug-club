@@ -1,6 +1,10 @@
 <div class="min-h-screen text-ink">
     <x-membros.header :initials="$this->userInitials" />
 
+    @if (session('bridge-made'))
+        <p class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 text-sm text-brand">{{ session('bridge-made') }}</p>
+    @endif
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div class="mb-8">
             <h1 class="text-[clamp(26px,4vw,38px)] leading-[1.05] font-display font-extrabold tracking-[-0.015em] text-black">
@@ -52,7 +56,7 @@
                 <div class="d">
                     <b>{{ $match['learner']->name }}</b> quer aprender <em>{{ $match['tag'] }}</em> e <b>{{ $match['teacher']->name }}</b> pode ensinar isso.
                 </div>
-                <button type="button" wire:click="makeBridge({{ $match['learner']->id }}, {{ $match['teacher']->id }}, '{{ $match['tag'] }}')"
+                <button type="button" wire:click="makeBridge({{ $match['learner']->id }}, {{ $match['teacher']->id }}, {{ \Illuminate\Support\Js::from($match['tag']) }})"
                         class="px-3.5 py-1.5 rounded-full text-sm font-semibold bg-black text-white hover:bg-brand">
                     Fazer a ponte
                 </button>
@@ -61,7 +65,7 @@
             <p class="text-stone mb-6">Nenhuma ponte sugerida no momento.</p>
         @endforelse
 
-        <h3 class="text-[17px] font-semibold mb-3">Antes das sessões de hoje</h3>
+        <h3 class="text-[17px] font-semibold mt-6 mb-3">Antes das sessões de hoje</h3>
         @forelse ($this->todaySessions as $session)
             <div class="rounded-[18px] border border-sand bg-card shadow-[0_1px_2px_rgba(11,11,12,.05),0_10px_28px_rgba(11,11,12,.07)] briefing-card border-l-4 border-brand p-[22px] mb-3">
                 <p class="eyebrow laranja">{{ $session->member->name }} · {{ $session->scheduled_at->format('H\hi') }}</p>

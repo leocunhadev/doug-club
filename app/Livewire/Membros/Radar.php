@@ -137,6 +137,8 @@ class Radar extends Component
         $learner->notify(new BridgeSuggestedNotification($teacher, $tag, iAmTheLearner: true));
         $teacher->notify(new BridgeSuggestedNotification($learner, $tag, iAmTheLearner: false));
 
+        session()->flash('bridge-made', "Apresentação enviada para {$learner->name} e {$teacher->name}.");
+
         unset($this->suggestedBridges);
     }
 
