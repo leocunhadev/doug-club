@@ -26,14 +26,14 @@ use Illuminate\Support\Facades\Storage;
  * Fills in every model this project has, for manual/visual testing of every
  * feature built so far. Runs after LmsSeeder (needs its Courses/Lessons).
  *
- * Creates exactly one new user — a club member ('club@example.com') — and
- * reuses the two users DatabaseSeeder already creates (test@example.com,
+ * Creates four club members (the prototype's "Gente do CLUB" cast, so the
+ * Pessoas page and Radar's "Pontes sugeridas" match have real data to show)
+ * and reuses the two users DatabaseSeeder already creates (test@example.com,
  * tier=start; admin@example.com, mentor+admin) for everything else.
  *
- * Note: with only one club member seeded, Radar's "Pontes sugeridas"
- * teach/learn match (issue #41) has no second person to pair with, so it
- * won't show a real match out of the box — that needs a second club
- * member, which is out of scope for this seed by explicit request.
+ * Only Ricardo Mendes gets sessions/dossiê/cofre/encontro data — he's the
+ * one club member every other feature's demo data is built around. The
+ * other three exist for Pessoas/Radar's people list and bridge matching.
  */
 class DemoDataSeeder extends Seeder
 {
@@ -47,10 +47,43 @@ class DemoDataSeeder extends Seeder
             'email' => 'club@example.com',
             'password' => Hash::make('123456789'),
             'tier' => 'club',
-            'company' => 'Estúdio Raiz',
-            'bio' => 'Ajudo marcas a contar a própria história sem parecer propaganda.',
-            'teach_tags' => ['storytelling', 'branding'],
-            'learn_tags' => ['precificação'],
+            'company' => 'Mendes Log · Logística',
+            'bio' => 'Assumiu o comercial da própria empresa. Faturamento de R$ 8M/ano.',
+            'teach_tags' => ['funil de indicação'],
+            'learn_tags' => ['precificação', 'discurso de venda'],
+        ]);
+
+        User::factory()->create([
+            'name' => 'Marina Prado',
+            'email' => 'marina@example.com',
+            'password' => Hash::make('123456789'),
+            'tier' => 'club',
+            'company' => 'Clínicas Vitalle · Saúde',
+            'bio' => 'Três unidades no Rio. Referência em precificação de serviços de saúde.',
+            'teach_tags' => ['precificação', 'expansão'],
+            'learn_tags' => ['marca pessoal'],
+        ]);
+
+        User::factory()->create([
+            'name' => 'Caio Fonseca',
+            'email' => 'caio@example.com',
+            'password' => Hash::make('123456789'),
+            'tier' => 'club',
+            'company' => 'Grupo Andar · Imobiliário',
+            'bio' => 'Segunda geração assumindo a empresa da família, em plena virada digital.',
+            'teach_tags' => ['negociação de alto valor'],
+            'learn_tags' => ['funil de indicação'],
+        ]);
+
+        User::factory()->create([
+            'name' => 'Alessandra Ribeiro',
+            'email' => 'alessandra@example.com',
+            'password' => Hash::make('123456789'),
+            'tier' => 'club',
+            'company' => 'AR Odonto · Saúde',
+            'bio' => 'Primeira mentorada do CLUB. Reposicionando a clínica para o premium.',
+            'teach_tags' => ['experiência do paciente'],
+            'learn_tags' => ['oferta premium'],
         ]);
 
         $frameworks = $this->seedFrameworks();
