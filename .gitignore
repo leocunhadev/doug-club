@@ -28,3 +28,5 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+/docs/security-audit/venv
+/docs/security-audit/__pycache__
