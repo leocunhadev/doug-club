@@ -3,6 +3,7 @@
 namespace Tests\Feature\Membros;
 
 use App\Models\Framework;
+use App\Models\FrameworkDownload;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -43,6 +44,38 @@ class FrameworkPdfDownloadTest extends TestCase
             ->assertDownload('Consumidor 4S.pdf');
     }
 
+    public function test_download_records_a_framework_download(): void
+    {
+        Storage::fake('public');
+        $path = UploadedFile::fake()->create('4s.pdf', 10, 'application/pdf')->store('framework-pdfs', 'public');
+        $framework = $this->framework(['pdf_path' => $path]);
+        $user = User::factory()->create(['tier' => 'start']);
+
+        $this->actingAs($user);
+        $this->get(route('membros.frameworks.download', $framework));
+
+        $this->assertDatabaseHas('framework_downloads', [
+            'user_id' => $user->id, 'framework_id' => $framework->id,
+        ]);
+    }
+
+    public function test_downloading_the_same_framework_twice_records_two_rows(): void
+    {
+        Storage::fake('public');
+        $path = UploadedFile::fake()->create('4s.pdf', 10, 'application/pdf')->store('framework-pdfs', 'public');
+        $framework = $this->framework(['pdf_path' => $path]);
+        $user = User::factory()->create(['tier' => 'start']);
+
+        $this->actingAs($user);
+        $this->get(route('membros.frameworks.download', $framework));
+        $this->get(route('membros.frameworks.download', $framework));
+
+        $this->assertSame(2, FrameworkDownload::query()
+            ->where('user_id', $user->id)
+            ->where('framework_id', $framework->id)
+            ->count());
+    }
+
     public function test_returns_404_without_an_uploaded_file(): void
     {
         $framework = $this->framework(['pdf_url' => 'https://example.com/4s.pdf']);
@@ -51,6 +84,8 @@ class FrameworkPdfDownloadTest extends TestCase
 
         $this->get(route('membros.frameworks.download', $framework))
             ->assertNotFound();
+
+        $this->assertDatabaseMissing('framework_downloads', ['framework_id' => $framework->id]);
     }
 
     public function test_returns_404_when_the_file_is_missing_from_disk(): void
@@ -63,5 +98,7 @@ class FrameworkPdfDownloadTest extends TestCase
 
         $this->get(route('membros.frameworks.download', $framework))
             ->assertNotFound();
+
+        $this->assertDatabaseMissing('framework_downloads', ['framework_id' => $framework->id]);
     }
 }
