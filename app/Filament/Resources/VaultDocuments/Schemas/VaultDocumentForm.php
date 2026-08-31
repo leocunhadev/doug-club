@@ -30,7 +30,7 @@ class VaultDocumentForm
                     ->requiredWithout('file_path'),
                 FileUpload::make('file_path')
                     ->label('File')
-                    ->disk('public')
+                    ->disk('local')
                     ->directory('vault-documents')
                     ->acceptedFileTypes([
                         'application/pdf',

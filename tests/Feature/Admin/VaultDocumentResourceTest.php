@@ -111,9 +111,9 @@ class VaultDocumentResourceTest extends TestCase
         ]);
     }
 
-    public function test_admin_can_upload_a_file_and_it_resolves_to_a_public_storage_path(): void
+    public function test_admin_can_upload_a_file_and_it_resolves_to_a_storage_path(): void
     {
-        Storage::fake('public');
+        Storage::fake('local');
         User::factory()->create(['tier' => 'mentor']);
         $member = User::factory()->create(['tier' => 'club']);
 
@@ -130,7 +130,7 @@ class VaultDocumentResourceTest extends TestCase
 
         $document = VaultDocument::where('title', 'Documento com upload')->firstOrFail();
 
-        Storage::disk('public')->assertExists($document->file_path);
+        Storage::disk('local')->assertExists($document->file_path);
     }
 
     public function test_admin_can_edit_a_document(): void

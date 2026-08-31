@@ -18,7 +18,7 @@ class VaultDocumentOpenController extends Controller
         abort_unless($document->member_id === request()->user()->id, 404);
 
         if ($document->hasUploadedFile()) {
-            abort_unless(Storage::disk('public')->exists($document->file_path), 404);
+            abort_unless(Storage::disk('local')->exists($document->file_path), 404);
 
             $this->markOpened($document);
 
@@ -29,7 +29,7 @@ class VaultDocumentOpenController extends Controller
                 return $this->downloadWatermarkedPdf($document, $watermarker, $filename);
             }
 
-            return Storage::disk('public')->download($document->file_path, $filename);
+            return Storage::disk('local')->download($document->file_path, $filename);
         }
 
         abort_unless(filled($document->file_url), 404);
@@ -41,11 +41,11 @@ class VaultDocumentOpenController extends Controller
 
     private function downloadWatermarkedPdf(VaultDocument $document, PdfWatermarker $watermarker, string $filename): StreamedResponse
     {
-        if (Storage::disk('public')->size($document->file_path) > 20 * 1024 * 1024) {
-            return Storage::disk('public')->download($document->file_path, $filename);
+        if (Storage::disk('local')->size($document->file_path) > 20 * 1024 * 1024) {
+            return Storage::disk('local')->download($document->file_path, $filename);
         }
 
-        $original = Storage::disk('public')->get($document->file_path);
+        $original = Storage::disk('local')->get($document->file_path);
         abort_if(is_null($original), 404);
 
         $user = request()->user();

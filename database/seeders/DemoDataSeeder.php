@@ -241,7 +241,7 @@ class DemoDataSeeder extends Seeder
         ]);
 
         $vaultPath = 'vault-documents/contrato-modelo-demo.pdf';
-        Storage::disk('public')->put($vaultPath, '%PDF-1.4 contrato modelo de demonstração para teste visual.');
+        Storage::disk('local')->put($vaultPath, '%PDF-1.4 contrato modelo de demonstração para teste visual.');
         VaultDocument::create([
             'member_id' => $clubMember->id, 'mentor_id' => $mentor->id,
             'title' => 'Contrato modelo', 'file_path' => $vaultPath,
