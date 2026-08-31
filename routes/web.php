@@ -21,85 +21,75 @@ use App\Livewire\Membros\Sobre;
 use App\Livewire\Membros\Upgrade;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    if (! auth()->check()) {
-        return redirect()->route('login');
-    }
-
-    return auth()->user()->isMentor()
-        ? redirect()->route('mentor.radar')
-        : redirect()->route('dashboard');
-});
-
-Route::get('membros', Dashboard::class)
-    ->middleware(['auth', 'verified', 'active'])
+Route::get('/', Dashboard::class)
+    ->middleware(['auth', 'verified', 'active', 'redirect-mentor-from-dashboard'])
     ->name('dashboard');
 
-Route::get('membros/materiais/{material}/download', LessonMaterialDownloadController::class)
+Route::get('materiais/{material}/download', LessonMaterialDownloadController::class)
     ->middleware(['auth', 'verified', 'active'])
     ->name('membros.materials.download');
 
-Route::get('membros/frameworks/{framework}/download', FrameworkPdfDownloadController::class)
+Route::get('frameworks/{framework}/download', FrameworkPdfDownloadController::class)
     ->middleware(['auth', 'verified', 'active'])
     ->name('membros.frameworks.download');
 
-Route::get('membros/cofre/{document}/abrir', VaultDocumentOpenController::class)
+Route::get('cofre/{document}/abrir', VaultDocumentOpenController::class)
     ->middleware(['auth', 'verified', 'active', 'tier:club'])
     ->name('membros.cofre.open');
 
-Route::get('membros/sobre', Sobre::class)
+Route::get('sobre', Sobre::class)
     ->middleware(['auth', 'verified', 'active'])
     ->name('membros.sobre');
 
-Route::get('membros/aulas', Aulas::class)
+Route::get('aulas', Aulas::class)
     ->middleware(['auth', 'verified', 'active'])
     ->name('membros.aulas');
 
-Route::get('membros/aulas/{lesson}/materiais', AulaMateriais::class)
+Route::get('aulas/{lesson}/materiais', AulaMateriais::class)
     ->middleware(['auth', 'verified', 'active'])
     ->name('membros.aulas.materiais');
 
-Route::get('membros/cofre', Cofre::class)
+Route::get('cofre', Cofre::class)
     ->middleware(['auth', 'verified', 'active', 'tier:club'])
     ->name('membros.cofre');
 
-Route::get('membros/encontros', Encontros::class)
+Route::get('encontros', Encontros::class)
     ->middleware(['auth', 'verified', 'active', 'tier:club'])
     ->name('membros.encontros');
 
-Route::get('membros/agenda', Agenda::class)
+Route::get('agenda', Agenda::class)
     ->middleware(['auth', 'verified', 'active', 'tier:club'])
     ->name('membros.agenda');
 
-Route::get('membros/pessoas', Pessoas::class)
+Route::get('pessoas', Pessoas::class)
     ->middleware(['auth', 'verified', 'active', 'tier:club'])
     ->name('membros.pessoas');
 
-Route::get('membros/frameworks', Frameworks::class)
+Route::get('frameworks', Frameworks::class)
     ->middleware(['auth', 'verified', 'active'])
     ->name('membros.frameworks');
 
-Route::get('membros/upgrade', Upgrade::class)
+Route::get('upgrade', Upgrade::class)
     ->middleware(['auth', 'verified', 'active', 'tier:start'])
     ->name('membros.upgrade');
 
-Route::get('membros/mentor/disponibilidade', Disponibilidade::class)
+Route::get('mentor/disponibilidade', Disponibilidade::class)
     ->middleware(['auth', 'verified', 'active', 'tier:mentor'])
     ->name('mentor.disp');
 
-Route::get('membros/mentor/dossies', Dossies::class)
+Route::get('mentor/dossies', Dossies::class)
     ->middleware(['auth', 'verified', 'active', 'tier:mentor'])
     ->name('mentor.dossies');
 
-Route::get('membros/mentor/radar', Radar::class)
+Route::get('mentor/radar', Radar::class)
     ->middleware(['auth', 'verified', 'active', 'tier:mentor'])
     ->name('mentor.radar');
 
-Route::get('membros/mentor/conteudo', Conteudo::class)
+Route::get('mentor/conteudo', Conteudo::class)
     ->middleware(['auth', 'verified', 'active', 'tier:mentor'])
     ->name('mentor.conteudo');
 
-Route::get('membros/preview-persona/{tier}', PreviewPersonaController::class)
+Route::get('preview-persona/{tier}', PreviewPersonaController::class)
     ->middleware(['auth', 'verified', 'active'])
     ->name('membros.preview-persona');
 

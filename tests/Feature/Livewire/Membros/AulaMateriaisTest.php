@@ -30,7 +30,7 @@ class AulaMateriaisTest extends TestCase
     {
         $this->actingAs(User::factory()->create());
 
-        $this->get('/membros/aulas/999/materiais')->assertNotFound();
+        $this->get('/aulas/999/materiais')->assertNotFound();
     }
 
     public function test_returns_404_for_a_club_only_lesson_viewed_by_a_start_tier_member(): void

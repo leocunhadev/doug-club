@@ -15,12 +15,12 @@ class PersonaNavigationTest extends TestCase
         $user = User::factory()->create(['tier' => 'start']);
         $this->actingAs($user);
 
-        $html = $this->get('/membros')->assertOk()->getContent();
+        $html = $this->get('/')->assertOk()->getContent();
 
         foreach ([
-            ['href' => 'http://localhost/membros', 'label' => 'Início'],
-            ['href' => 'http://localhost/membros/aulas', 'label' => 'Aulas'],
-            ['href' => 'http://localhost/membros/frameworks', 'label' => 'Frameworks'],
+            ['href' => 'http://localhost', 'label' => 'Início'],
+            ['href' => 'http://localhost/aulas', 'label' => 'Aulas'],
+            ['href' => 'http://localhost/frameworks', 'label' => 'Frameworks'],
         ] as $link) {
             $this->assertMatchesRegularExpression(
                 '#<a[^>]*href="'.preg_quote($link['href'], '#').'"[^>]*>\s*'.preg_quote($link['label'], '#').'\s*</a>#s',
@@ -34,13 +34,13 @@ class PersonaNavigationTest extends TestCase
         $user = User::factory()->create(['tier' => 'start']);
         $this->actingAs($user);
 
-        $html = $this->get('/membros')->assertOk()->getContent();
+        $html = $this->get('/')->assertOk()->getContent();
 
         foreach ([
-            ['href' => 'http://localhost/membros/cofre', 'label' => 'Meu cofre'],
-            ['href' => 'http://localhost/membros/agenda', 'label' => 'Minha sessão'],
-            ['href' => 'http://localhost/membros/pessoas', 'label' => 'Pessoas'],
-            ['href' => 'http://localhost/membros/encontros', 'label' => 'Encontros'],
+            ['href' => 'http://localhost/cofre', 'label' => 'Meu cofre'],
+            ['href' => 'http://localhost/agenda', 'label' => 'Minha sessão'],
+            ['href' => 'http://localhost/pessoas', 'label' => 'Pessoas'],
+            ['href' => 'http://localhost/encontros', 'label' => 'Encontros'],
         ] as $link) {
             $this->assertMatchesRegularExpression(
                 '#<a[^>]*href="'.preg_quote($link['href'], '#').'"[^>]*>\s*'.preg_quote($link['label'], '#').'\s*🔒\s*</a>#su',
@@ -54,16 +54,16 @@ class PersonaNavigationTest extends TestCase
         $user = User::factory()->create(['tier' => 'club']);
         $this->actingAs($user);
 
-        $html = $this->get('/membros')->assertOk()->getContent();
+        $html = $this->get('/')->assertOk()->getContent();
 
         foreach ([
-            ['href' => 'http://localhost/membros', 'label' => 'Início'],
-            ['href' => 'http://localhost/membros/aulas', 'label' => 'Aulas'],
-            ['href' => 'http://localhost/membros/cofre', 'label' => 'Meu cofre'],
-            ['href' => 'http://localhost/membros/agenda', 'label' => 'Minha sessão'],
-            ['href' => 'http://localhost/membros/pessoas', 'label' => 'Pessoas'],
-            ['href' => 'http://localhost/membros/encontros', 'label' => 'Encontros'],
-            ['href' => 'http://localhost/membros/frameworks', 'label' => 'Frameworks'],
+            ['href' => 'http://localhost', 'label' => 'Início'],
+            ['href' => 'http://localhost/aulas', 'label' => 'Aulas'],
+            ['href' => 'http://localhost/cofre', 'label' => 'Meu cofre'],
+            ['href' => 'http://localhost/agenda', 'label' => 'Minha sessão'],
+            ['href' => 'http://localhost/pessoas', 'label' => 'Pessoas'],
+            ['href' => 'http://localhost/encontros', 'label' => 'Encontros'],
+            ['href' => 'http://localhost/frameworks', 'label' => 'Frameworks'],
         ] as $link) {
             $this->assertMatchesRegularExpression(
                 '#<a[^>]*href="'.preg_quote($link['href'], '#').'"[^>]*>\s*'.preg_quote($link['label'], '#').'\s*</a>#s',
@@ -77,13 +77,13 @@ class PersonaNavigationTest extends TestCase
         $user = User::factory()->create(['tier' => 'mentor']);
         $this->actingAs($user);
 
-        $html = $this->get('/membros/mentor/radar')->assertOk()->getContent();
+        $html = $this->get('/mentor/radar')->assertOk()->getContent();
 
         foreach ([
-            ['href' => 'http://localhost/membros/mentor/disponibilidade', 'label' => 'Disponibilidade'],
-            ['href' => 'http://localhost/membros/mentor/conteudo', 'label' => 'Publicar'],
-            ['href' => 'http://localhost/membros/mentor/dossies', 'label' => 'Dossiês'],
-            ['href' => 'http://localhost/membros/mentor/radar', 'label' => 'Radar'],
+            ['href' => 'http://localhost/mentor/disponibilidade', 'label' => 'Disponibilidade'],
+            ['href' => 'http://localhost/mentor/conteudo', 'label' => 'Publicar'],
+            ['href' => 'http://localhost/mentor/dossies', 'label' => 'Dossiês'],
+            ['href' => 'http://localhost/mentor/radar', 'label' => 'Radar'],
         ] as $link) {
             $this->assertMatchesRegularExpression(
                 '#<a[^>]*href="'.preg_quote($link['href'], '#').'"[^>]*>\s*'.preg_quote($link['label'], '#').'\s*</a>#s',
@@ -96,7 +96,7 @@ class PersonaNavigationTest extends TestCase
     {
         $this->actingAs(User::factory()->create());
 
-        $html = $this->get('/membros')->assertOk()->getContent();
+        $html = $this->get('/')->assertOk()->getContent();
 
         $this->assertMatchesRegularExpression(
             '#<form[^>]*action="http://localhost/logout"[^>]*method="POST"#s',

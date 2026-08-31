@@ -12,7 +12,7 @@ class TierGatingTest extends TestCase
 
     public function test_guests_are_redirected_to_login(): void
     {
-        $this->get('/membros/mentor/radar')->assertRedirect('/login');
+        $this->get('/mentor/radar')->assertRedirect('/login');
     }
 
     public function test_start_tier_cannot_access_the_mentor_radar(): void
@@ -20,7 +20,7 @@ class TierGatingTest extends TestCase
         $user = User::factory()->create(['tier' => 'start']);
         $this->actingAs($user);
 
-        $this->get('/membros/mentor/radar')
+        $this->get('/mentor/radar')
             ->assertRedirect(route('dashboard'))
             ->assertSessionHas('status');
 
@@ -33,7 +33,7 @@ class TierGatingTest extends TestCase
         $user = User::factory()->create(['tier' => 'club']);
         $this->actingAs($user);
 
-        $this->get('/membros/mentor/radar')->assertRedirect(route('dashboard'));
+        $this->get('/mentor/radar')->assertRedirect(route('dashboard'));
     }
 
     public function test_mentor_tier_can_access_the_mentor_radar(): void
@@ -41,7 +41,7 @@ class TierGatingTest extends TestCase
         $user = User::factory()->create(['tier' => 'mentor']);
         $this->actingAs($user);
 
-        $this->get('/membros/mentor/radar')
+        $this->get('/mentor/radar')
             ->assertOk()
             ->assertSee('Radar do dia');
     }
@@ -51,7 +51,7 @@ class TierGatingTest extends TestCase
         $user = User::factory()->create(['tier' => 'start']);
         $this->actingAs($user);
 
-        $this->get('/membros/pessoas')->assertRedirect(route('membros.upgrade'));
+        $this->get('/pessoas')->assertRedirect(route('membros.upgrade'));
 
         $this->get(route('membros.upgrade'))
             ->assertOk()
@@ -67,7 +67,7 @@ class TierGatingTest extends TestCase
         $user = User::factory()->create(['tier' => 'start']);
         $this->actingAs($user);
 
-        $response = $this->get('/membros/cofre');
+        $response = $this->get('/cofre');
 
         $response->assertRedirect(route('membros.upgrade'));
         $this->get($response->headers->get('Location'))->assertOk();

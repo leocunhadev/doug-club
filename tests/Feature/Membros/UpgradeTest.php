@@ -15,28 +15,28 @@ class UpgradeTest extends TestCase
 
     public function test_guests_are_redirected_to_login(): void
     {
-        $this->get('/membros/upgrade')->assertRedirect(route('login'));
+        $this->get('/upgrade')->assertRedirect(route('login'));
     }
 
     public function test_club_tier_member_is_denied(): void
     {
         $this->actingAs(User::factory()->create(['tier' => 'club']));
 
-        $this->get('/membros/upgrade')->assertRedirect(route('dashboard'));
+        $this->get('/upgrade')->assertRedirect(route('dashboard'));
     }
 
     public function test_mentor_tier_member_is_denied(): void
     {
         $this->actingAs(User::factory()->create(['tier' => 'mentor']));
 
-        $this->get('/membros/upgrade')->assertRedirect(route('dashboard'));
+        $this->get('/upgrade')->assertRedirect(route('dashboard'));
     }
 
     public function test_start_tier_member_sees_the_page(): void
     {
         $this->actingAs(User::factory()->create(['tier' => 'start']));
 
-        $this->get('/membros/upgrade')
+        $this->get('/upgrade')
             ->assertOk()
             ->assertSee('Aplicar para o CLUB');
     }

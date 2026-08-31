@@ -24,14 +24,14 @@ class AgendaTest extends TestCase
 
     public function test_guests_are_redirected_to_login(): void
     {
-        $this->get('/membros/agenda')->assertRedirect('/login');
+        $this->get('/agenda')->assertRedirect('/login');
     }
 
     public function test_start_tier_is_redirected_to_the_upgrade_pitch(): void
     {
         $this->actingAs(User::factory()->create(['tier' => 'start']));
 
-        $this->get('/membros/agenda')->assertRedirect(route('membros.upgrade'));
+        $this->get('/agenda')->assertRedirect(route('membros.upgrade'));
     }
 
     public function test_club_member_without_a_session_sees_the_booking_calendar(): void

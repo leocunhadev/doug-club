@@ -22,7 +22,7 @@ class AulasTest extends TestCase
 
     public function test_guests_are_redirected_to_login(): void
     {
-        $this->get('/membros/aulas')->assertRedirect('/login');
+        $this->get('/aulas')->assertRedirect('/login');
     }
 
     public function test_regular_user_sees_the_lock_when_the_catalog_has_no_lessons_at_all(): void
@@ -265,7 +265,7 @@ class AulasTest extends TestCase
 
         $this->actingAs(User::factory()->create(['tier' => 'start']));
 
-        $this->get('/membros/aulas?lesson='.$deepLinkLesson->id)
+        $this->get('/aulas?lesson='.$deepLinkLesson->id)
             ->assertOk()
             ->assertSee("wire:key=\"hero-player-{$deepLinkLesson->id}\"", false);
     }
@@ -286,7 +286,7 @@ class AulasTest extends TestCase
 
         $this->actingAs(User::factory()->create(['tier' => 'start']));
 
-        $this->get('/membros/aulas?lesson='.$clubLesson->id)
+        $this->get('/aulas?lesson='.$clubLesson->id)
             ->assertOk()
             ->assertSee("wire:key=\"hero-player-{$startLesson->id}\"", false)
             ->assertDontSee("wire:key=\"hero-player-{$clubLesson->id}\"", false);
@@ -296,7 +296,7 @@ class AulasTest extends TestCase
     {
         $this->actingAs(User::factory()->create());
 
-        $this->get('/membros/aulas?lesson=999999')
+        $this->get('/aulas?lesson=999999')
             ->assertOk();
     }
 
@@ -421,7 +421,7 @@ class AulasTest extends TestCase
 
         $this->actingAs(User::factory()->create());
 
-        $this->get('/membros/aulas')
+        $this->get('/aulas')
             ->assertOk()
             ->assertSee(route('membros.aulas.materiais', $lesson), false);
     }

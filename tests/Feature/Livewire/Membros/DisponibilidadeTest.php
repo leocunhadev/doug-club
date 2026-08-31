@@ -15,14 +15,14 @@ class DisponibilidadeTest extends TestCase
 
     public function test_guests_are_redirected_to_login(): void
     {
-        $this->get('/membros/mentor/disponibilidade')->assertRedirect('/login');
+        $this->get('/mentor/disponibilidade')->assertRedirect('/login');
     }
 
     public function test_club_member_is_redirected_to_the_dashboard(): void
     {
         $this->actingAs(User::factory()->create(['tier' => 'club']));
 
-        $this->get('/membros/mentor/disponibilidade')->assertRedirect('/membros');
+        $this->get('/mentor/disponibilidade')->assertRedirect('/');
     }
 
     public function test_mentor_can_add_a_block(): void

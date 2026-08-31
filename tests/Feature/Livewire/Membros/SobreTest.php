@@ -14,7 +14,7 @@ class SobreTest extends TestCase
 
     public function test_guests_are_redirected_to_login(): void
     {
-        $this->get('/membros/sobre')->assertRedirect('/login');
+        $this->get('/sobre')->assertRedirect('/login');
     }
 
     public function test_page_renders_the_douglas_oliveira_bio(): void

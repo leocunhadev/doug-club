@@ -15,7 +15,7 @@ class CofreTest extends TestCase
 
     public function test_guests_are_redirected_to_login(): void
     {
-        $this->get('/membros/cofre')->assertRedirect('/login');
+        $this->get('/cofre')->assertRedirect('/login');
     }
 
     public function test_member_sees_only_their_own_documents(): void

@@ -151,11 +151,11 @@ class AuthenticationTest extends TestCase
         $this->get('/')->assertRedirect(route('mentor.radar'));
     }
 
-    public function test_root_redirects_club_tier_to_the_dashboard(): void
+    public function test_root_shows_the_dashboard_for_club_tier(): void
     {
         $user = User::factory()->create(['tier' => 'club']);
         $this->actingAs($user);
 
-        $this->get('/')->assertRedirect(route('dashboard'));
+        $this->get('/')->assertOk();
     }
 }

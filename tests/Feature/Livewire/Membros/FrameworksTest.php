@@ -17,7 +17,7 @@ class FrameworksTest extends TestCase
 
     public function test_guests_are_redirected_to_login(): void
     {
-        $this->get('/membros/frameworks')->assertRedirect('/login');
+        $this->get('/frameworks')->assertRedirect('/login');
     }
 
     public function test_start_tier_sees_every_framework(): void

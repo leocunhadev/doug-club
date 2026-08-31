@@ -46,14 +46,14 @@ class RadarTest extends TestCase
 
     public function test_guests_are_redirected_to_login(): void
     {
-        $this->get('/membros/mentor/radar')->assertRedirect(route('login'));
+        $this->get('/mentor/radar')->assertRedirect(route('login'));
     }
 
     public function test_club_tier_member_is_denied(): void
     {
         $this->actingAs(User::factory()->create(['tier' => 'club']));
 
-        $this->get('/membros/mentor/radar')->assertRedirect(route('dashboard'));
+        $this->get('/mentor/radar')->assertRedirect(route('dashboard'));
     }
 
     public function test_today_kpi_counts_only_non_cancelled_sessions_scheduled_today(): void

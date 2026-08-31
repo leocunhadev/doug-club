@@ -15,14 +15,14 @@ class PessoasTest extends TestCase
 
     public function test_guests_are_redirected_to_login(): void
     {
-        $this->get('/membros/pessoas')->assertRedirect(route('login'));
+        $this->get('/pessoas')->assertRedirect(route('login'));
     }
 
     public function test_non_club_tier_member_is_denied(): void
     {
         $this->actingAs(User::factory()->create(['tier' => 'start']));
 
-        $this->get('/membros/pessoas')->assertRedirect(route('membros.upgrade'));
+        $this->get('/pessoas')->assertRedirect(route('membros.upgrade'));
     }
 
     public function test_lists_other_club_members_but_not_the_logged_in_user(): void

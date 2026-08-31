@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'active' => \App\Http\Middleware\EnsureAccessIsActive::class,
             'tier' => \App\Http\Middleware\EnsureTier::class,
+            'redirect-mentor-from-dashboard' => \App\Http\Middleware\RedirectMentorFromDashboard::class,
         ]);
 
         $middleware->validateCsrfTokens(except: [

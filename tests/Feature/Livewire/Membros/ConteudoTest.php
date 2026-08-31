@@ -17,21 +17,21 @@ class ConteudoTest extends TestCase
 
     public function test_guests_are_redirected_to_login(): void
     {
-        $this->get('/membros/mentor/conteudo')->assertRedirect('/login');
+        $this->get('/mentor/conteudo')->assertRedirect('/login');
     }
 
     public function test_club_member_is_redirected_to_the_dashboard(): void
     {
         $this->actingAs(User::factory()->create(['tier' => 'club']));
 
-        $this->get('/membros/mentor/conteudo')->assertRedirect('/membros');
+        $this->get('/mentor/conteudo')->assertRedirect('/');
     }
 
     public function test_mentor_can_access_the_page(): void
     {
         $this->actingAs(User::factory()->create(['tier' => 'mentor']));
 
-        $this->get('/membros/mentor/conteudo')->assertOk();
+        $this->get('/mentor/conteudo')->assertOk();
     }
 
     public function test_publishing_a_lesson_creates_it_with_smart_defaults(): void

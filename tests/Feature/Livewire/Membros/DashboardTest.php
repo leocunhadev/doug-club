@@ -21,7 +21,7 @@ class DashboardTest extends TestCase
 
     public function test_guests_are_redirected_to_login(): void
     {
-        $this->get('/membros')->assertRedirect('/login');
+        $this->get('/')->assertRedirect('/login');
     }
 
     public function test_the_global_toast_component_is_present_on_the_page(): void
@@ -374,10 +374,10 @@ class DashboardTest extends TestCase
             ->assertSee(route('membros.aulas.materiais', $lesson), false);
     }
 
-    public function test_membros_page_renders_through_the_paper_layout(): void
+    public function test_dashboard_page_renders_through_the_paper_layout(): void
     {
         $this->actingAs(User::factory()->create())
-            ->get('/membros')
+            ->get('/')
             ->assertOk()
             ->assertSee('bg-paper', false);
     }
@@ -473,16 +473,16 @@ class DashboardTest extends TestCase
         $html = Livewire::test(Dashboard::class)->html();
 
         $this->assertMatchesRegularExpression(
-            '#<a[^>]*href="http://localhost/membros/agenda"[^>]*>\s*Marcar minha sessão#s',
+            '#<a[^>]*href="http://localhost/agenda"[^>]*>\s*Marcar minha sessão#s',
             $html,
         );
 
         $this->assertMatchesRegularExpression(
-            '#<a[^>]*href="http://localhost/membros/aulas"[^>]*>\s*Biblioteca de aulas#s',
+            '#<a[^>]*href="http://localhost/aulas"[^>]*>\s*Biblioteca de aulas#s',
             $html,
         );
         $this->assertMatchesRegularExpression(
-            '#<a[^>]*href="http://localhost/membros/frameworks"[^>]*>\s*Frameworks DO#s',
+            '#<a[^>]*href="http://localhost/frameworks"[^>]*>\s*Frameworks DO#s',
             $html,
         );
     }

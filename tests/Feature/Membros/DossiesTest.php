@@ -17,14 +17,14 @@ class DossiesTest extends TestCase
 
     public function test_guests_are_redirected_to_login(): void
     {
-        $this->get('/membros/mentor/dossies')->assertRedirect(route('login'));
+        $this->get('/mentor/dossies')->assertRedirect(route('login'));
     }
 
     public function test_club_tier_member_is_denied(): void
     {
         $this->actingAs(User::factory()->create(['tier' => 'club']));
 
-        $this->get('/membros/mentor/dossies')->assertRedirect(route('dashboard'));
+        $this->get('/mentor/dossies')->assertRedirect(route('dashboard'));
     }
 
     public function test_page_lists_all_club_members(): void

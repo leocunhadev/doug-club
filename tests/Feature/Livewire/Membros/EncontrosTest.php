@@ -36,14 +36,14 @@ class EncontrosTest extends TestCase
 
     public function test_guests_are_redirected_to_login(): void
     {
-        $this->get('/membros/encontros')->assertRedirect('/login');
+        $this->get('/encontros')->assertRedirect('/login');
     }
 
     public function test_start_tier_is_redirected_to_the_upgrade_pitch(): void
     {
         $this->actingAs(User::factory()->create(['tier' => 'start']));
 
-        $this->get('/membros/encontros')->assertRedirect(route('membros.upgrade'));
+        $this->get('/encontros')->assertRedirect(route('membros.upgrade'));
     }
 
     public function test_club_tier_can_access_the_page(): void
@@ -52,14 +52,14 @@ class EncontrosTest extends TestCase
 
         $this->actingAs(User::factory()->create(['tier' => 'club']));
 
-        $this->get('/membros/encontros')->assertOk()->assertSee('Encontros do grupo');
+        $this->get('/encontros')->assertOk()->assertSee('Encontros do grupo');
     }
 
     public function test_mentor_tier_can_access_the_page(): void
     {
         $this->actingAs(User::factory()->create(['tier' => 'mentor']));
 
-        $this->get('/membros/encontros')->assertOk();
+        $this->get('/encontros')->assertOk();
     }
 
     public function test_upcoming_come_first_ascending_then_past_descending(): void

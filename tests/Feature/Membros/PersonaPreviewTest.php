@@ -14,7 +14,7 @@ class PersonaPreviewTest extends TestCase
     {
         $this->actingAs(User::factory()->create(['is_admin' => false]));
 
-        $this->get('/membros')
+        $this->get('/')
             ->assertOk()
             ->assertDontSee('class="planswitch"', false);
     }
@@ -23,7 +23,7 @@ class PersonaPreviewTest extends TestCase
     {
         $this->actingAs(User::factory()->create(['is_admin' => true, 'tier' => 'club']));
 
-        $this->get('/membros')
+        $this->get('/')
             ->assertOk()
             ->assertSee('class="planswitch"', false)
             ->assertSee('Start')
@@ -54,7 +54,7 @@ class PersonaPreviewTest extends TestCase
 
         $this->get(route('membros.preview-persona', ['tier' => 'start']))->assertRedirect(route('dashboard'));
 
-        $html = $this->get('/membros')->assertOk()->getContent();
+        $html = $this->get('/')->assertOk()->getContent();
 
         // The full club-only nav is shown even when previewing as start,
         // but locked (with a padlock) — unlike the real club-tier nav.
@@ -69,7 +69,7 @@ class PersonaPreviewTest extends TestCase
 
         $this->get(route('membros.preview-persona', ['tier' => 'start']));
 
-        $this->get('/membros')
+        $this->get('/')
             ->assertOk()
             ->assertSee('class="start-tag"', false);
     }
@@ -84,7 +84,7 @@ class PersonaPreviewTest extends TestCase
 
         $this->assertFalse(session()->has('admin_persona_preview'));
 
-        $this->get('/membros')
+        $this->get('/')
             ->assertOk()
             ->assertDontSee('class="start-tag"', false);
     }
@@ -112,6 +112,6 @@ class PersonaPreviewTest extends TestCase
         $this->get(route('membros.preview-persona', ['tier' => 'mentor']));
 
         // Previewing "mentor" must not grant real access to the mentor-only route.
-        $this->get('/membros/mentor/radar')->assertRedirect(route('dashboard'));
+        $this->get('/mentor/radar')->assertRedirect(route('dashboard'));
     }
 }

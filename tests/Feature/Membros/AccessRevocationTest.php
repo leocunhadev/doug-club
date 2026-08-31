@@ -16,11 +16,11 @@ class AccessRevocationTest extends TestCase
 
         $this->actingAs($user);
 
-        $this->get('/membros')->assertOk();
+        $this->get('/')->assertOk();
 
         $user->update(['access_revoked_at' => now()]);
 
-        $this->get('/membros')->assertRedirect('/login');
+        $this->get('/')->assertRedirect('/login');
 
         $this->assertGuest();
     }
