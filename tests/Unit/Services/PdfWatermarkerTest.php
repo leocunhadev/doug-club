@@ -17,6 +17,22 @@ class PdfWatermarkerTest extends TestCase
         return $pdf->Output('S');
     }
 
+    private function extractText(string $pdf): string
+    {
+        $text = '';
+        preg_match_all('/stream\r?\n(.*?)endstream/s', $pdf, $matches);
+
+        foreach ($matches[1] as $raw) {
+            $decompressed = @gzuncompress(rtrim($raw, "\r\n"));
+
+            if ($decompressed !== false) {
+                $text .= $decompressed;
+            }
+        }
+
+        return $text;
+    }
+
     public function test_stamp_returns_a_different_valid_pdf(): void
     {
         $original = $this->samplePdfBytes();
@@ -28,6 +44,19 @@ class PdfWatermarkerTest extends TestCase
 
         $this->assertStringStartsWith('%PDF', $stamped);
         $this->assertNotSame($original, $stamped);
+    }
+
+    public function test_stamp_actually_draws_the_watermark_text_on_the_page(): void
+    {
+        $original = $this->samplePdfBytes();
+        $stampText = 'Ricardo Mendes · ricardo@empresa.com · baixado em 31/08/2026';
+
+        $stamped = (new PdfWatermarker)->stamp($original, $stampText);
+
+        $decoded = $this->extractText($stamped);
+        $expected = iconv('UTF-8', 'ISO-8859-1//TRANSLIT', $stampText);
+
+        $this->assertStringContainsString($expected, $decoded);
     }
 
     public function test_stamp_handles_accented_characters_without_throwing(): void

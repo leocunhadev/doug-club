@@ -41,7 +41,13 @@ class VaultDocumentOpenController extends Controller
 
     private function downloadWatermarkedPdf(VaultDocument $document, PdfWatermarker $watermarker, string $filename): StreamedResponse
     {
+        if (Storage::disk('public')->size($document->file_path) > 20 * 1024 * 1024) {
+            return Storage::disk('public')->download($document->file_path, $filename);
+        }
+
         $original = Storage::disk('public')->get($document->file_path);
+        abort_if(is_null($original), 404);
+
         $user = request()->user();
         $stampText = "{$user->name} · {$user->email} · baixado em ".now()->format('d/m/Y');
 

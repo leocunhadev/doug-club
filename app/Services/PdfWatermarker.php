@@ -8,7 +8,7 @@ class PdfWatermarker
 {
     public function stamp(string $pdfContents, string $stampText): string
     {
-        $stream = fopen('php://temp', 'rb+');
+        $stream = fopen('php://memory', 'rb+');
         fwrite($stream, $pdfContents);
         rewind($stream);
 
