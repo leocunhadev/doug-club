@@ -65,6 +65,16 @@
             <p class="text-stone mb-6">Nenhuma ponte sugerida no momento.</p>
         @endforelse
 
+        @if ($this->engagedStartMembers->isNotEmpty())
+            <div class="match rounded-[18px] border border-sand bg-card shadow-[0_1px_2px_rgba(11,11,12,.05),0_10px_28px_rgba(11,11,12,.07)]">
+                <div class="d">
+                    <b>{{ $this->engagedStartMembers->count() }} {{ Str::plural('membro', $this->engagedStartMembers->count()) }} Start</b>
+                    assistiram todas as aulas e baixaram 2+ frameworks: {{ $this->engagedStartMembers->pluck('name')->join(', ') }}.
+                    <em>Prontos para o convite ao CLUB.</em>
+                </div>
+            </div>
+        @endif
+
         <h3 class="text-[17px] font-semibold mt-6 mb-3">Antes das sessões de hoje</h3>
         @forelse ($this->todaySessions as $session)
             <div class="rounded-[18px] border border-sand bg-card shadow-[0_1px_2px_rgba(11,11,12,.05),0_10px_28px_rgba(11,11,12,.07)] briefing-card border-l-4 border-brand p-[22px] mb-3">

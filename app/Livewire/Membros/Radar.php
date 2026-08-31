@@ -5,7 +5,10 @@ namespace App\Livewire\Membros;
 use App\Livewire\Concerns\ComputesUserInitials;
 use App\Models\BridgeRequest;
 use App\Models\EncontroFeedback;
+use App\Models\FrameworkDownload;
+use App\Models\Lesson;
 use App\Models\LessonFeedback;
+use App\Models\LessonProgress;
 use App\Models\MentorCommitment;
 use App\Models\MentorNote;
 use App\Models\MentorSession;
@@ -140,6 +143,42 @@ class Radar extends Component
         session()->flash('bridge-made', "Apresentação enviada para {$learner->name} e {$teacher->name}.");
 
         unset($this->suggestedBridges);
+    }
+
+    #[Computed]
+    public function engagedStartMembers(): Collection
+    {
+        $startLessonIds = Lesson::query()
+            ->where('tier', 'start')
+            ->whereNotNull('published_at')
+            ->pluck('id');
+
+        if ($startLessonIds->isEmpty()) {
+            return collect();
+        }
+
+        return User::query()
+            ->where('tier', 'start')
+            ->get()
+            ->filter(function (User $member) use ($startLessonIds) {
+                $completedCount = LessonProgress::query()
+                    ->where('user_id', $member->id)
+                    ->where('status', 'completed')
+                    ->whereIn('lesson_id', $startLessonIds)
+                    ->count();
+
+                if ($completedCount < $startLessonIds->count()) {
+                    return false;
+                }
+
+                $distinctFrameworksDownloaded = FrameworkDownload::query()
+                    ->where('user_id', $member->id)
+                    ->distinct('framework_id')
+                    ->count('framework_id');
+
+                return $distinctFrameworksDownloaded >= 2;
+            })
+            ->values();
     }
 
     public function lastNoteFor(int $memberId): ?MentorNote

@@ -7,8 +7,11 @@ use App\Models\BridgeRequest;
 use App\Models\Course;
 use App\Models\Encontro;
 use App\Models\EncontroFeedback;
+use App\Models\Framework;
+use App\Models\FrameworkDownload;
 use App\Models\Lesson;
 use App\Models\LessonFeedback;
+use App\Models\LessonProgress;
 use App\Models\MentorCommitment;
 use App\Models\MentorNote;
 use App\Models\MentorSession;
@@ -23,14 +26,14 @@ class RadarTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function lesson(): Lesson
+    private function lesson(array $overrides = []): Lesson
     {
         $course = Course::create(['label' => 'Curso 1', 'title' => 'Vendas', 'position' => 10]);
 
-        return Lesson::create([
+        return Lesson::create(array_merge([
             'course_id' => $course->id, 'number' => 1, 'title' => 'Aula 1',
             'video_provider' => 'vimeo', 'video_id' => '76979871', 'published_at' => '2026-01-01', 'position' => 1,
-        ]);
+        ], $overrides));
     }
 
     private function encontro(): Encontro
@@ -343,5 +346,69 @@ class RadarTest extends TestCase
         Livewire::test(Radar::class)
             ->call('makeBridge', $learner->id, $teacher->id, 'Precificação')
             ->assertSee('Nenhuma ponte sugerida no momento.');
+    }
+
+    public function test_engaged_start_member_shown_when_all_lessons_completed_and_two_frameworks_downloaded(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+        $member = User::factory()->create(['tier' => 'start', 'name' => 'Ana Beatriz']);
+        $lesson = $this->lesson(['tier' => 'start']);
+
+        LessonProgress::create(['user_id' => $member->id, 'lesson_id' => $lesson->id, 'status' => 'completed']);
+        FrameworkDownload::create(['user_id' => $member->id, 'framework_id' => Framework::create(['code' => 'A', 'title' => 'Framework A', 'description' => 'x', 'position' => 1])->id]);
+        FrameworkDownload::create(['user_id' => $member->id, 'framework_id' => Framework::create(['code' => 'B', 'title' => 'Framework B', 'description' => 'x', 'position' => 2])->id]);
+
+        Livewire::test(Radar::class)
+            ->assertSee('1 membro Start')
+            ->assertSee('Ana Beatriz')
+            ->assertSee('Prontos para o convite ao CLUB.');
+    }
+
+    public function test_engaged_start_member_not_shown_when_only_one_framework_downloaded(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+        $member = User::factory()->create(['tier' => 'start', 'name' => 'Carla Nunes']);
+        $lesson = $this->lesson(['tier' => 'start']);
+
+        LessonProgress::create(['user_id' => $member->id, 'lesson_id' => $lesson->id, 'status' => 'completed']);
+        FrameworkDownload::create(['user_id' => $member->id, 'framework_id' => Framework::create(['code' => 'A', 'title' => 'Framework A', 'description' => 'x', 'position' => 1])->id]);
+
+        Livewire::test(Radar::class)->assertDontSee('Carla Nunes');
+    }
+
+    public function test_engaged_start_member_not_shown_when_not_all_lessons_completed(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+        $member = User::factory()->create(['tier' => 'start', 'name' => 'Diego Ramos']);
+        $this->lesson(['tier' => 'start']);
+        $this->lesson(['tier' => 'start', 'number' => 2]);
+        $completedLesson = Lesson::query()->where('number', 1)->first();
+
+        LessonProgress::create(['user_id' => $member->id, 'lesson_id' => $completedLesson->id, 'status' => 'completed']);
+        FrameworkDownload::create(['user_id' => $member->id, 'framework_id' => Framework::create(['code' => 'A', 'title' => 'Framework A', 'description' => 'x', 'position' => 1])->id]);
+        FrameworkDownload::create(['user_id' => $member->id, 'framework_id' => Framework::create(['code' => 'B', 'title' => 'Framework B', 'description' => 'x', 'position' => 2])->id]);
+
+        Livewire::test(Radar::class)->assertDontSee('Diego Ramos');
+    }
+
+    public function test_repeated_download_of_the_same_framework_does_not_count_as_two(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+        $member = User::factory()->create(['tier' => 'start', 'name' => 'Elton Braga']);
+        $lesson = $this->lesson(['tier' => 'start']);
+        $framework = Framework::create(['code' => 'A', 'title' => 'Framework A', 'description' => 'x', 'position' => 1]);
+
+        LessonProgress::create(['user_id' => $member->id, 'lesson_id' => $lesson->id, 'status' => 'completed']);
+        FrameworkDownload::create(['user_id' => $member->id, 'framework_id' => $framework->id]);
+        FrameworkDownload::create(['user_id' => $member->id, 'framework_id' => $framework->id]);
+
+        Livewire::test(Radar::class)->assertDontSee('Elton Braga');
+    }
+
+    public function test_no_engaged_start_members_card_when_there_are_no_start_lessons(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'mentor']));
+
+        Livewire::test(Radar::class)->assertDontSee('Prontos para o convite ao CLUB.');
     }
 }
