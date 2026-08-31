@@ -12,13 +12,8 @@
                 </p>
             </div>
 
-            <x-lesson-player :lesson="$this->featuredLesson" :progress="$this->featuredProgress" :has-feedback="$this->featuredHasFeedback" />
+            <x-lesson-player :lesson="$this->featuredLesson" :progress="$this->featuredProgress" :has-feedback="$this->featuredHasFeedback" :total-count="$this->totalCount" />
             <x-nps-modal />
-
-            <p class="mt-4 text-sm text-stone">
-                Você está assistindo agora: <b class="font-semibold text-ink">{{ $this->featuredLesson && $this->featuredLesson->isAvailableFor(auth()->user()) ? $this->featuredLesson->title : '—' }}</b>
-                · {{ $this->totalCount }} {{ Str::plural('aula', $this->totalCount) }} na sua biblioteca
-            </p>
 
             <div class="mt-6 flex flex-wrap items-center gap-2">
                 @foreach (['Tudo', 'Encontros', 'Convidados', 'Frameworks'] as $cat)

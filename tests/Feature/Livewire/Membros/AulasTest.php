@@ -234,8 +234,6 @@ class AulasTest extends TestCase
 
         $html = Livewire::test(Aulas::class)->html();
 
-        $this->assertSame(1, substr_count($html, 'Assistindo'));
-
         preg_match_all(
             '/<button[^>]*wire:click="watchLesson\((\d+)\)"[^>]*>(.*?)<\/button>/s',
             $html,

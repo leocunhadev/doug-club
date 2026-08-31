@@ -1,4 +1,4 @@
-@props(['lesson', 'progress', 'hasFeedback' => false])
+@props(['lesson', 'progress', 'hasFeedback' => false, 'totalCount' => null])
 
 @if ($lesson && $lesson->isAvailableFor(auth()->user()))
     <div
@@ -26,6 +26,13 @@
                 class="pointer-events-none absolute select-none whitespace-nowrap text-xs font-medium text-white/40 [text-shadow:0_1px_2px_rgba(0,0,0,.6)]"
             >{{ auth()->user()->email }}</span>
         </div>
+
+        @if ($totalCount !== null)
+            <div class="-mx-3 -mb-3 mt-3 flex flex-wrap items-center justify-between gap-2.5 rounded-b-2xl bg-black px-4 py-3 text-[13px] text-white/70 sm:-mx-4 sm:-mb-4">
+                <span>Assistindo agora: <b class="font-semibold text-white">{{ $lesson->title }}</b></span>
+                <span>{{ $totalCount }} {{ Str::plural('aula', $totalCount) }} na sua biblioteca</span>
+            </div>
+        @endif
     </div>
 
     <div class="mt-4">
