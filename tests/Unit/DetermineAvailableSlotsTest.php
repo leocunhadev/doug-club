@@ -117,6 +117,22 @@ class DetermineAvailableSlotsTest extends TestCase
         $this->assertCount(1, $slots);
     }
 
+    public function test_an_inactive_block_yields_no_slots(): void
+    {
+        $mentor = $this->mentor();
+        $targetDate = now()->addDays(5)->startOfDay();
+
+        MentorAvailability::create([
+            'mentor_id' => $mentor->id, 'day_of_week' => $targetDate->dayOfWeek,
+            'start_time' => '09:00', 'end_time' => '12:00', 'active' => false,
+        ]);
+
+        $slots = (new DetermineAvailableSlots)->handle($mentor)
+            ->filter(fn ($slot) => $slot->isSameDay($targetDate));
+
+        $this->assertCount(0, $slots);
+    }
+
     public function test_slots_beyond_the_14_day_window_are_excluded(): void
     {
         $mentor = $this->mentor();

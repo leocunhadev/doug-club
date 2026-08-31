@@ -15,11 +15,17 @@ class MentorAvailability extends Model
         'day_of_week',
         'start_time',
         'end_time',
+        'active',
     ];
 
     protected $casts = [
         'start_time' => 'datetime:H:i',
         'end_time' => 'datetime:H:i',
+        'active' => 'boolean',
+    ];
+
+    protected $attributes = [
+        'active' => true,
     ];
 
     public function mentor(): BelongsTo

@@ -214,6 +214,15 @@
     background: #fff;
     transition: .2s;
 }
+.disp-block.off {
+    border-color: theme('colors.sand');
+}
+.disp-block.off .sw {
+    background: theme('colors.sand');
+}
+.disp-block.off .sw::after {
+    left: 3px;
+}
 .cofre-note {
     display: flex;
     gap: 12px;

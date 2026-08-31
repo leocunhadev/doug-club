@@ -16,7 +16,7 @@ class DetermineAvailableSlots
     /** @return Collection<int, \Carbon\Carbon> */
     public function handle(User $mentor): Collection
     {
-        $availabilities = MentorAvailability::query()->where('mentor_id', $mentor->id)->get();
+        $availabilities = MentorAvailability::query()->where('mentor_id', $mentor->id)->where('active', true)->get();
 
         $bookedSlots = MentorSession::query()
             ->where('mentor_id', $mentor->id)

@@ -73,6 +73,29 @@ class Disponibilidade extends Component
         unset($this->blocks);
     }
 
+    public function toggleBlock(int $blockId): void
+    {
+        $block = MentorAvailability::query()
+            ->where('id', $blockId)
+            ->where('mentor_id', Auth::id())
+            ->first();
+
+        if (! $block) {
+            return;
+        }
+
+        $block->update(['active' => ! $block->active]);
+
+        $days = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+        $label = "{$days[$block->day_of_week]}, {$block->start_time->format('H:i')} às {$block->end_time->format('H:i')}";
+
+        $this->dispatch('toast', message: $block->active
+            ? "{$label} aberto para os mentorados."
+            : "{$label} fechado.");
+
+        unset($this->blocks);
+    }
+
     public function render()
     {
         return view('livewire.membros.disponibilidade');

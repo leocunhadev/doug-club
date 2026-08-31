@@ -141,4 +141,55 @@ class DisponibilidadeTest extends TestCase
 
         $this->assertDatabaseHas('mentor_availabilities', ['id' => $block->id]);
     }
+
+    public function test_mentor_can_toggle_their_own_block_off_and_on(): void
+    {
+        $mentor = User::factory()->create(['tier' => 'mentor']);
+        $block = MentorAvailability::create([
+            'mentor_id' => $mentor->id, 'day_of_week' => 2, 'start_time' => '09:00', 'end_time' => '12:00',
+        ]);
+
+        $this->actingAs($mentor);
+
+        Livewire::test(Disponibilidade::class)
+            ->call('toggleBlock', $block->id)
+            ->assertDispatched('toast', message: 'Terça, 09:00 às 12:00 fechado.');
+
+        $this->assertFalse($block->fresh()->active);
+
+        Livewire::test(Disponibilidade::class)
+            ->call('toggleBlock', $block->id)
+            ->assertDispatched('toast', message: 'Terça, 09:00 às 12:00 aberto para os mentorados.');
+
+        $this->assertTrue($block->fresh()->active);
+    }
+
+    public function test_mentor_cannot_toggle_another_mentors_block(): void
+    {
+        $owner = User::factory()->create(['tier' => 'mentor']);
+        $otherMentor = User::factory()->create(['tier' => 'mentor']);
+        $block = MentorAvailability::create([
+            'mentor_id' => $owner->id, 'day_of_week' => 2, 'start_time' => '09:00', 'end_time' => '12:00',
+        ]);
+
+        $this->actingAs($otherMentor);
+
+        Livewire::test(Disponibilidade::class)->call('toggleBlock', $block->id);
+
+        $this->assertTrue($block->fresh()->active);
+    }
+
+    public function test_deactivating_a_block_does_not_delete_it(): void
+    {
+        $mentor = User::factory()->create(['tier' => 'mentor']);
+        $block = MentorAvailability::create([
+            'mentor_id' => $mentor->id, 'day_of_week' => 2, 'start_time' => '09:00', 'end_time' => '12:00',
+        ]);
+
+        $this->actingAs($mentor);
+
+        Livewire::test(Disponibilidade::class)->call('toggleBlock', $block->id);
+
+        $this->assertDatabaseHas('mentor_availabilities', ['id' => $block->id, 'active' => false]);
+    }
 }

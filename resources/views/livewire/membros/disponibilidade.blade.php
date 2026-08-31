@@ -44,12 +44,17 @@
 
         <div class="disp-grid max-w-3xl">
             @forelse ($this->blocks as $block)
-                <button type="button" wire:click="removeBlock({{ $block->id }})"
-                        class="disp-block rounded-[18px] border border-sand bg-card shadow-[0_1px_2px_rgba(11,11,12,.05),0_10px_28px_rgba(11,11,12,.07)]">
-                    <b>{{ ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'][$block->day_of_week] }}</b>
-                    <small>{{ $block->start_time->format('H:i') }} às {{ $block->end_time->format('H:i') }}</small>
-                    <div class="sw"></div>
-                </button>
+                <div class="disp-block {{ ! $block->active ? 'off' : '' }} rounded-[18px] border border-sand bg-card shadow-[0_1px_2px_rgba(11,11,12,.05),0_10px_28px_rgba(11,11,12,.07)]">
+                    <button type="button" wire:click="toggleBlock({{ $block->id }})" class="block w-full text-left">
+                        <b>{{ ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'][$block->day_of_week] }}</b>
+                        <small>{{ $block->start_time->format('H:i') }} às {{ $block->end_time->format('H:i') }}</small>
+                        <div class="sw"></div>
+                    </button>
+                    <button type="button" wire:click="removeBlock({{ $block->id }})"
+                            class="mt-2 text-xs text-stone hover:text-brand underline">
+                        Excluir
+                    </button>
+                </div>
             @empty
                 <p class="text-stone col-span-full">Nenhum bloco de disponibilidade ainda.</p>
             @endforelse

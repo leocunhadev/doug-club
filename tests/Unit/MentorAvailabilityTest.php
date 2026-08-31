@@ -32,6 +32,16 @@ class MentorAvailabilityTest extends TestCase
         $this->assertSame('12:00', $block->end_time->format('H:i'));
     }
 
+    public function test_a_new_block_is_active_by_default(): void
+    {
+        $mentor = User::factory()->create(['tier' => 'mentor']);
+        $block = MentorAvailability::create([
+            'mentor_id' => $mentor->id, 'day_of_week' => 2, 'start_time' => '09:00', 'end_time' => '12:00',
+        ]);
+
+        $this->assertTrue($block->active);
+    }
+
     public function test_block_is_deleted_when_the_mentor_is_deleted(): void
     {
         $mentor = User::factory()->create(['tier' => 'mentor']);
