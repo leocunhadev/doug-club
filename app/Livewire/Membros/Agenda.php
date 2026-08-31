@@ -22,6 +22,8 @@ class Agenda extends Component
 
     public ?string $selectedDate = null;
 
+    public ?string $selectedSlot = null;
+
     #[Computed]
     public function mentor(): ?User
     {
@@ -52,9 +54,10 @@ class Agenda extends Component
     public function selectDate(string $date): void
     {
         $this->selectedDate = $date;
+        $this->selectedSlot = null;
     }
 
-    public function bookSlot(string $slot, BookMentorSession $action): void
+    public function selectSlot(string $slot): void
     {
         if (! $this->mentor || $this->upcomingSession) {
             return;
@@ -66,11 +69,37 @@ class Agenda extends Component
             return;
         }
 
+        $this->selectedSlot = $slot;
+    }
+
+    public function clearSelection(): void
+    {
+        $this->selectedSlot = null;
+    }
+
+    public function confirmBooking(BookMentorSession $action): void
+    {
+        if (! $this->selectedSlot || ! $this->mentor || $this->upcomingSession) {
+            return;
+        }
+
+        $scheduledAt = Carbon::parse($this->selectedSlot);
+
+        if (! $this->availableSlots->contains(fn ($s) => $s->equalTo($scheduledAt))) {
+            $this->selectedSlot = null;
+
+            return;
+        }
+
         $session = $action->handle($this->mentor, Auth::user(), $scheduledAt);
 
         if (! $session) {
             $this->dispatch('toast', message: 'Esse horário acabou de ser preenchido. Escolha outro.');
+        } else {
+            $this->dispatch('toast', message: "Sessão confirmada para {$scheduledAt->format('d/m')} às {$scheduledAt->format('H:i')}. Convite e lembrete no seu e-mail.");
         }
+
+        $this->selectedSlot = null;
 
         unset($this->availableSlots, $this->upcomingSession);
     }

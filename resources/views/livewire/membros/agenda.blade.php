@@ -67,11 +67,31 @@
                 @if ($selectedDate && $slotsByDay->has($selectedDate))
                     <div class="mt-4 flex flex-wrap gap-2">
                         @foreach ($slotsByDay->get($selectedDate) as $slot)
-                            <button type="button" wire:click="bookSlot('{{ $slot->toIso8601String() }}')"
-                                    class="px-3.5 py-1.5 rounded-full text-sm font-medium border border-sand bg-card text-ink hover:border-black">
+                            <button type="button" wire:click="selectSlot('{{ $slot->toIso8601String() }}')"
+                                    class="px-3.5 py-1.5 rounded-full text-sm font-medium border {{ $selectedSlot === $slot->toIso8601String() ? 'bg-black text-white border-black' : 'border-sand bg-card text-ink hover:border-black' }}">
                                 {{ $slot->format('H:i') }}
                             </button>
                         @endforeach
+                    </div>
+                @endif
+
+                @if ($selectedSlot)
+                    @php $selectedSlotAt = \Carbon\Carbon::parse($selectedSlot); @endphp
+                    <div class="mt-4 max-w-md rounded-[18px] border border-sand bg-card p-6">
+                        <p class="text-xs font-bold uppercase tracking-widest text-stone mb-1">Confirmar sessão</p>
+                        <p class="font-display text-lg">{{ $selectedSlotAt->format('d/m/Y \à\s H:i') }}</p>
+                        <p class="text-sm text-stone mt-1">Sessão 1:1 · 90 minutos</p>
+
+                        <div class="mt-4 flex items-center gap-3">
+                            <button type="button" wire:click="confirmBooking"
+                                    class="px-4 py-2 rounded-full text-sm font-semibold bg-black text-white hover:bg-brand">
+                                Confirmar sessão
+                            </button>
+                            <button type="button" wire:click="clearSelection"
+                                    class="text-sm text-stone hover:text-ink underline">
+                                Trocar horário
+                            </button>
+                        </div>
                     </div>
                 @endif
             @endif

@@ -75,7 +75,30 @@ class AgendaTest extends TestCase
             ->assertSee('Cancelar sessão');
     }
 
-    public function test_booking_a_valid_slot_creates_the_session(): void
+    public function test_selecting_a_slot_shows_the_confirmation_card_without_booking_it(): void
+    {
+        $mentor = $this->mentor();
+        $targetDate = now()->addDays(5)->startOfDay();
+        MentorAvailability::create([
+            'mentor_id' => $mentor->id, 'day_of_week' => $targetDate->dayOfWeek,
+            'start_time' => '09:00', 'end_time' => '10:30',
+        ]);
+
+        $member = User::factory()->create(['tier' => 'club']);
+        $this->actingAs($member);
+
+        $slot = $targetDate->copy()->setTime(9, 0);
+
+        Livewire::test(Agenda::class)
+            ->call('selectDate', $targetDate->format('Y-m-d'))
+            ->call('selectSlot', $slot->toIso8601String())
+            ->assertSee('Confirmar sessão')
+            ->assertDontSee('Cancelar sessão');
+
+        $this->assertDatabaseMissing('mentor_sessions', ['member_id' => $member->id]);
+    }
+
+    public function test_confirming_a_selected_slot_creates_the_session(): void
     {
         Notification::fake();
         Queue::fake();
@@ -93,7 +116,9 @@ class AgendaTest extends TestCase
         $slot = $targetDate->copy()->setTime(9, 0);
 
         Livewire::test(Agenda::class)
-            ->call('bookSlot', $slot->toIso8601String())
+            ->call('selectDate', $targetDate->format('Y-m-d'))
+            ->call('selectSlot', $slot->toIso8601String())
+            ->call('confirmBooking')
             ->assertSee('Cancelar sessão');
 
         $this->assertDatabaseHas('mentor_sessions', [
@@ -101,7 +126,54 @@ class AgendaTest extends TestCase
         ]);
     }
 
-    public function test_booking_a_slot_not_in_the_available_list_is_ignored(): void
+    public function test_clearing_the_selection_hides_the_confirmation_card(): void
+    {
+        $mentor = $this->mentor();
+        $targetDate = now()->addDays(5)->startOfDay();
+        MentorAvailability::create([
+            'mentor_id' => $mentor->id, 'day_of_week' => $targetDate->dayOfWeek,
+            'start_time' => '09:00', 'end_time' => '10:30',
+        ]);
+
+        $member = User::factory()->create(['tier' => 'club']);
+        $this->actingAs($member);
+
+        $slot = $targetDate->copy()->setTime(9, 0);
+
+        Livewire::test(Agenda::class)
+            ->call('selectDate', $targetDate->format('Y-m-d'))
+            ->call('selectSlot', $slot->toIso8601String())
+            ->call('clearSelection')
+            ->assertDontSee('Confirmar sessão');
+    }
+
+    public function test_changing_the_date_clears_a_pending_selection(): void
+    {
+        $mentor = $this->mentor();
+        $firstDate = now()->addDays(5)->startOfDay();
+        $secondDate = now()->addDays(6)->startOfDay();
+        MentorAvailability::create([
+            'mentor_id' => $mentor->id, 'day_of_week' => $firstDate->dayOfWeek,
+            'start_time' => '09:00', 'end_time' => '10:30',
+        ]);
+        MentorAvailability::create([
+            'mentor_id' => $mentor->id, 'day_of_week' => $secondDate->dayOfWeek,
+            'start_time' => '09:00', 'end_time' => '10:30',
+        ]);
+
+        $member = User::factory()->create(['tier' => 'club']);
+        $this->actingAs($member);
+
+        $slot = $firstDate->copy()->setTime(9, 0);
+
+        Livewire::test(Agenda::class)
+            ->call('selectDate', $firstDate->format('Y-m-d'))
+            ->call('selectSlot', $slot->toIso8601String())
+            ->call('selectDate', $secondDate->format('Y-m-d'))
+            ->assertDontSee('Confirmar sessão');
+    }
+
+    public function test_selecting_a_slot_not_in_the_available_list_is_ignored(): void
     {
         $mentor = $this->mentor();
         // No availability created at all — every slot is invalid.
@@ -111,12 +183,13 @@ class AgendaTest extends TestCase
         $bogusSlot = now()->addDays(5)->setTime(9, 0);
 
         Livewire::test(Agenda::class)
-            ->call('bookSlot', $bogusSlot->toIso8601String());
+            ->call('selectSlot', $bogusSlot->toIso8601String())
+            ->call('confirmBooking');
 
         $this->assertDatabaseMissing('mentor_sessions', ['member_id' => $member->id]);
     }
 
-    public function test_booking_a_slot_that_was_just_taken_dispatches_a_toast(): void
+    public function test_confirming_a_slot_that_was_just_taken_dispatches_a_toast(): void
     {
         $mentor = $this->mentor();
         $targetDate = now()->addDays(5)->startOfDay();
@@ -141,7 +214,9 @@ class AgendaTest extends TestCase
         });
 
         Livewire::test(Agenda::class)
-            ->call('bookSlot', $slot->toIso8601String())
+            ->call('selectDate', $targetDate->format('Y-m-d'))
+            ->call('selectSlot', $slot->toIso8601String())
+            ->call('confirmBooking')
             ->assertDispatched('toast', message: 'Esse horário acabou de ser preenchido. Escolha outro.');
 
         $this->assertDatabaseMissing('mentor_sessions', ['member_id' => $member->id]);
