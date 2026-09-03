@@ -101,4 +101,4 @@ jobs:
             php artisan queue:restart
             php artisan up || true
 
-            chown -R larasail:larasail "$DEPLOY_PATH"
+            chown -R www-data:www-data "$DEPLOY_PATH"
