@@ -28,6 +28,7 @@ class MentorSeeder extends Seeder
                 'name' => 'Léo Cunha',
                 'password' => Hash::make($password),
                 'tier' => 'mentor',
+                'is_admin' => true,
                 'email_verified_at' => now(),
             ]
         );
