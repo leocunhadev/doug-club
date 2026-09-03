@@ -41,6 +41,8 @@ jobs:
               exit 1
             fi
 
+            git config --global --add safe.directory "$DEPLOY_PATH"
+
             if [ -d "$DEPLOY_PATH/.git" ]; then
               cd "$DEPLOY_PATH"
               git fetch origin main
