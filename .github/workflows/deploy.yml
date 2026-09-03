@@ -1,0 +1,104 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies e build dos assets
+        run: |
+          npm ci
+          npm run build
+
+      - name: Sincronizar código com a main no servidor
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -e
+            DEPLOY_PATH="${{ secrets.DEPLOY_PATH }}"
+            if [ -z "$DEPLOY_PATH" ]; then
+              echo "DEPLOY_PATH está vazio — abortando" >&2
+              exit 1
+            fi
+
+            if [ -d "$DEPLOY_PATH/.git" ]; then
+              cd "$DEPLOY_PATH"
+              git fetch origin main
+              git reset --hard origin/main
+              rm -f /tmp/doug-club-bootstrap
+            else
+              echo "Bootstrap inicial: $DEPLOY_PATH ainda não é um clone do repositório"
+              touch /tmp/doug-club-bootstrap
+              if [ -d "$DEPLOY_PATH" ]; then
+                mv "$DEPLOY_PATH" "${DEPLOY_PATH}-backup-$(date +%Y%m%d%H%M%S)"
+              fi
+              git clone --branch main "https://github.com/${{ github.repository }}.git" "$DEPLOY_PATH"
+              LAST_BACKUP=$(ls -dt "${DEPLOY_PATH}"-backup-* 2>/dev/null | head -n1)
+              if [ -n "$LAST_BACKUP" ] && [ -f "$LAST_BACKUP/.env" ]; then
+                cp "$LAST_BACKUP/.env" "$DEPLOY_PATH/.env"
+                echo "Reaproveitando .env de $LAST_BACKUP"
+              fi
+            fi
+
+      - name: Enviar assets buildados (public/build) para o servidor
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: -avz --delete
+          path: public/build/
+          remote_path: ${{ secrets.DEPLOY_PATH }}/public/build/
+          remote_host: ${{ secrets.DEPLOY_HOST }}
+          remote_user: ${{ secrets.DEPLOY_USER }}
+          remote_key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Instalar dependências PHP e finalizar deploy
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -e
+            DEPLOY_PATH="${{ secrets.DEPLOY_PATH }}"
+            cd "$DEPLOY_PATH"
+
+            composer install --no-dev --optimize-autoloader --no-interaction
+
+            if [ -f /tmp/doug-club-bootstrap ]; then
+              echo "Finalizando bootstrap inicial"
+              grep -q '^APP_KEY=$' .env && php artisan key:generate --force || true
+              php artisan storage:link
+              php artisan migrate:fresh --force
+              rm -f /tmp/doug-club-bootstrap
+            else
+              php artisan down --render="errors::503" --retry=60 || true
+              php artisan migrate --force
+            fi
+
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan event:cache
+            php artisan queue:restart
+            php artisan up || true
+
+            chown -R larasail:larasail "$DEPLOY_PATH"
