@@ -10,7 +10,7 @@ class RedirectMentorFromDashboard
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->user()?->isMentor()) {
+        if ($request->user()?->viewingTier() === 'mentor') {
             return redirect()->route('mentor.radar');
         }
 

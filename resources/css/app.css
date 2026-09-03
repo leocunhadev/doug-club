@@ -284,7 +284,7 @@
 .login-card label {
     color: #8f8a82;
 }
-.login-card input {
+.login-card input:not([type='checkbox']):not([type='radio']) {
     background: #0B0B0C;
     border: 1px solid #2c2c30;
     color: #fff;

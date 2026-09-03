@@ -494,6 +494,18 @@ class DashboardTest extends TestCase
         Livewire::test(Dashboard::class)->assertSee('Conhecer o CLUB');
     }
 
+    public function test_start_tier_conhecer_o_club_link_is_clickable_not_locked(): void
+    {
+        $this->actingAs(User::factory()->create(['tier' => 'start']));
+
+        $html = Livewire::test(Dashboard::class)->html();
+
+        $this->assertMatchesRegularExpression(
+            '#<a[^>]*href="http://localhost/upgrade"[^>]*>\s*Conhecer o CLUB#s',
+            $html,
+        );
+    }
+
     public function test_start_tier_sees_the_newest_lesson_in_the_novidade_card_with_a_working_watch_button(): void
     {
         $user = User::factory()->create(['tier' => 'start']);

@@ -7,7 +7,6 @@ use App\Livewire\Concerns\TracksLessonProgress;
 use App\Models\Lesson;
 use App\Models\MentorNote;
 use App\Models\MentorSession;
-use App\Support\PersonaNavigation;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -86,26 +85,29 @@ class Dashboard extends Component
             ->first();
     }
 
+    #[Computed]
+    public function viewingHasClubAccess(): bool
+    {
+        return in_array(Auth::user()->viewingTier(), ['club', 'mentor'], true);
+    }
+
     /**
      * @return array<int, array{label: string, route: string, available: bool}>
      */
     #[Computed]
     public function quickLinks(): array
     {
-        $availability = collect((new PersonaNavigation)->tabs(Auth::user()->tier))->keyBy('route');
+        $tier = Auth::user()->viewingTier();
 
-        $thirdLink = Auth::user()->hasClubAccess()
-            ? ['label' => 'Marcar minha sessão', 'route' => 'membros.agenda']
-            : ['label' => 'Conhecer o CLUB', 'route' => 'membros.upgrade'];
+        $thirdLink = in_array($tier, ['club', 'mentor'], true)
+            ? ['label' => 'Marcar minha sessão', 'route' => 'membros.agenda', 'available' => true]
+            : ['label' => 'Conhecer o CLUB', 'route' => 'membros.upgrade', 'available' => $tier === 'start'];
 
-        return collect([
-            ['label' => 'Biblioteca de aulas', 'route' => 'membros.aulas'],
-            ['label' => 'Frameworks DO', 'route' => 'membros.frameworks'],
+        return [
+            ['label' => 'Biblioteca de aulas', 'route' => 'membros.aulas', 'available' => true],
+            ['label' => 'Frameworks DO', 'route' => 'membros.frameworks', 'available' => true],
             $thirdLink,
-        ])->map(fn (array $link) => [
-            ...$link,
-            'available' => $availability->get($link['route'])['available'] ?? false,
-        ])->all();
+        ];
     }
 
     public function render()

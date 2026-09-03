@@ -13,7 +13,7 @@ class PersonaNavigationTest extends TestCase
 
         $this->assertCount(7, $tabs);
         $this->assertSame(
-            ['Início', 'Aulas', 'Meu cofre', 'Minha sessão', 'Pessoas', 'Encontros', 'Frameworks'],
+            ['Início', 'Aulas', 'Meu cofre', 'Minha sessão (1:1)', 'Pessoas', 'Encontros', 'Frameworks'],
             array_column($tabs, 'label'),
         );
         $this->assertSame([true, true, false, false, false, false, true], array_column($tabs, 'available'));
@@ -25,7 +25,7 @@ class PersonaNavigationTest extends TestCase
 
         $this->assertCount(7, $tabs);
         $this->assertSame(
-            ['Início', 'Aulas', 'Meu cofre', 'Minha sessão', 'Pessoas', 'Encontros', 'Frameworks'],
+            ['Início', 'Aulas', 'Meu cofre', 'Minha sessão (1:1)', 'Pessoas', 'Encontros', 'Frameworks'],
             array_column($tabs, 'label'),
         );
         $this->assertSame([true, true, true, true, true, true, true], array_column($tabs, 'available'));

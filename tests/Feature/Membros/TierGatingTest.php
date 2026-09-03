@@ -58,6 +58,17 @@ class TierGatingTest extends TestCase
             ->assertSee('Aplicar para o CLUB');
     }
 
+    public function test_club_tier_visiting_upgrade_directly_sees_an_accurate_message(): void
+    {
+        $user = User::factory()->create(['tier' => 'club']);
+        $this->actingAs($user);
+
+        $this->get('/upgrade')->assertRedirect(route('dashboard'));
+
+        $this->get(route('dashboard'))
+            ->assertDontSee('Esse conteúdo está disponível no start.', false);
+    }
+
     public function test_club_only_redirect_target_still_requires_the_start_tier_itself(): void
     {
         // A mentor never fails the club check (hasClubAccess() covers both

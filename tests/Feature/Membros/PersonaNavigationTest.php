@@ -38,7 +38,7 @@ class PersonaNavigationTest extends TestCase
 
         foreach ([
             ['href' => 'http://localhost/cofre', 'label' => 'Meu cofre'],
-            ['href' => 'http://localhost/agenda', 'label' => 'Minha sessão'],
+            ['href' => 'http://localhost/agenda', 'label' => 'Minha sessão (1:1)'],
             ['href' => 'http://localhost/pessoas', 'label' => 'Pessoas'],
             ['href' => 'http://localhost/encontros', 'label' => 'Encontros'],
         ] as $link) {
@@ -60,7 +60,7 @@ class PersonaNavigationTest extends TestCase
             ['href' => 'http://localhost', 'label' => 'Início'],
             ['href' => 'http://localhost/aulas', 'label' => 'Aulas'],
             ['href' => 'http://localhost/cofre', 'label' => 'Meu cofre'],
-            ['href' => 'http://localhost/agenda', 'label' => 'Minha sessão'],
+            ['href' => 'http://localhost/agenda', 'label' => 'Minha sessão (1:1)'],
             ['href' => 'http://localhost/pessoas', 'label' => 'Pessoas'],
             ['href' => 'http://localhost/encontros', 'label' => 'Encontros'],
             ['href' => 'http://localhost/frameworks', 'label' => 'Frameworks'],

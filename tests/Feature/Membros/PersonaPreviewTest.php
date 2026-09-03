@@ -114,4 +114,39 @@ class PersonaPreviewTest extends TestCase
         // Previewing "mentor" must not grant real access to the mentor-only route.
         $this->get('/mentor/radar')->assertRedirect(route('dashboard'));
     }
+
+    public function test_mentor_tier_admin_can_preview_the_start_and_club_dashboard(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true, 'tier' => 'mentor']);
+        $this->actingAs($admin);
+
+        $this->get(route('membros.preview-persona', ['tier' => 'start']))
+            ->assertRedirect(route('dashboard'));
+
+        // A mentor-tier admin previewing "start" must actually land on the
+        // dashboard ("início"), not get bounced back to their own mentor radar.
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('class="start-tag"', false);
+
+        $this->get(route('membros.preview-persona', ['tier' => 'club']))
+            ->assertRedirect(route('dashboard'));
+
+        $this->get('/')
+            ->assertOk()
+            ->assertDontSee('class="start-tag"', false);
+    }
+
+    public function test_mentor_tier_admin_previewing_start_sees_the_start_hero_copy_too(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true, 'tier' => 'mentor']);
+        $this->actingAs($admin);
+
+        $this->get(route('membros.preview-persona', ['tier' => 'start']));
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('DO.ing Club start', false)
+            ->assertDontSee('DO.ing Club · Mentoria', false);
+    }
 }

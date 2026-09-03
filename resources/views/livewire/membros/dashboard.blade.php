@@ -4,11 +4,11 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16 sm:space-y-20">
         <section>
             <p class="text-xs font-bold uppercase tracking-widest text-brand mb-2.5">
-                {{ auth()->user()->hasClubAccess() ? 'DO.ing Club · Mentoria' : 'DO.ing Club start · Sua base' }}
+                {{ $this->viewingHasClubAccess ? 'DO.ing Club · Mentoria' : 'DO.ing Club start · Sua base' }}
             </p>
             <h1 class="text-[clamp(34px,6vw,58px)] leading-[1.02] font-display font-extrabold tracking-[-0.015em] text-black">
                 Olá, {{ auth()->user()->name }}.<br>
-                @if (auth()->user()->hasClubAccess())
+                @if ($this->viewingHasClubAccess)
                     Vamos <span class="text-brand">continuar de onde paramos?</span>
                 @else
                     Sua próxima <span class="text-brand">decisão</span> começa aqui.
@@ -23,7 +23,7 @@
                     </div>
                 </div>
             @endif
-            @if (auth()->user()->hasClubAccess())
+            @if ($this->viewingHasClubAccess)
                 <p class="mt-3 max-w-2xl text-stone">
                     Acompanhe as transmissões ao vivo e os conteúdos gravados de Douglas Oliveira. Tudo em um lugar só,
                     exclusivo para quem decidiu agir.
@@ -43,7 +43,7 @@
 
             <div class="flex flex-col gap-4">
                 <div class="rounded-2xl bg-black text-white p-6 flex flex-col gap-2.5">
-                    @if (! auth()->user()->hasClubAccess())
+                    @if (! $this->viewingHasClubAccess)
                         @if ($newest = $this->newestLesson)
                             <p class="text-xs font-bold uppercase tracking-widest text-white/50">Novidade na biblioteca</p>
                             <p class="font-display text-xl leading-tight">{{ $newest->title }}</p>

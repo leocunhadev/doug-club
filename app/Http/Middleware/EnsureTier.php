@@ -24,6 +24,11 @@ class EnsureTier
                 return redirect()->route('membros.upgrade');
             }
 
+            if ($minTier === 'start') {
+                return redirect()->route('dashboard')
+                    ->with('status', 'Essa página é exclusiva para quem ainda não é CLUB.');
+            }
+
             return redirect()->route('dashboard')
                 ->with('status', "Esse conteúdo está disponível no {$minTier}.");
         }
