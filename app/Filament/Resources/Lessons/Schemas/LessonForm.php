@@ -21,12 +21,15 @@ class LessonForm
         return $schema
             ->components([
                 Select::make('course_id')
+                    ->label('Curso')
                     ->relationship('course', 'label')
                     ->required(),
                 TextInput::make('number')
+                    ->label('Número')
                     ->required()
                     ->numeric(),
                 TextInput::make('title')
+                    ->label('Título')
                     ->required(),
                 Hidden::make('duration_locked')
                     ->dehydrated(false)
@@ -37,8 +40,8 @@ class LessonForm
                         $set('duration_locked', $record?->video_provider === 'vimeo');
                     }),
                 TextInput::make('duration_seconds')
-                    ->label('Duration (mm:ss or h:mm:ss)')
-                    ->placeholder('e.g. 5:30 or 1:15:30')
+                    ->label('Duração (mm:ss ou h:mm:ss)')
+                    ->placeholder('ex: 5:30 ou 1:15:30')
                     ->regex('/^(?:\d{1,3}:[0-5]\d|\d{1,2}:[0-5]\d:[0-5]\d)$/')
                     ->formatStateUsing(fn (?int $state): ?string => self::formatDuration($state))
                     ->dehydrateStateUsing(fn (?string $state): ?int => self::parseDuration($state))
@@ -46,6 +49,7 @@ class LessonForm
                     // disabled() also turns off saving by default — force it back on.
                     ->dehydrated(),
                 Select::make('video_provider')
+                    ->label('Provedor de vídeo')
                     ->options([
                         'vimeo' => 'Vimeo',
                         'youtube' => 'YouTube',
@@ -54,20 +58,25 @@ class LessonForm
                     ->live()
                     ->afterStateUpdated(fn (Get $get, Set $set) => self::syncVimeoDuration($get, $set)),
                 TextInput::make('video_id')
+                    ->label('ID do vídeo')
                     ->required()
                     ->live(onBlur: true)
                     ->afterStateUpdated(fn (Get $get, Set $set) => self::syncVimeoDuration($get, $set)),
                 FileUpload::make('thumbnail_path')
+                    ->label('Miniatura')
                     ->disk('public')
                     ->directory('lesson-thumbnails')
                     ->image(),
                 DatePicker::make('published_at')
+                    ->label('Publicado em')
                     ->required(),
                 TextInput::make('position')
+                    ->label('Posição')
                     ->required()
                     ->numeric()
                     ->default(0),
                 Select::make('category')
+                    ->label('Categoria')
                     ->options([
                         'Encontros' => 'Encontros',
                         'Convidados' => 'Convidados',
@@ -76,6 +85,7 @@ class LessonForm
                     ->default('Encontros')
                     ->required(),
                 Select::make('tier')
+                    ->label('Plano mínimo')
                     ->options([
                         'start' => 'Start',
                         'club' => 'CLUB',

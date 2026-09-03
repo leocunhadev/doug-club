@@ -23,6 +23,16 @@ class LessonResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
+    public static function getModelLabel(): string
+    {
+        return 'Aula';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Aulas';
+    }
+
     public static function form(Schema $schema): Schema
     {
         return LessonForm::configure($schema);

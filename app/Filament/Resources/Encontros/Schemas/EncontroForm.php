@@ -14,6 +14,7 @@ class EncontroForm
         return $schema
             ->components([
                 TextInput::make('tema')
+                    ->label('Tema')
                     ->required(),
                 TextInput::make('quem')
                     ->label('Quem')

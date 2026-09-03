@@ -16,14 +16,17 @@ class CoursesTable
         return $table
             ->columns([
                 TextColumn::make('label')
+                    ->label('Nome')
                     ->searchable(),
                 TextColumn::make('title')
+                    ->label('Título')
                     ->searchable(),
                 TextColumn::make('position')
+                    ->label('Posição')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('lessons_count')
-                    ->label('Lessons')
+                    ->label('Aulas')
                     ->counts('lessons')
                     ->numeric(),
             ])

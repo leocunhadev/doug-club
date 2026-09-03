@@ -18,6 +18,16 @@ class MentorSessionResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'scheduled_at';
 
+    public static function getModelLabel(): string
+    {
+        return 'Sessão de Mentoria';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Sessões de Mentoria';
+    }
+
     public static function table(Table $table): Table
     {
         return MentorSessionsTable::configure($table);

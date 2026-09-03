@@ -18,6 +18,16 @@ class ClubApplicationResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'id';
 
+    public static function getModelLabel(): string
+    {
+        return 'Candidatura ao CLUB';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Candidaturas ao CLUB';
+    }
+
     public static function table(Table $table): Table
     {
         return ClubApplicationsTable::configure($table);

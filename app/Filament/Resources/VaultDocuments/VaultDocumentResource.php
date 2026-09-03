@@ -22,6 +22,16 @@ class VaultDocumentResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
+    public static function getModelLabel(): string
+    {
+        return 'Documento do Cofre';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Documentos do Cofre';
+    }
+
     public static function form(Schema $schema): Schema
     {
         return VaultDocumentForm::configure($schema);

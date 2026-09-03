@@ -18,6 +18,16 @@ class BridgeRequestResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'id';
 
+    public static function getModelLabel(): string
+    {
+        return 'Pedido de Ponte';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Pedidos de Ponte';
+    }
+
     public static function table(Table $table): Table
     {
         return BridgeRequestsTable::configure($table);

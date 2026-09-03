@@ -18,15 +18,17 @@ class FrameworkForm
                     ->label('Código')
                     ->required(),
                 TextInput::make('title')
+                    ->label('Título')
                     ->required(),
                 Textarea::make('description')
+                    ->label('Descrição')
                     ->required(),
                 TextInput::make('pdf_url')
-                    ->label('External URL')
+                    ->label('URL externa')
                     ->url()
                     ->requiredWithout('pdf_path'),
                 FileUpload::make('pdf_path')
-                    ->label('File (PDF)')
+                    ->label('Arquivo (PDF)')
                     ->disk('public')
                     ->directory('framework-pdfs')
                     ->acceptedFileTypes(['application/pdf'])
@@ -37,6 +39,7 @@ class FrameworkForm
                     ->searchable()
                     ->nullable(),
                 TextInput::make('position')
+                    ->label('Posição')
                     ->required()
                     ->numeric()
                     ->default(0),

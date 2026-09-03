@@ -22,6 +22,16 @@ class CourseResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'label';
 
+    public static function getModelLabel(): string
+    {
+        return 'Curso';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Cursos';
+    }
+
     public static function form(Schema $schema): Schema
     {
         return CourseForm::configure($schema);

@@ -19,18 +19,21 @@ class MaterialsRelationManager extends RelationManager
 {
     protected static string $relationship = 'materials';
 
+    protected static ?string $title = 'Materiais';
+
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
                 TextInput::make('title')
+                    ->label('Título')
                     ->required(),
                 TextInput::make('file_url')
-                    ->label('External URL')
+                    ->label('URL externa')
                     ->url()
                     ->requiredWithout('file_path'),
                 FileUpload::make('file_path')
-                    ->label('File (PDF/Word)')
+                    ->label('Arquivo (PDF/Word)')
                     ->disk('public')
                     ->directory('lesson-materials')
                     ->acceptedFileTypes([
@@ -48,9 +51,10 @@ class MaterialsRelationManager extends RelationManager
             ->recordTitleAttribute('title')
             ->columns([
                 TextColumn::make('title')
+                    ->label('Título')
                     ->searchable(),
                 TextColumn::make('tipo')
-                    ->label('Type')
+                    ->label('Tipo')
                     ->state(fn (LessonMaterial $record): string => $record->hasUploadedFile() ? 'Upload' : 'Link')
                     ->badge(),
             ])

@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\Courses\Schemas;
 
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
 class CourseForm
@@ -13,8 +13,10 @@ class CourseForm
         return $schema
             ->components([
                 TextInput::make('label')
+                    ->label('Nome')
                     ->required(),
                 TextInput::make('title')
+                    ->label('Título')
                     // The `title` column is NOT NULL at the DB level, but this field is
                     // intentionally optional (see the "Boas Vindas" seeded course, which
                     // has an empty title by design). Filament's TextInput coerces an
@@ -24,8 +26,10 @@ class CourseForm
                     // an empty string here instead.
                     ->dehydrateStateUsing(fn (?string $state): string => $state ?? ''),
                 Textarea::make('description')
+                    ->label('Descrição')
                     ->columnSpanFull(),
                 TextInput::make('position')
+                    ->label('Posição')
                     ->required()
                     ->numeric()
                     ->default(0),

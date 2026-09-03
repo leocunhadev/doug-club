@@ -16,13 +16,16 @@ class FrameworksTable
         return $table
             ->columns([
                 TextColumn::make('code')
+                    ->label('Código')
                     ->searchable(),
                 TextColumn::make('title')
+                    ->label('Título')
                     ->searchable(),
                 TextColumn::make('lesson.title')
                     ->label('Aula vinculada')
                     ->placeholder('—'),
                 TextColumn::make('position')
+                    ->label('Posição')
                     ->numeric()
                     ->sortable(),
             ])

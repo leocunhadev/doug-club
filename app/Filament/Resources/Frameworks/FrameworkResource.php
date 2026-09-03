@@ -22,6 +22,16 @@ class FrameworkResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
+    public static function getModelLabel(): string
+    {
+        return 'Framework';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Frameworks';
+    }
+
     public static function form(Schema $schema): Schema
     {
         return FrameworkForm::configure($schema);

@@ -22,6 +22,16 @@ class EncontroResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'tema';
 
+    public static function getModelLabel(): string
+    {
+        return 'Encontro';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Encontros';
+    }
+
     public static function form(Schema $schema): Schema
     {
         return EncontroForm::configure($schema);

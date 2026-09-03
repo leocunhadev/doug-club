@@ -16,8 +16,10 @@ class EncontrosTable
         return $table
             ->columns([
                 TextColumn::make('tema')
+                    ->label('Tema')
                     ->searchable(),
                 TextColumn::make('quem')
+                    ->label('Quem')
                     ->searchable(),
                 TextColumn::make('scheduled_at')
                     ->dateTime('d/m/Y H:i')

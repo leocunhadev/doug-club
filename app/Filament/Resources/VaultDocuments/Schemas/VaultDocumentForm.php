@@ -25,11 +25,11 @@ class VaultDocumentForm
                 Textarea::make('description')
                     ->label('Descrição'),
                 TextInput::make('file_url')
-                    ->label('External URL')
+                    ->label('URL externa')
                     ->url()
                     ->requiredWithout('file_path'),
                 FileUpload::make('file_path')
-                    ->label('File')
+                    ->label('Arquivo')
                     ->disk('local')
                     ->directory('vault-documents')
                     ->acceptedFileTypes([
